@@ -16,7 +16,8 @@ echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $resourceGroup:${10}| awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:$10| awk '{print substr($1,2); }' >> vars.sh
+echo $deployGPUNodes:$11| awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
@@ -28,6 +29,7 @@ sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
 sed -i '11s/^/export resourceGroup=/' vars.sh
+sed -i '12s/^/export deployGPUNodes=/' vars.sh
 
 export vmName=$3
 
@@ -283,6 +285,29 @@ else
 
     sudo service sshd restart
 fi
+
+if [ "$deployGPUNodes" == "true" ] && [ "$k3sControlPlane" == "false" ]; then
+    # Installing NVIDIA GPU drivers
+    echo ""
+    echo "Installing NVIDIA GPU drivers"
+    echo ""
+    sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+    && sudo curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sudo sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    sudo apt-get update -y
+    sudo apt-get install -y nvidia-container-toolkit
+    # Configure K3s to use nvidia-ctk
+    sudo nvidia-ctk runtime configure --runtime=containerd
+    sudo systemctl restart k3s
+fi
+
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR: Failed to install NVIDIA GPU drivers"
+        exit 1
+    fi
+
+    # Installing NVIDIA container toolkit
 
 # Uploading this script log to staging storage for ease of troubleshooting
 echo ""

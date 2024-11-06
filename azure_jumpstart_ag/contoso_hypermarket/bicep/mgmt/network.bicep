@@ -32,7 +32,10 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
-
+var sites = [
+  'Chicago'
+  'Seattle'
+]
 
 var bastionSubnet = [
   {
@@ -83,7 +86,9 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudK3sSubnet,cloudSubnet) : union(cloudK3sSubnet,cloudSubnet,bastionSubnet)
+    subnets: (deployBastion == false)
+      ? union(cloudK3sSubnet, cloudSubnet)
+      : union(cloudK3sSubnet, cloudSubnet, bastionSubnet)
   }
 }
 
@@ -379,8 +384,8 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
   }
 }
 
-resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
-  name: 'Ag-LB-Public-IP'
+resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for (site, i) in sites: {
+  name: 'Ag-LB-Public-IP-${site}'
   location: location
   properties: {
     publicIPAllocationMethod: 'Static'
@@ -390,10 +395,10 @@ resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
   sku: {
     name: 'Standard'
   }
-}
+}]
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
-  name: 'Ag-LoadBalancer'
+resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (site, i) in sites: {
+  name: 'Ag-LoadBalancer-${site}'
   location: location
   sku: {
     name: 'Standard'
@@ -401,16 +406,17 @@ resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
   properties: {
     frontendIPConfigurations: [
       {
-        name: 'Ag-LB-Frontend'
+        name: 'Ag-LB-Frontend-${site}'
         properties: {
           publicIPAddress: {
-            id: loadBalancerPip.id
+            id: loadBalancerPip[i].id
           }
         }
       }
     ]
   }
-}
+}]
+
 
 output vnetId string = cloudVirtualNetwork.id
 output k3sSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
