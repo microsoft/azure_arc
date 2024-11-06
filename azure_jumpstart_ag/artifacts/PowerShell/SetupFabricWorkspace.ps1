@@ -203,7 +203,7 @@ function Set-Fabric-Workspace {
   }
 
   # Download dashboard report and Update to use KQL database
-  $hyperMarketDashboardReport = $templateBaseUrl + "artifacts/adx_dashboards/fabric-hypermarket-dashboard.json"
+  $hyperMarketDashboardReport = $templateBaseUrl + "artifacts/fabric/ot_dashboard.json"
   Write-Host "INFO: Downloading and preparing dashboard report to import into Fabric workspace."
   $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri $hyperMarketDashboardReport).Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
 
@@ -373,7 +373,7 @@ function Set-Fabric-Workspace {
 
   # Import data sceince notebook for sales forecast
   # Download dashboard report and Update to use KQL database
-  $ordersSalesForecastNotebook = "orders-sales-forecast.ipynb"
+  $ordersSalesForecastNotebook = "orders_sales_forecast.ipynb"
   Write-Host "INFO: Downloading and preparing nootebook to import into Fabric workspace."
   $ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/fabric/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
 
