@@ -5,14 +5,6 @@
 # Access rights deploy Microsoft Fabric items used in Contoso Hypermarket scenario.
 # Make sure Create Workspace is enabled in Frabric for service principals. 
 #Access settings using https://app.fabric.microsoft.com/admin-portal/tenantSettings?experience=power-bi
-
-# NOTE: To run locally create a file named fabric-config.json with the following content
-#
-# {
-#   "runAs": "user",                    # Indicates whether to run under regular user account or managed identity
-#   "resourceGroup": "rg-fabric",       # Resource group where Contoso Hypermarket is deployed
-#   "templateBaseUrl": "https://raw.githubusercontent.com/main/azure_arc/main/azure_arc_data/azure_jumpstart_ag/artifacts"
-# }
 #
 ####################################################################################################
 $ProgressPreference = "SilentlyContinue"
@@ -28,11 +20,13 @@ if ([System.IO.File]::Exists($fabricConfigFile)){
   $runAs = $fabricConfig.runAs
   $tenantID = $fabricConfig.tenantID
   $subscriptionID = $fabricConfig.subscriptionID
-  $resourceGroup = $fabricConfig.resourceGroup
   $templateBaseUrl = $fabricConfig.templateBaseUrl
   $fabricWorkspaceName = $fabricConfig.fabricWorkspaceName
   $fabricCapacityName = $fabricConfig.fabricCapacityName
-  $eventHubKeyName = $fabricConfig.eventHubKeyName
+  $eventHubNamespace = $fabricConfig.eventHubNamespace
+  $eventHubName = $fabricConfig.eventHubName
+  $eventHubKeyName = $eventHubKeyName
+  $eventHubPrimaryKey = $fabricConfig.eventHubPrimaryKey
   $AgLogsDir = "."
 } 
 else {
@@ -244,35 +238,6 @@ function Set-Fabric-Workspace {
   # Power BI API endpoint to create EventHut connection
   $powerBIEndpoint = "https://api.powerbi.com/v2.0/myorg/me/gatewayClusterCloudDatasource"
 
-  # Get Evenhub connection details
-  $eventHubInfo = (az resource list --resource-group $resourceGroup --resource-type "Microsoft.EventHub/namespaces" | ConvertFrom-Json)
-  if ($eventHubInfo.Count -ne 1) {
-    Write-Host "ERROR: Resource group contains no Eventhub namespaces or more than one. Make sure to have only one EventHub namesapce in the resource group."
-  }
-
-  $eventHubNamespace = $eventHubInfo[0].name
-  Write-Host "INFO: Found EventHub Namespace: $eventHubNamespace"
-
-  # Make sure Eventhub with name 'orders' exists
-  $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
-  $eventHubName = $eventHubs[0].name
-  if (-not $eventHubName) {
-    Write-Host "ERROR: Event Hubs not found in the EventHub namespace $eventHubNamespace"
-    return
-  }
-
-  Write-Host "INFO: Found EventHub: $eventHubName"
-
-  # Get Event Hub credentials
-  Write-Host "INFO: Retrieving Event Hub key for '$eventHubKeyName' Shared Acess Policy."
-  $eventHubKey = az eventhubs namespace authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --name $eventHubKeyName --query primaryKey --output tsv
-  if ($eventHubKey -eq '') {
-    Write-Host "ERROR: Failed to retrieve Event Hub key."
-    return
-  }
-
-  Write-Host "INFO: Received Event Hub key."
-
   # Create body to create EventHub data source
   $eventHubEndpoint = "$eventHubNamespace.servicebus.windows.net"
   $connectionBody = @"
@@ -303,7 +268,7 @@ function Set-Fabric-Workspace {
   "referenceDatasource": false,
   "credentialDetails": {
     "credentialType": "Basic",
-    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHubKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubKey\"}]}",
+    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHubKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubPrimaryKey\"}]}",
     "encryptedConnection": "Any",
     "privacyLevel": "Organizational",
     "skipTestConnection": false,
