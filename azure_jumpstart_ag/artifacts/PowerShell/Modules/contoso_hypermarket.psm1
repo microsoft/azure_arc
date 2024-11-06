@@ -538,11 +538,11 @@ function Set-LoadBalancerBackendPools {
     #$loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
     #$loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
     #$lbIndex = 0
-
+    $vnetResourceId = $(az network vnet list -g $resourceGroup --query [].id -o tsv)
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         $loadBalancerName = "Ag-LoadBalancer-${clusterName}"
-        $loadBalancerPublicIp = "Ag-LB-Public-IP-${clusterName}"
+        $loadBalancerPublicIp = "Ag-LB-Frontend-${clusterName}"
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
         $services = kubectl get services -n contoso-hypermarket -o json | ConvertFrom-Json
         $services.items | ForEach-Object {
@@ -555,7 +555,7 @@ function Set-LoadBalancerBackendPools {
                 az network lb address-pool create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-pool" `
-                    --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
+                    --vnet $vnetResourceId `
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
                     --only-show-errors
 
@@ -573,16 +573,20 @@ function Set-LoadBalancerBackendPools {
         }
 
         # Grafana backend pool creation
-        $grafanaPublicIpName = "Ag-VM-Client-PIP"
+        $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMPIP = $(az network public-ip show -g $resourceGroup -n $grafanaPublicIpName --query ipAddress -o tsv)
+        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName  `
+        --resource-group $resourceGroup `
+        --query "[].virtualMachine.network.privateIpAddresses[0]" `
+        -o tsv `
+        --only-show-errors
 
         az network lb address-pool create -g $resourceGroup `
             --lb-name $loadBalancerName `
             --name "$serviceName-pool" `
-            --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
-            --backend-addresses "[{name:Grafana,ip-address:${clientVMPIP}}]" `
+            --vnet $vnetResourceId `
+            --backend-addresses "[{name:Grafana,ip-address:${clientVMIpAddress}}]" `
             --only-show-errors
 
         az network lb inbound-nat-rule create -g $resourceGroup `

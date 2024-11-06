@@ -406,7 +406,7 @@ resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (site
   properties: {
     frontendIPConfigurations: [
       {
-        name: 'Ag-LB-Frontend-${i}'
+        name: 'Ag-LB-Frontend-${site}'
         properties: {
           publicIPAddress: {
             id: loadBalancerPip[i].id
