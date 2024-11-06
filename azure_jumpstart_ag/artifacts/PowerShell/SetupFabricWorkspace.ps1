@@ -604,7 +604,11 @@ Function Import-FabricItem {
       }
       
       $partPath = $filePath.Replace($itemPathAbs, "").TrimStart("\").Replace("\", "/")
-      $fileEncodedContent = ($fileContent) ? [Convert]::ToBase64String($fileContent) : ""
+      if ($fileContent) {
+          $fileEncodedContent = [Convert]::ToBase64String($fileContent)
+      } else {
+          $fileEncodedContent = ""
+      }
       
       Write-Output @{
           Path        = $partPath
@@ -680,15 +684,16 @@ function Set-PowerBI-Project {
   $pbipFolder = Get-Location  # Path to the folder containing Power BI project files, default to current directory
 
   # Download PowerBI report zip file
-  $localFilePath = "$pbipFolder\Contoso-Hypermarket.zip"
+  $pbipFileName = "Contoso_Hypermarket.zip"
+  $localFilePath = "$pbipFolder\$pbipFileName"
   Write-Host "INFO: Downloading Power BI report zip file."
-  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/Contoso-Hypermarket.zip" -OutFile $localFilePath
+  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/$pbipFileName" -OutFile $localFilePath
 
   Write-Host "INFO: Unzipping Power BI report zip file."
   Expand-Archive -Path $localFilePath -DestinationPath $pbipFolder -Force
 
-  $pbipSemanticModelPath = "$pbipFolder\Contoso-Hypermarket.SemanticModel"
-  $pbipReportPath = "$pbipFolder\Contoso-Hypermarket.Report"
+  $pbipSemanticModelPath = "$pbipFolder\Contoso_Hypermarket.SemanticModel"
+  $pbipReportPath = "$pbipFolder\Contoso_Hypermarket.Report"
 
   # Update KQL endpoint 
   $modelFilePath = "$pbipSemanticModelPath\model.bim"
