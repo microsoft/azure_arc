@@ -161,7 +161,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
   ]
 }
 
-resource gpuInstallationScript 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =if(deployGPUNodes) {
+resource gpuInstallationScript 'Microsoft.Compute/virtualMachines/extensions@2015-06-15' =if(deployGPUNodes) {
   parent: vm
   name: 'gpuInstallationScript'
   location: azureLocation
