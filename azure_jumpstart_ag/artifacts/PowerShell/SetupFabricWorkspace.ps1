@@ -277,7 +277,7 @@ function Set-Fabric-Workspace {
   $eventHubEndpoint = "$eventHubNamespace.servicebus.windows.net"
   $connectionBody = @"
 {
-  "datasourceName": "$fabricWorkspaceName-$eventHubName-Test",
+  "datasourceName": "$fabricWorkspaceName-$eventHubName",
   "datasourceType": "Extension",
   "connectionDetails": "{\"endpoint\":\"$eventHubEndpoint\",\"entityPath\":\"$eventHubName\"}",
   "singleSignOnType": "None",
