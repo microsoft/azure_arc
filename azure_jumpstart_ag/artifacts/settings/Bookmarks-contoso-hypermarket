@@ -91,17 +91,38 @@
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "Main-UI-URL-Chicago"
+                  "url": "Main-UI-Chicago-URL"
                }, {
                   "id": "14",
                   "name": "Main UI - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "Main-UI-URL-Seattle"
+                  "url": "Main-UI-Seattle-URL"
                } ],
                "id": "12",
                "name": "Main UI",
+               "source": "unknown",
+               "type": "folder"
+            },
+            {
+               "children": [ {
+                  "id": "13",
+                  "name": "Shopper Insights API - Chicago",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Shopper-Insights-API-Chicago-URL"
+               }, {
+                  "id": "14",
+                  "name": "Shopper Insights API - Seattle",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Shopper-Insights-API-Seattle-URL"
+               } ],
+               "id": "12",
+               "name": "Shopper Insights API",
                "source": "unknown",
                "type": "folder"
             }],
@@ -123,6 +144,27 @@
             "source": "unknown",
             "type": "folder"
          }, {
+            "children": [ {
+               "id": "16",
+               "name": "InfluxDB-Seattle",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "InfluxDB-Seattle-URL"
+            },{
+               "id": "17",
+               "name": "InfluxDB-Chicago",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "InfluxDB-Chicago-URL"
+            }],
+            "id": "15",
+            "name": "InfluxDB",
+            "source": "unknown",
+            "type": "folder"
+         },
+         {
             "children": [ {
                "id": "30",
                "name": "Prometheus Dev",

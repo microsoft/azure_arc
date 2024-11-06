@@ -614,12 +614,15 @@ function Set-LoadBalancerBackendPools {
 
 }
 
-function Deploy-MotorsBookmarks {
+function Deploy-HypermarketBookmarks {
     $bookmarksFileName = "$AgToolsDir\Bookmarks"
     $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        $publicIPAddress = $(az network public-ip show --resource-group $resourceGroup --name "Ag-LB-Public-IP-$clusterName" --query "ipAddress" --output tsv)
         $services = kubectl get services -n contoso-hypermarket -o json | ConvertFrom-Json
 
         # Matching url: backend-api
@@ -627,55 +630,124 @@ function Deploy-MotorsBookmarks {
             $_.metadata.name -eq 'backend-api' -and
             $_.spec.ports.port -contains 5002
         }
-        $flaskIps = $matchingServices.status.loadBalancer.ingress.ip
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
-        foreach ($flaskIp in $flaskIps) {
-            $output = "http://${flaskIp}:8888"
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:5002"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("Flask-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("backend-api-" + $clusterName + "-URL"), $output
             $newContent | Set-Content -Path $bookmarksFileName
-
             Start-Sleep -Seconds 2
         }
 
-        # Matching url: Influxdb
+        # Matching url: cerebral-api-service
         $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -eq 'Influxdb' -and
-            $_.spec.ports.port -contains 8086
+            $_.metadata.name -eq 'cerebral-api-service' -and
+            $_.spec.ports.port -contains 5003
         }
-        $influxdbIps = $matchingServices.status.loadBalancer.ingress.ip
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
-        foreach ($influxdbIp in $influxdbIps) {
-            $output = "http://${influxdbIp}:8086"
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:5003"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("Influxdb-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("cerebral-api-" + $clusterName + "-URL"), $output
             $newContent | Set-Content -Path $bookmarksFileName
-
             Start-Sleep -Seconds 2
         }
 
-        # Matching url: prometheus
+        # Matching url: cerebral-simulator-service
         $matchingServices = $services.items | Where-Object {
-            $_.spec.ports.port -contains 9090 -and
-            $_.spec.type -eq "LoadBalancer"
+            $_.metadata.name -eq 'cerebral-simulator-service' -and
+            $_.spec.ports.port -contains 8001
         }
-        $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
-        foreach ($prometheusIp in $prometheusIps) {
-            $output = "http://${prometheusIp}:9090"
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:8001"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("cerebral-simulator-" + $clusterName + "-URL"), $output
             $newContent | Set-Content -Path $bookmarksFileName
+            Start-Sleep -Seconds 2
+        }
 
+        # Matching url: footfall-ai-api
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'footfall-ai-api' -and
+            $_.spec.ports.port -contains 5000
+        }
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:5000"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("footfall-ai-api-" + $clusterName + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: main-ui
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'main-ui' -and
+            $_.spec.ports.port -contains 8080
+        }
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:8080"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("main-ui-" + $clusterName + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: InfluxDB
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'InfluxDB' -and
+            $_.spec.ports.port -contains 9999
+        }
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:9999"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("InfluxDB-" + $clusterName + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: Shopper Insights API
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'shopper-insights-api' -and
+            $_.spec.ports.port -contains 5001
+        }
+        $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($backendApiIp in $backendApiIps) {
+            $output = "http://${publicIPAddress}:5001"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("Shopper-Insights-API-" + $clusterName + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
             Start-Sleep -Seconds 2
         }
     }
