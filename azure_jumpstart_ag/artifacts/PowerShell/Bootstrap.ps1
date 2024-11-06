@@ -414,6 +414,9 @@ if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
   Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 }
 
+# Install WSL
+wsl --install
+
 # Restart machine to initiate VM autologon
 $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-Command "Restart-Computer -Force"'
 $trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddSeconds(10))
