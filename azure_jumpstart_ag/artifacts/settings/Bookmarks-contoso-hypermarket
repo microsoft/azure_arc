@@ -13,104 +13,111 @@
                   "url": "backend-api-Chicago-URL"
                }, {
                   "id": "5",
-                  "name": "backend-db - Chicago",
-                  "show_icon": false,
-                  "source": "unknown",
-                  "type": "url",
-                  "url": "backend-db-Chicago-URL"
-               } ],
-               "id": "3",
-               "name": "Chicago",
-               "source": "unknown",
-               "type": "folder"
-            }, {
-               "children": [ {
-                  "id": "7",
                   "name": "backend-api - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
                   "url": "backend-api-Seattle-URL"
-               }, {
-                  "id": "8",
-                  "name": "backend-db - Seattle",
+               } ],
+               "id": "3",
+               "name": "Backend API",
+               "source": "unknown",
+               "type": "folder"
+            }, {
+               "children": [ {
+                  "id": "7",
+                  "name": "cerebral-api - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "backend-db-Seattle-URL"
+                  "url": "cerebral-api-Chicago-URL"
+               }, {
+                  "id": "8",
+                  "name": "cerebral-api - Seattle",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "cerebral-api-Seattle-URL"
                } ],
                "id": "6",
-               "name": "Seattle",
+               "name": "Cerebral-API",
                "source": "unknown",
                "type": "folder"
             }, {
                "children": [ {
                   "id": "10",
-                  "name": "POS Dev - Customer",
+                  "name": "cerebral simulator - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Dev-URL-Customer"
+                  "url": "cerebral-simulator-Chicago-URL"
                }, {
                   "id": "11",
-                  "name": "POS Dev - Manager",
+                  "name": "cerebral simulator - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Dev-URL-Manager"
+                  "url": "cerebral-simulator-Seattle-URL"
                } ],
                "id": "9",
-               "name": "Dev",
+               "name": "Cerebral-Simulator",
                "source": "unknown",
                "type": "folder"
             }, {
                "children": [ {
                   "id": "13",
-                  "name": "POS Staging - Customer",
+                  "name": "Footfall API - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Staging-URL-Customer"
+                  "url": "Footfall-API-URL-Chicago"
                }, {
                   "id": "14",
-                  "name": "POS Staging - Manager",
+                  "name": "Footfall API - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Staging-URL-Manager"
+                  "url": "Footfall-API-URL-Seattle"
                } ],
                "id": "12",
-               "name": "Staging",
+               "name": "Footfall-API",
                "source": "unknown",
                "type": "folder"
-            } ],
+            } ,
+            {
+               "children": [ {
+                  "id": "13",
+                  "name": "Main UI - Chicago",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Main-UI-URL-Chicago"
+               }, {
+                  "id": "14",
+                  "name": "Main UI - Seattle",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Main-UI-URL-Seattle"
+               } ],
+               "id": "12",
+               "name": "Main UI",
+               "source": "unknown",
+               "type": "folder"
+            }],
             "id": "2",
-            "name": "POS",
+            "name": "Control Center",
             "source": "unknown",
             "type": "folder"
          }, {
             "children": [ {
                "id": "16",
-               "name": "Grafana Dev",
+               "name": "Grafana",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Dev-URL"
-            }, {
-               "id": "17",
-               "name": "Grafana Staging",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Grafana-Staging-URL"
-            }, {
-               "id": "18",
-               "name": "Grafana Prod",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "http://localhost:3000/"
-            } ],
+               "url": "Grafana-URL"
+            }],
             "id": "15",
             "name": "Grafana",
             "source": "unknown",

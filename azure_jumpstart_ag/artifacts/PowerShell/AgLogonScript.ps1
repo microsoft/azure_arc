@@ -278,7 +278,7 @@ if($scenario -eq "contoso_supermarket"){
 }elseif($scenario -eq "contoso_motors"){
     Deploy-MotorsBookmarks
 }elseif($scenario -eq "contoso_hypermarket"){
-    #Deploy-HypermarketBookmarks
+    Deploy-HypermarketBookmarks
 }
 
 ##############################################################
