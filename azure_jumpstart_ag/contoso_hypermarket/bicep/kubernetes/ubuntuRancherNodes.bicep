@@ -148,7 +148,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${deployGPUNodes}'
       fileUris: [
         '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
       ]
@@ -157,5 +157,19 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
   dependsOn: [
     vmRoleAssignment_Owner
     vmRoleAssignment_Storage
+    gpuInstallationScript
   ]
+}
+
+resource gpuInstallationScript 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =if(deployGPUNodes) {
+  parent: vm
+  name: 'gpuInstallationScript'
+  location: azureLocation
+  properties: {
+    publisher: 'Microsoft.HpcCompute'
+    type: 'NvidiaGpuDriverLinux'
+    typeHandlerVersion: '1.6'
+    autoUpgradeMinorVersion: true
+    settings: {}
+  }
 }
