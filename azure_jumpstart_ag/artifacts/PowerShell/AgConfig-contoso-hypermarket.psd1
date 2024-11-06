@@ -161,7 +161,7 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             IsProduction           = $true
         }
-        Chicago = @{
+        <#Chicago = @{
             ArcClusterName         = "Ag-K3s-Chicago"
             FriendlyName           = "Chicago"
             GrafanaDataSource      = "chicago"
@@ -171,7 +171,7 @@
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             IsProduction           = $true
-        }
+        }#>
     }
 
     # Universal resource tag and resource types
