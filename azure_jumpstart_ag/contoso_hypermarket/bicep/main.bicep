@@ -86,6 +86,9 @@ param akvNameSite2 string = 'agakv2${namingGuid}'
 @description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
 param deployGPUNodes bool = false
 
+@description('The capacity of the OpenAI Cognitive Services account')
+param openAICapacity int = 10
+
 @description('The array of OpenAI models to deploy')
 param azureOpenAIModels array = [
   {
@@ -266,5 +269,6 @@ module azureOpenAI 'ai/aoai.bicep' = {
     location: location
     openAIAccountName: 'openai${namingGuid}'
     azureOpenAIModels: azureOpenAIModels
+    openAICapacity: openAICapacity
   }
 }

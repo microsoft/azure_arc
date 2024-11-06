@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('The name of the OpenAI Cognitive Services SKU')
 param openAISkuName string = 'S0'
 
+@description('The capacity of the OpenAI Cognitive Services account')
+param openAICapacity int = 10
+
 @description('The type of Cognitive Services account to create')
 param cognitiveSvcType string = 'AIServices'
 
@@ -40,7 +43,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
   name: '${openAIAccountName}-${model.name}-deployment'
   sku: {
     name: 'Standard'
-    capacity: 10
+    capacity: openAICapacity
   }
   properties: {
     model: {
@@ -49,7 +52,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
       version: model.version
     }
     versionUpgradeOption: 'NoAutoUpgrade'
-    currentCapacity: 10
+    currentCapacity: openAICapacity
     raiPolicyName: 'Microsoft.Default'
   }
 }]
