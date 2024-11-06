@@ -563,11 +563,11 @@ function Set-LoadBalancerBackendPools {
                     --lb-name $loadBalancerName `
                     --name "$serviceName-NATRule" `
                     --protocol Tcp `
-                    --frontend-port-range-start $servicePort `
-                    --frontend-port-range-end $servicePort `
+                    --frontend-port-range-start $servicePort[0] `
+                    --frontend-port-range-end $servicePort[0] `
                     --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
-                    --backend-port $servicePort `
+                    --backend-port $servicePort[0] `
                     --only-show-errors
             }
         }
