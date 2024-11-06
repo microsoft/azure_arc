@@ -25,7 +25,7 @@ if ([System.IO.File]::Exists($fabricConfigFile)){
   $fabricCapacityName = $fabricConfig.fabricCapacityName
   $eventHubNamespace = $fabricConfig.eventHubNamespace
   $eventHubName = $fabricConfig.eventHubName
-  $eventHubKeyName = $eventHubKeyName
+  $eventHubKeyName = $fabricConfig.eventHubKeyName
   $eventHubPrimaryKey = $fabricConfig.eventHubPrimaryKey
   $AgLogsDir = "."
 } 
