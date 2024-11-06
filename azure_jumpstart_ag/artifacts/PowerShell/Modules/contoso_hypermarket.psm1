@@ -751,6 +751,57 @@ function Deploy-HypermarketBookmarks {
             Start-Sleep -Seconds 2
         }
     }
+}
+
+function Set-ACSA {
+    # Begin ACSA Installation.
+    # Documentation: https://aepreviews.ms/docs/edge-storage-accelerator/how-to-install-edge-storage-accelerator/
+
+    # Ensure necessary variables are available
+    $storageAccountName = $global:aioStorageAccountName     # Using $global:aioStorageAccountName
+    $storageContainer = "shopper-videos"                     # Container name set to "shoppervideos"
+    $resourceGroup = $global:resourceGroup
+    $location = $global:azureLocation
+    $arcClusterName = $global:k3sArcClusterName
+    $subscriptionId = $global:subscriptionId
+
+    # Create a storage account
+    Write-Host "Storage Account Name: $storageAccountName"
+    Write-Host "Container Name: $storageContainer"
+
+    # Create a container within the storage account
+    Write-Host "Creating container within the storage account..."
+    az storage container create `
+        --name "$storageContainer" `
+        --account-name "$storageAccountName" `
+        --auth-mode login
+
+    # Assign necessary role to the extension principal
+    $principalID = az k8s-extension list `
+        --cluster-name $arcClusterName `
+        --resource-group $resourceGroup `
+        --cluster-type connectedClusters `
+        --query "[?extensionType=='microsoft.arc.containerstorage'].identity.principalId | [0]" -o tsv
+
+    az role assignment create `
+        --assignee-object-id $principalID `
+        --assignee-principal-type ServicePrincipal `
+        --role "Storage Blob Data Owner" `
+        --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+
+    # Deploy the ACSA application #NEED TO BE CHANGED
+    $acsadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/acsa_fault_detection/yaml/acsa-edge-sub-volume.yaml"
+    $acsadeployYamlPath = "acsa-edge-sub-volume.yaml"
+    Invoke-WebRequest -Uri $acsadeployYamlUrl -OutFile $acsadeployYamlPath
+
+    # Replace {STORAGEACCOUNT} with the actual storage account name
+    (Get-Content $acsadeployYamlPath) -replace '{STORAGEACCOUNT}', $storageAccountName | Set-Content $acsadeployYamlPath
+
+    # Apply the acsa-deploy.yaml file using kubectl
+    Write-Host "Applying acsa-deploy.yaml configuration..."
+    kubectl apply -f $acsadeployYamlPath
+    Write-Host "acsa-deploy.yaml configuration applied successfully."
+}
 
     Start-Sleep -Seconds 2
 

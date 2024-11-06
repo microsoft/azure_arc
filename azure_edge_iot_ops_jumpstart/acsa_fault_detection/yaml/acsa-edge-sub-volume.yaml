@@ -1,0 +1,13 @@
+apiVersion: "arccontainerstorage.azure.net/v1"
+kind: EdgeSubvolume
+metadata:
+  name: videos
+  namespace: contoso-hypermarket
+spec:
+  edgevolume: acsa-pvc
+  path: videos #Don't use a preceding slash.
+  auth:
+    authType: MANAGED_IDENTITY
+  storageaccountendpoint: https://{STORAGEACCOUNT}.blob.core.windows.net/
+  container: shopper-videos
+  ingestPolicy: edgeingestpolicy-default
