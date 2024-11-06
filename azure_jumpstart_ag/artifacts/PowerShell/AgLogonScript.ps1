@@ -216,11 +216,6 @@ if ($scenario -eq "contoso_supermarket") {
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 }
 
-##############################################################
-# Deploy Kubernetes Prometheus Stack for Observability
-##############################################################
-Deploy-Prometheus -AgConfig $AgConfig
-
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
@@ -236,14 +231,21 @@ if ($scenario -eq "contoso_motors") {
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }elseif($scenario -eq "contoso_hypermarket"){
+    Set-ACSA
     Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-    Deploy-HypermarketConfigs
     Set-AIServiceSecrets
     Set-EventHubSecrets
     Set-SQLSecret
+    Deploy-HypermarketConfigs
+    Set-LoadBalancerBackendPools
 }
+
+##############################################################
+# Deploy Kubernetes Prometheus Stack for Observability
+##############################################################
+Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
@@ -277,7 +279,7 @@ if($scenario -eq "contoso_supermarket"){
 }elseif($scenario -eq "contoso_motors"){
     Deploy-MotorsBookmarks
 }elseif($scenario -eq "contoso_hypermarket"){
-    #Deploy-HypermarketBookmarks
+    Deploy-HypermarketBookmarks
 }
 
 ##############################################################

@@ -6,116 +6,165 @@
             "children": [ {
                "children": [ {
                   "id": "4",
-                  "name": "POS Chicago - Customer",
+                  "name": "backend-api - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Chicago-URL-Customer"
+                  "url": "backend-api-Chicago-URL"
                }, {
                   "id": "5",
-                  "name": "POS Chicago - Manager",
+                  "name": "backend-api - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Chicago-URL-Manager"
+                  "url": "backend-api-Seattle-URL"
                } ],
                "id": "3",
-               "name": "Chicago",
+               "name": "Backend API",
                "source": "unknown",
                "type": "folder"
             }, {
                "children": [ {
                   "id": "7",
-                  "name": "POS Seattle - Customer",
+                  "name": "cerebral-api - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Seattle-URL-Customer"
+                  "url": "cerebral-api-Chicago-URL"
                }, {
                   "id": "8",
-                  "name": "POS Seattle - Manager",
+                  "name": "cerebral-api - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Seattle-URL-Manager"
+                  "url": "cerebral-api-Seattle-URL"
                } ],
                "id": "6",
-               "name": "Seattle",
+               "name": "Cerebral-API",
                "source": "unknown",
                "type": "folder"
             }, {
                "children": [ {
                   "id": "10",
-                  "name": "POS Dev - Customer",
+                  "name": "cerebral simulator - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Dev-URL-Customer"
+                  "url": "cerebral-simulator-Chicago-URL"
                }, {
                   "id": "11",
-                  "name": "POS Dev - Manager",
+                  "name": "cerebral simulator - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Dev-URL-Manager"
+                  "url": "cerebral-simulator-Seattle-URL"
                } ],
                "id": "9",
-               "name": "Dev",
+               "name": "Cerebral-Simulator",
                "source": "unknown",
                "type": "folder"
             }, {
                "children": [ {
                   "id": "13",
-                  "name": "POS Staging - Customer",
+                  "name": "Footfall API - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Staging-URL-Customer"
+                  "url": "Footfall-API-URL-Chicago"
                }, {
                   "id": "14",
-                  "name": "POS Staging - Manager",
+                  "name": "Footfall API - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Staging-URL-Manager"
+                  "url": "Footfall-API-URL-Seattle"
                } ],
                "id": "12",
-               "name": "Staging",
+               "name": "Footfall-API",
                "source": "unknown",
                "type": "folder"
-            } ],
+            } ,
+            {
+               "children": [ {
+                  "id": "13",
+                  "name": "Main UI - Chicago",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Main-UI-Chicago-URL"
+               }, {
+                  "id": "14",
+                  "name": "Main UI - Seattle",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Main-UI-Seattle-URL"
+               } ],
+               "id": "12",
+               "name": "Main UI",
+               "source": "unknown",
+               "type": "folder"
+            },
+            {
+               "children": [ {
+                  "id": "13",
+                  "name": "Shopper Insights API - Chicago",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Shopper-Insights-API-Chicago-URL"
+               }, {
+                  "id": "14",
+                  "name": "Shopper Insights API - Seattle",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "Shopper-Insights-API-Seattle-URL"
+               } ],
+               "id": "12",
+               "name": "Shopper Insights API",
+               "source": "unknown",
+               "type": "folder"
+            }],
             "id": "2",
-            "name": "POS",
+            "name": "Control Center",
             "source": "unknown",
             "type": "folder"
          }, {
             "children": [ {
                "id": "16",
-               "name": "Grafana Dev",
+               "name": "Grafana",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Dev-URL"
-            }, {
-               "id": "17",
-               "name": "Grafana Staging",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Grafana-Staging-URL"
-            }, {
-               "id": "18",
-               "name": "Grafana Prod",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "http://localhost:3000/"
-            } ],
+               "url": "Grafana-URL"
+            }],
             "id": "15",
             "name": "Grafana",
             "source": "unknown",
             "type": "folder"
          }, {
+            "children": [ {
+               "id": "16",
+               "name": "InfluxDB-Seattle",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "InfluxDB-Seattle-URL"
+            },{
+               "id": "17",
+               "name": "InfluxDB-Chicago",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "InfluxDB-Chicago-URL"
+            }],
+            "id": "15",
+            "name": "InfluxDB",
+            "source": "unknown",
+            "type": "folder"
+         },
+         {
             "children": [ {
                "id": "30",
                "name": "Prometheus Dev",
