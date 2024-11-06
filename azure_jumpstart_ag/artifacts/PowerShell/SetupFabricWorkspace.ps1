@@ -82,8 +82,21 @@ function Set-Fabric-Workspace {
 
   # Display current Fabric capacities
   $fabricCapacities = (ConvertFrom-Json($httpResp.Content)).value
-  foreach ($fabricCapacity in $fabricCapacities){
-    Write-Host "INFO: Fabric capacity name: $($fabricCapacity.displayName), id: $($fabricCapacity.Id), state: $($fabricCapacity.state)"
+  if ($fabricCapacities.Count -gt 0)
+  {
+    foreach ($fabricCapacity in $fabricCapacities){
+      Write-Host "INFO: Fabric capacity name: $($fabricCapacity.displayName), id: $($fabricCapacity.Id), state: $($fabricCapacity.state)"
+    }
+  }
+  else {
+    Write-Host "ERROR: No Fabric capacities are available in your tenant to setup Fabric workspace. Create Fabric capacity or sign up for Trial license in your tenant to get started. Re-run this script when a new fabric capacity is created."
+    return
+  }
+
+  # Verify if Fabric capactiy is configured
+  if (!$fabriccapacityName) {
+    Write-Host "[$(Get-Date -Format t)] ERROR: Fabric capacity is required to setup Fabric workspace. Choose one of the available fabric capacity name and update configuration file, and re-run this script." -ForegroundColor DarkRed
+    return
   }
 
   # Verify if Fabric capacity exists with specific name
