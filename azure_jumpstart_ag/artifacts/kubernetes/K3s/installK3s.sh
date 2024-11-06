@@ -286,7 +286,7 @@ else
     sudo service sshd restart
 fi
 
-if [[ "$deployGPUNodes" == "true" && "$k3sControlPlane" == "false"]]; then
+if [ "$deployGPUNodes" == "true" ] && [ "$k3sControlPlane" == "false" ]; then
     # Installing NVIDIA GPU drivers
     echo ""
     echo "Installing NVIDIA GPU drivers"
