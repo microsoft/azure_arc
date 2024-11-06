@@ -6,18 +6,18 @@
             "children": [ {
                "children": [ {
                   "id": "4",
-                  "name": "POS Chicago - Customer",
+                  "name": "backend-api - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Chicago-URL-Customer"
+                  "url": "backend-api-Chicago-URL"
                }, {
                   "id": "5",
-                  "name": "POS Chicago - Manager",
+                  "name": "backend-db - Chicago",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Chicago-URL-Manager"
+                  "url": "backend-db-Chicago-URL"
                } ],
                "id": "3",
                "name": "Chicago",
@@ -26,18 +26,18 @@
             }, {
                "children": [ {
                   "id": "7",
-                  "name": "POS Seattle - Customer",
+                  "name": "backend-api - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Seattle-URL-Customer"
+                  "url": "backend-api-Seattle-URL"
                }, {
                   "id": "8",
-                  "name": "POS Seattle - Manager",
+                  "name": "backend-db - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "POS-Seattle-URL-Manager"
+                  "url": "backend-db-Seattle-URL"
                } ],
                "id": "6",
                "name": "Seattle",
