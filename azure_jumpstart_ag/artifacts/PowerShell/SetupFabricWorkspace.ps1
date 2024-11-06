@@ -520,17 +520,17 @@ Function Import-FabricItem {
   )
 
   # Search for folders with .pbir and .pbism in it
-  $itemsInFolder = Get-ChildItem -LiteralPath $path | ? { @(".pbism", ".pbir") -contains $_.Extension }
+  $itemsInFolder = Get-ChildItem -LiteralPath $path | Where-Object { @(".pbism", ".pbir") -contains $_.Extension }
 
   if ($itemsInFolder.Count -eq 0) {
       Write-Host "Cannot find valid item definitions (*.pbir; *.pbism) in the '$path'"
       return
   }    
 
-  if ($itemsInFolder | ? { $_.Extension -ieq ".pbir" }) {
+  if ($itemsInFolder | Where-Object { $_.Extension -ieq ".pbir" }) {
       $itemType = "Report"
   }
-  elseif ($itemsInFolder | ? { $_.Extension -ieq ".pbism" }) {
+  elseif ($itemsInFolder | Where-Object { $_.Extension -ieq ".pbism" }) {
       $itemType = "SemanticModel"
   }
   else {
@@ -544,11 +544,11 @@ Function Import-FabricItem {
   $files = Get-ChildItem -LiteralPath $path -Recurse -Attributes !Directory
 
   # Remove files not required for the API: item.*.json; cache.abf; .pbi folder
-  $files = $files | ? { $_.Name -notlike "item.*.json" -and $_.Name -notlike "*.abf" -and $_.Directory.Name -notlike ".pbi" }        
+  $files = $files | Where-Object { $_.Name -notlike "item.*.json" -and $_.Name -notlike "*.abf" -and $_.Directory.Name -notlike ".pbi" }        
 
   # Prioritizes reading the displayName and type from itemProperties parameter    
   $displayName = $null
-  if ($itemProperties -ne $null) {            
+  if ($null -ne $itemProperties) {            
       $displayName = $itemProperties.displayName         
   }
 
@@ -566,7 +566,7 @@ Function Import-FabricItem {
   }
 
   $itemPathAbs = Resolve-Path -LiteralPath $path
-  $parts = $files |% {
+  $parts = $files |ForEach-Object {
       $filePath = $_.FullName
       if ($filePath -like "*.pbir") {
           $fileContentText = Get-Content -LiteralPath $filePath
@@ -600,7 +600,7 @@ Function Import-FabricItem {
           }
       }
       else {
-          $fileContent = Get-Content -LiteralPath $filePath -AsByteStream -Raw
+          $fileContent = [System.IO.File]::ReadAllBytes($filePath)
       }
       
       $partPath = $filePath.Replace($itemPathAbs, "").TrimStart("\").Replace("\", "/")
@@ -615,11 +615,11 @@ Function Import-FabricItem {
 
   Write-Host "Payload parts:"        
 
-  $parts | % { Write-Host "part: $($_.Path)" }
+  $parts | ForEach-Object { Write-Host "part: $($_.Path)" }
   $itemId = $null
 
   # Check if there is already an item with same displayName and type
-  $foundItem = $items | ? { $_.type -ieq $itemType -and $_.displayName -ieq $displayName }
+  $foundItem = $items | Where-Object { $_.type -ieq $itemType -and $_.displayName -ieq $displayName }
   if ($foundItem) {
       if ($foundItem.Count -gt 1) {
           throw "Found more than one item for displayName '$displayName'"
@@ -629,7 +629,7 @@ Function Import-FabricItem {
       $itemId = $foundItem.id
   }
 
-  if ($itemId -eq $null) {
+  if ($null -eq $itemId ) {
       write-host "Creating a new item"
       # Prepare the request                    
       $itemRequest = @{ 
