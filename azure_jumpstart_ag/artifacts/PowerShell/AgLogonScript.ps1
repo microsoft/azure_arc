@@ -250,7 +250,9 @@ if ($scenario -eq "contoso_motors") {
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
 #####################################################################
-Deploy-Workbook "arc-inventory-workbook.bicep"
+if($scenario -ne "contoso_hypermarket"){
+    Deploy-Workbook "arc-inventory-workbook.bicep"
+}
 #####################################################################
 # Deploy Azure Workbook for OS Performance
 #####################################################################
