@@ -864,6 +864,14 @@ function Deploy-HypermarketBookmarks {
             $newContent | Set-Content -Path $bookmarksFileName
             Start-Sleep -Seconds 2
         }
+
+        # Matching url: Grafana
+        # Replace matching value in the Bookmarks file
+        $output = "http://${publicIPAddress}:3000"
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Grafana-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+        Start-Sleep -Seconds 2
     }
     Start-Sleep -Seconds 2
 
