@@ -1,9 +1,7 @@
 BeforeDiscovery {
 
-    # Login to Azure PowerShell with service principal provided by user
-    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spnTenantId -Subscription $env:subscriptionId
+    # Login to Azure PowerShell with Managed Identity
+    Connect-AzAccount -Identity -Tenant $env:spnTenantId -Subscription $env:subscriptionId
 
 }
 Describe "ArcBox resource group" {
