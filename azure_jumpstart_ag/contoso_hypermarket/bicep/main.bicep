@@ -93,7 +93,7 @@ param openAICapacity int = 10
 param azureOpenAIModels array = [
   {
     name: 'gpt-4o'
-    version: '2024-05013'
+    version: '2024-05-13'
   }
 ]
 

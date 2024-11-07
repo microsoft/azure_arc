@@ -25,7 +25,7 @@ param azureOpenAiSkuName string = 'GlobalStandard'
 param azureOpenAIModels array = [
   {
     name: 'gpt-4o'
-    version: '2024-05013'
+    version: '2024-05-13'
   }
 ]
 
