@@ -255,7 +255,7 @@ module eventHub 'data/eventHub.bicep' = {
   }
 }
 
-module fabricCapacity 'data/fabric.bicep' = {
+module fabricCapacity 'data/fabric.bicep' = if (!empty(fabricCapacityAdmin)) {
   name: 'fabricCapacity'
   params: {
     fabricCapacityName: fabricCapacityName

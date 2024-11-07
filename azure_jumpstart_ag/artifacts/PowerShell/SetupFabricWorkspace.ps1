@@ -5,14 +5,6 @@
 # Access rights deploy Microsoft Fabric items used in Contoso Hypermarket scenario.
 # Make sure Create Workspace is enabled in Frabric for service principals. 
 #Access settings using https://app.fabric.microsoft.com/admin-portal/tenantSettings?experience=power-bi
-
-# NOTE: To run locally create a file named fabric-config.json with the following content
-#
-# {
-#   "runAs": "user",                    # Indicates whether to run under regular user account or managed identity
-#   "resourceGroup": "rg-fabric",       # Resource group where Contoso Hypermarket is deployed
-#   "templateBaseUrl": "https://raw.githubusercontent.com/main/azure_arc/main/azure_arc_data/azure_jumpstart_ag/artifacts"
-# }
 #
 ####################################################################################################
 $ProgressPreference = "SilentlyContinue"
@@ -28,11 +20,13 @@ if ([System.IO.File]::Exists($fabricConfigFile)){
   $runAs = $fabricConfig.runAs
   $tenantID = $fabricConfig.tenantID
   $subscriptionID = $fabricConfig.subscriptionID
-  $resourceGroup = $fabricConfig.resourceGroup
   $templateBaseUrl = $fabricConfig.templateBaseUrl
   $fabricWorkspaceName = $fabricConfig.fabricWorkspaceName
   $fabricCapacityName = $fabricConfig.fabricCapacityName
+  $eventHubNamespace = $fabricConfig.eventHubNamespace
+  $eventHubName = $fabricConfig.eventHubName
   $eventHubKeyName = $fabricConfig.eventHubKeyName
+  $eventHubPrimaryKey = $fabricConfig.eventHubPrimaryKey
   $AgLogsDir = "."
 } 
 else {
@@ -88,8 +82,21 @@ function Set-Fabric-Workspace {
 
   # Display current Fabric capacities
   $fabricCapacities = (ConvertFrom-Json($httpResp.Content)).value
-  foreach ($fabricCapacity in $fabricCapacities){
-    Write-Host "INFO: Fabric capacity name: $($fabricCapacity.displayName), id: $($fabricCapacity.Id), state: $($fabricCapacity.state)"
+  if ($fabricCapacities.Count -gt 0)
+  {
+    foreach ($fabricCapacity in $fabricCapacities){
+      Write-Host "INFO: Fabric capacity name: $($fabricCapacity.displayName), id: $($fabricCapacity.Id), state: $($fabricCapacity.state)"
+    }
+  }
+  else {
+    Write-Host "ERROR: No Fabric capacities are available in your tenant to setup Fabric workspace. Create Fabric capacity or sign up for Trial license in your tenant to get started. Re-run this script when a new fabric capacity is created."
+    return
+  }
+
+  # Verify if Fabric capactiy is configured
+  if (!$fabriccapacityName) {
+    Write-Host "[$(Get-Date -Format t)] ERROR: Fabric capacity is required to setup Fabric workspace. Choose one of the available fabric capacity name and update configuration file, and re-run this script." -ForegroundColor DarkRed
+    return
   }
 
   # Verify if Fabric capacity exists with specific name
@@ -196,7 +203,7 @@ function Set-Fabric-Workspace {
   }
 
   # Download dashboard report and Update to use KQL database
-  $hyperMarketDashboardReport = $templateBaseUrl + "artifacts/adx_dashboards/fabric-hypermarket-dashboard.json"
+  $hyperMarketDashboardReport = $templateBaseUrl + "artifacts/fabric/ot_dashboard.json"
   Write-Host "INFO: Downloading and preparing dashboard report to import into Fabric workspace."
   $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri $hyperMarketDashboardReport).Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
 
@@ -244,40 +251,11 @@ function Set-Fabric-Workspace {
   # Power BI API endpoint to create EventHut connection
   $powerBIEndpoint = "https://api.powerbi.com/v2.0/myorg/me/gatewayClusterCloudDatasource"
 
-  # Get Evenhub connection details
-  $eventHubInfo = (az resource list --resource-group $resourceGroup --resource-type "Microsoft.EventHub/namespaces" | ConvertFrom-Json)
-  if ($eventHubInfo.Count -ne 1) {
-    Write-Host "ERROR: Resource group contains no Eventhub namespaces or more than one. Make sure to have only one EventHub namesapce in the resource group."
-  }
-
-  $eventHubNamespace = $eventHubInfo[0].name
-  Write-Host "INFO: Found EventHub Namespace: $eventHubNamespace"
-
-  # Make sure Eventhub with name 'orders' exists
-  $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
-  $eventHubName = $eventHubs[0].name
-  if (-not $eventHubName) {
-    Write-Host "ERROR: Event Hubs not found in the EventHub namespace $eventHubNamespace"
-    return
-  }
-
-  Write-Host "INFO: Found EventHub: $eventHubName"
-
-  # Get Event Hub credentials
-  Write-Host "INFO: Retrieving Event Hub key for '$eventHubKeyName' Shared Acess Policy."
-  $eventHubKey = az eventhubs namespace authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --name $eventHubKeyName --query primaryKey --output tsv
-  if ($eventHubKey -eq '') {
-    Write-Host "ERROR: Failed to retrieve Event Hub key."
-    return
-  }
-
-  Write-Host "INFO: Received Event Hub key."
-
   # Create body to create EventHub data source
   $eventHubEndpoint = "$eventHubNamespace.servicebus.windows.net"
   $connectionBody = @"
 {
-  "datasourceName": "$fabricWorkspaceName-$eventHubName-Test",
+  "datasourceName": "$fabricWorkspaceName-$eventHubName",
   "datasourceType": "Extension",
   "connectionDetails": "{\"endpoint\":\"$eventHubEndpoint\",\"entityPath\":\"$eventHubName\"}",
   "singleSignOnType": "None",
@@ -303,7 +281,7 @@ function Set-Fabric-Workspace {
   "referenceDatasource": false,
   "credentialDetails": {
     "credentialType": "Basic",
-    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHubKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubKey\"}]}",
+    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHubKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubPrimaryKey\"}]}",
     "encryptedConnection": "Any",
     "privacyLevel": "Organizational",
     "skipTestConnection": false,
@@ -395,7 +373,7 @@ function Set-Fabric-Workspace {
 
   # Import data sceince notebook for sales forecast
   # Download dashboard report and Update to use KQL database
-  $ordersSalesForecastNotebook = "orders-sales-forecast.ipynb"
+  $ordersSalesForecastNotebook = "orders_sales_forecast.ipynb"
   Write-Host "INFO: Downloading and preparing nootebook to import into Fabric workspace."
   $ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/fabric/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
 
@@ -520,17 +498,17 @@ Function Import-FabricItem {
   )
 
   # Search for folders with .pbir and .pbism in it
-  $itemsInFolder = Get-ChildItem -LiteralPath $path | ? { @(".pbism", ".pbir") -contains $_.Extension }
+  $itemsInFolder = Get-ChildItem -LiteralPath $path | Where-Object { @(".pbism", ".pbir") -contains $_.Extension }
 
   if ($itemsInFolder.Count -eq 0) {
       Write-Host "Cannot find valid item definitions (*.pbir; *.pbism) in the '$path'"
       return
   }    
 
-  if ($itemsInFolder | ? { $_.Extension -ieq ".pbir" }) {
+  if ($itemsInFolder | Where-Object { $_.Extension -ieq ".pbir" }) {
       $itemType = "Report"
   }
-  elseif ($itemsInFolder | ? { $_.Extension -ieq ".pbism" }) {
+  elseif ($itemsInFolder | Where-Object { $_.Extension -ieq ".pbism" }) {
       $itemType = "SemanticModel"
   }
   else {
@@ -544,11 +522,11 @@ Function Import-FabricItem {
   $files = Get-ChildItem -LiteralPath $path -Recurse -Attributes !Directory
 
   # Remove files not required for the API: item.*.json; cache.abf; .pbi folder
-  $files = $files | ? { $_.Name -notlike "item.*.json" -and $_.Name -notlike "*.abf" -and $_.Directory.Name -notlike ".pbi" }        
+  $files = $files | Where-Object { $_.Name -notlike "item.*.json" -and $_.Name -notlike "*.abf" -and $_.Directory.Name -notlike ".pbi" }        
 
   # Prioritizes reading the displayName and type from itemProperties parameter    
   $displayName = $null
-  if ($itemProperties -ne $null) {            
+  if ($null -ne $itemProperties) {            
       $displayName = $itemProperties.displayName         
   }
 
@@ -566,7 +544,7 @@ Function Import-FabricItem {
   }
 
   $itemPathAbs = Resolve-Path -LiteralPath $path
-  $parts = $files |% {
+  $parts = $files |ForEach-Object {
       $filePath = $_.FullName
       if ($filePath -like "*.pbir") {
           $fileContentText = Get-Content -LiteralPath $filePath
@@ -600,11 +578,15 @@ Function Import-FabricItem {
           }
       }
       else {
-          $fileContent = Get-Content -LiteralPath $filePath -AsByteStream -Raw
+          $fileContent = [System.IO.File]::ReadAllBytes($filePath)
       }
       
       $partPath = $filePath.Replace($itemPathAbs, "").TrimStart("\").Replace("\", "/")
-      $fileEncodedContent = ($fileContent) ? [Convert]::ToBase64String($fileContent) : ""
+      if ($fileContent) {
+          $fileEncodedContent = [Convert]::ToBase64String($fileContent)
+      } else {
+          $fileEncodedContent = ""
+      }
       
       Write-Output @{
           Path        = $partPath
@@ -615,11 +597,11 @@ Function Import-FabricItem {
 
   Write-Host "Payload parts:"        
 
-  $parts | % { Write-Host "part: $($_.Path)" }
+  $parts | ForEach-Object { Write-Host "part: $($_.Path)" }
   $itemId = $null
 
   # Check if there is already an item with same displayName and type
-  $foundItem = $items | ? { $_.type -ieq $itemType -and $_.displayName -ieq $displayName }
+  $foundItem = $items | Where-Object { $_.type -ieq $itemType -and $_.displayName -ieq $displayName }
   if ($foundItem) {
       if ($foundItem.Count -gt 1) {
           throw "Found more than one item for displayName '$displayName'"
@@ -629,7 +611,7 @@ Function Import-FabricItem {
       $itemId = $foundItem.id
   }
 
-  if ($itemId -eq $null) {
+  if ($null -eq $itemId ) {
       write-host "Creating a new item"
       # Prepare the request                    
       $itemRequest = @{ 
@@ -680,15 +662,16 @@ function Set-PowerBI-Project {
   $pbipFolder = Get-Location  # Path to the folder containing Power BI project files, default to current directory
 
   # Download PowerBI report zip file
-  $localFilePath = "$pbipFolder\Contoso-Hypermarket.zip"
+  $pbipFileName = "Contoso_Hypermarket.zip"
+  $localFilePath = "$pbipFolder\$pbipFileName"
   Write-Host "INFO: Downloading Power BI report zip file."
-  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/Contoso-Hypermarket.zip" -OutFile $localFilePath
+  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/$pbipFileName" -OutFile $localFilePath
 
   Write-Host "INFO: Unzipping Power BI report zip file."
   Expand-Archive -Path $localFilePath -DestinationPath $pbipFolder -Force
 
-  $pbipSemanticModelPath = "$pbipFolder\Contoso-Hypermarket.SemanticModel"
-  $pbipReportPath = "$pbipFolder\Contoso-Hypermarket.Report"
+  $pbipSemanticModelPath = "$pbipFolder\Contoso_Hypermarket.SemanticModel"
+  $pbipReportPath = "$pbipFolder\Contoso_Hypermarket.Report"
 
   # Update KQL endpoint 
   $modelFilePath = "$pbipSemanticModelPath\model.bim"
