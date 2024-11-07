@@ -533,8 +533,8 @@ function Deploy-HypermarketConfigs {
 
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
-    $azureOpenAIModelName = $global:azureOpenAIModel.name
-    $azureOpenAIModelVersion = $global:azureOpenAIModel.version
+    $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
+    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
