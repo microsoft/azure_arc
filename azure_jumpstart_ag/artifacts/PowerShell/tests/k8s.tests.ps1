@@ -1,7 +1,7 @@
 BeforeDiscovery {
 
     # Login to Azure PowerShell with Managed Identity
-    Connect-AzAccount -Identity -Tenant $env:spnTenantId -Subscription $env:subscriptionId
+    Connect-AzAccount -Identity -Subscription $env:subscriptionId
 
     # Import the configuration data
     $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
