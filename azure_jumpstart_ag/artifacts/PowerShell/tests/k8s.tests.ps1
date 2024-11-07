@@ -1,9 +1,7 @@
 BeforeDiscovery {
 
-    # Login to Azure PowerShell with service principal provided by user
-    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spnTenantId -Subscription $env:subscriptionId
+    # Login to Azure PowerShell with Managed Identity
+    Connect-AzAccount -Identity -Subscription $env:subscriptionId
 
     # Import the configuration data
     $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
@@ -47,7 +45,7 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
                 $containersInCrashLoop = $pod.status.containerStatuses | Where-Object {
                     $_.state.waiting.reason -eq "CrashLoopBackOff"
                 }
-                
+
                 # Ensure there are no containers in CrashLoopBackOff for this pod
                 $containersInCrashLoop | Should -BeNullOrEmpty -Because "Pod $($pod.metadata.name) should not have containers in CrashLoopBackOff"
             }
@@ -56,15 +54,15 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
                 $pod.status.phase | Should -BeIn @("Running", "Succeeded") -Because "Pod $($pod.metadata.name) should be Running or Completed"
             }
         }
-    }       
+    }
     It "Azure IoT Operations - aio-operator service should be online with a valid ClusterIP" {
         # Find the aio-operator service in the list
         $aioOperatorService = $aioServices.items | Where-Object { $_.metadata.name -eq "aio-operator" }
-    
+
         # Verify that the aio-operator service exists
         $aioOperatorService | Should -Not -BeNullOrEmpty -Because "The aio-operator service should exist in the azure-iot-operations namespace"
-    
+
         # Verify that the aio-operator service has a ClusterIP assigned
-        $aioOperatorService.spec.clusterIP | Should -Not -BeNullOrEmpty -Because "The aio-operator service should have a valid ClusterIP assigned"    
+        $aioOperatorService.spec.clusterIP | Should -Not -BeNullOrEmpty -Because "The aio-operator service should have a valid ClusterIP assigned"
     }
 }
