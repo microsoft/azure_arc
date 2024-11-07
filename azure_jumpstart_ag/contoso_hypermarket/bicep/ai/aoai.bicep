@@ -13,12 +13,20 @@ param openAICapacity int = 10
 @description('The type of Cognitive Services account to create')
 param cognitiveSvcType string = 'AIServices'
 
+@description('The deployment type of the Cognitive Services account')
+@allowed([
+  'ProvisionedManaged'
+  'Standard'
+  'GlobalStandard'
+])
+param azureOpenAiSkuName string = 'GlobalStandard'
+
 @description('The array of OpenAI models to deploy')
 param azureOpenAIModels array = [
-  {
+  /*{
     name: 'gpt-35-turbo'
     version: '0301'
-  }
+  }*/
   {
     name: 'gpt-4o-mini'
     version: '2024-07-18'
@@ -42,7 +50,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
   parent: openAIAccount
   name: '${openAIAccountName}-${model.name}-deployment'
   sku: {
-    name: 'Standard'
+    name: azureOpenAiSkuName
     capacity: openAICapacity
   }
   properties: {
