@@ -752,12 +752,12 @@ function Deploy-HypermarketBookmarks {
         # Matching url: InfluxDB
         $matchingServices = $services.items | Where-Object {
             $_.metadata.name -eq 'InfluxDB' -and
-            $_.spec.ports.port -contains 9999
+            $_.spec.ports.port -contains 8086
         }
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:9999"
+            $output = "http://${publicIPAddress}:8086"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
