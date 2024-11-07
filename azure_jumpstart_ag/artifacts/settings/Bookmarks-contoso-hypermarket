@@ -137,7 +137,7 @@
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-URL"
+               "url": "http://localhost:3000"
             }],
             "id": "15",
             "name": "Grafana",
