@@ -578,12 +578,19 @@ function Set-LoadBalancerBackendPools {
         $services.items | ForEach-Object {
             $service = $_
             $serviceName = $service.metadata.name
-            $servicePort = $service.spec.ports.port
+            $servicePorts = $service.spec.ports.port
             $serviceIp = $service.status.loadBalancer.ingress.ip
+
+            if($serviceName -eq "influxdb"){
+                $servicePort = $servicePorts[1]
+            }else{
+                $servicePort = $servicePorts[0]
+            }
 
             if ($null -ne $serviceIp) {
                 Write-Host "[$(Get-Date -Format t)] Creating backend pool for service: $serviceName" -ForegroundColor Gray
                 Write-Host "`n"
+
                 az network lb address-pool create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-pool" `
@@ -597,11 +604,11 @@ function Set-LoadBalancerBackendPools {
                     --lb-name $loadBalancerName `
                     --name "$serviceName-NATRule" `
                     --protocol Tcp `
-                    --frontend-port-range-start $servicePort[0] `
-                    --frontend-port-range-end $servicePort[0] `
+                    --frontend-port-range-start $servicePort `
+                    --frontend-port-range-end $servicePort `
                     --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
-                    --backend-port $servicePort[0] `
+                    --backend-port $servicePort `
                     --only-show-errors
             }
         }
