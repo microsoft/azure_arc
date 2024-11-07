@@ -568,10 +568,6 @@ function Set-SQLSecret {
 }
 
 function Set-LoadBalancerBackendPools {
-
-    #$loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
-    #$loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
-    #$lbIndex = 0
     $vnetResourceId = $(az network vnet list -g $resourceGroup --query [].id -o tsv)
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
@@ -586,6 +582,8 @@ function Set-LoadBalancerBackendPools {
             $serviceIp = $service.status.loadBalancer.ingress.ip
 
             if ($null -ne $serviceIp) {
+                Write-Host "[$(Get-Date -Format t)] Creating backend pool for service: $serviceName" -ForegroundColor Gray
+                Write-Host "`n"
                 az network lb address-pool create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-pool" `
@@ -593,6 +591,8 @@ function Set-LoadBalancerBackendPools {
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
                     --only-show-errors
 
+                Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+                Write-Host "`n"
                 az network lb inbound-nat-rule create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-NATRule" `
@@ -616,12 +616,18 @@ function Set-LoadBalancerBackendPools {
         -o tsv `
         --only-show-errors
 
+        Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
+
         az network lb address-pool create -g $resourceGroup `
             --lb-name $loadBalancerName `
             --name "$serviceName-pool" `
             --vnet $vnetResourceId `
             --backend-addresses "[{name:Grafana,ip-address:${clientVMIpAddress}}]" `
             --only-show-errors
+
+        Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
 
         az network lb inbound-nat-rule create -g $resourceGroup `
             --lb-name $loadBalancerName `
@@ -634,6 +640,9 @@ function Set-LoadBalancerBackendPools {
             --backend-port $servicePort `
             --only-show-errors
 
+        Write-Host "[$(Get-Date -Format t)] Creating outbound rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
+
         az network lb outbound-rule create --address-pool "$serviceName-pool"`
             --lb-name $loadBalancerName `
             --name "Grafana-outbound" `
@@ -642,8 +651,6 @@ function Set-LoadBalancerBackendPools {
             --frontend-ip-configs $loadBalancerPublicIp `
             --resource-group $resourceGroup `
             --only-show-errors
-
-        #$lbIndex++
     }
 
 }
