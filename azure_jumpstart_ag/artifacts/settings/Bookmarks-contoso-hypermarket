@@ -70,14 +70,14 @@
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "Footfall-API-URL-Chicago"
+                  "url": "Footfall-AI-API-Chicago-URL"
                }, {
                   "id": "14",
                   "name": "Footfall API - Seattle",
                   "show_icon": false,
                   "source": "unknown",
                   "type": "url",
-                  "url": "Footfall-API-URL-Seattle"
+                  "url": "Footfall-AI-API-Seattle-URL"
                } ],
                "id": "12",
                "name": "Footfall-API",
@@ -163,41 +163,6 @@
             "name": "InfluxDB",
             "source": "unknown",
             "type": "folder"
-         },
-         {
-            "children": [ {
-               "id": "30",
-               "name": "Prometheus Dev",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Dev-URL"
-            }, {
-               "id": "31",
-               "name": "Prometheus Staging",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Staging-URL"
-            }, {
-               "id": "32",
-               "name": "Prometheus Canary - Chicago",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Chicago-URL"
-            }, {
-               "id": "33",
-               "name": "Prometheus Prod - Seattle",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Seattle-URL"
-            } ],
-            "id": "29",
-            "name": "Prometheus",
-            "source": "unknown",
-            "type": "folder"
          }, {
             "children": [ {
                "id": "20",
@@ -205,7 +170,7 @@
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "https://github.com/microsoft/jumpstart-agora-apps"
+               "url": "https://github.com/azure/jumpstart-apps"
             }, {
                "id": "21",
                "name": "Agora-Apps-Repo-Your-Fork",

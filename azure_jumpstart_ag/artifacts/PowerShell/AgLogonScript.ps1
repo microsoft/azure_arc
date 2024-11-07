@@ -103,7 +103,7 @@ $global:Credentials = New-Object System.Management.Automation.PSCredential($AgCo
 # Setup Azure CLI
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
-Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI" -ForegroundColor Gray
 if($scenario -eq "contoso_hypermarket"){
     az login --identity | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 }else{
@@ -250,11 +250,15 @@ if ($scenario -eq "contoso_motors") {
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
 #####################################################################
-Deploy-Workbook "arc-inventory-workbook.bicep"
+if($scenario -ne "contoso_hypermarket"){
+    Deploy-Workbook "arc-inventory-workbook.bicep"
+}
 #####################################################################
 # Deploy Azure Workbook for OS Performance
 #####################################################################
-Deploy-Workbook "arc-osperformance-workbook.bicep"
+if($scenario -ne "contoso_hypermarket"){
+    Deploy-Workbook "arc-osperformance-workbook.bicep"
+}
 
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports
