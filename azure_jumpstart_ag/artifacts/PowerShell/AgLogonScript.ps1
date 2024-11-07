@@ -254,7 +254,9 @@ Deploy-Workbook "arc-inventory-workbook.bicep"
 #####################################################################
 # Deploy Azure Workbook for OS Performance
 #####################################################################
-Deploy-Workbook "arc-osperformance-workbook.bicep"
+if($scenario -ne "contoso_hypermarket"){
+    Deploy-Workbook "arc-osperformance-workbook.bicep"
+}
 
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports
