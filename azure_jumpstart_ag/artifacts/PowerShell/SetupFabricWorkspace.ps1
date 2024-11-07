@@ -46,6 +46,9 @@ $global:kqlClusterUri = ""
 Start-Transcript -Path ($AgLogsDir + "\SetupFabricWorkspace.log")
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Fabric Wrokspace" -ForegroundColor DarkGreen
 
+# Turn off subscription selection prompt in new AZ CLI
+az config set core.login_experience_v2=off
+
 # Login to Azure as end user or managed identity to get access tokens for different API endpoints
 if ($runAs -eq "user") {
   # login using device code
@@ -208,7 +211,7 @@ function Set-Fabric-Workspace {
   $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri $hyperMarketDashboardReport).Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
 
   # Convert the KQL dashboard report payload to base64
-  Write-Host "INFO: Conerting report content into base64 encoded format."
+  Write-Host "INFO: Converting report content into base64 encoded format."
   $base64Payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ordersDashboardBody))
 
   # Build KQL dashboard report payload from the report template
@@ -363,12 +366,11 @@ function Set-Fabric-Workspace {
   # Use MWC Token to create event data connection
   Write-Host "INFO: Creating eventstream in KQL database to ingest data."
   $dataSourceConnectionId = Invoke-RestMethod -Method Post -Uri $streamApi -Body $streamBody -ContentType "application/json" -Headers @{ Authorization = "MwcToken $mwcToken" }
-  if ($dataSourceConnectionId.Length -gt 0){
-    Write-Host "INFO: Created eventstream in KQL database with ID: $dataSourceConnectionId"
+  if ($dataSourceConnectionId.dataSourceConnectionId){
+    Write-Host "INFO: Created eventstream in KQL database with ID: $($dataSourceConnectionId.dataSourceConnectionId)"
   }
   else {
-    Write-Host "ERROR: Failed to create eventstream in KQL database."
-    return
+    Write-Host "ERROR: Failed to create eventstream in KQL database. Review KQL database to make sure datastream is created."
   }
 
   # Import data sceince notebook for sales forecast
@@ -378,7 +380,7 @@ function Set-Fabric-Workspace {
   $ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/fabric/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
 
   # Convert the KQL dashboard report payload to base64
-  Write-Host "INFO: Converting report content into base64 encoded format."
+  Write-Host "INFO: Converting notebook content into base64 encoded format."
   $base64Payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ordersNotebookBody))
 
   # Build KQL dashboard report payload from the report template
@@ -399,12 +401,11 @@ function Set-Fabric-Workspace {
 }
 "@
 
-  # Create KQL dashboard report
+  # Create notebook in Fabric workspace
   $nootebookApi = "https://api.fabric.microsoft.com/v1/workspaces/$fabricWorkspaceId/notebooks"
   $headers = @{"Authorization" = "Bearer $fabricAccessToken"; "Content-Type" = "application/json"}
-  $notebookResp = Invoke-RestMethod -Method Post -Uri $nootebookApi -Headers $headers -Body $body
-  $notebookResp
-  Write-Host "INFO: Created notebook in Fabric workspace."
+  Invoke-RestMethod -Method Post -Uri $nootebookApi -Headers $headers -Body $body
+  Write-Host "INFO: Imported notebook in Fabric workspace."
 }
 
 Function Invoke-FabricAPIRequest {
@@ -689,6 +690,9 @@ function Set-PowerBI-Project {
   Write-Host "INFO: Import the PowerBI report and save the item id."
   $reportImport = Import-FabricItem -workspaceId $global:workspaceId -path $pbipReportPath -itemProperties @{"semanticModelId" = $semanticModelImport.Id}
   Write-Host "INFO: Imported PowerBI report with the item id $($reportImport.id)"
+
+  # Print Fabric workspace URL
+
 }
 
 # Create Fabric workspace and KQL database
