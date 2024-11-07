@@ -23,10 +23,6 @@ param azureOpenAiSkuName string = 'GlobalStandard'
 
 @description('The array of OpenAI models to deploy')
 param azureOpenAIModels array = [
-  /*{
-    name: 'gpt-35-turbo'
-    version: '0301'
-  }*/
   {
     name: 'gpt-4o-mini'
     version: '2024-07-18'
