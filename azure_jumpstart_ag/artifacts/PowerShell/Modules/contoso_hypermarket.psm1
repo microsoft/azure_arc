@@ -533,6 +533,8 @@ function Deploy-HypermarketConfigs {
 
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
+    $azureOpenAIModelName = $global:azureOpenAIModel.name
+    $azureOpenAIModelVersion = $global:azureOpenAIModel.version
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -549,7 +551,9 @@ function Set-AIServiceSecrets {
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
             --from-literal=azure-openai-key=$AIServicesKey `
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
-            --from-literal=region=$location
+            --from-literal=region=$location `
+            --from-literal=azure-openai-model-name=$azureOpenAIModelName `
+            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion
     }
 }
 
@@ -761,7 +765,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:5003/api/docs"
+            $output = "http://${publicIPAddress}:5003"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file

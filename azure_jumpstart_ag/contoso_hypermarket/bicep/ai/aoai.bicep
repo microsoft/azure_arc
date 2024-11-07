@@ -22,12 +22,10 @@ param cognitiveSvcType string = 'AIServices'
 param azureOpenAiSkuName string = 'GlobalStandard'
 
 @description('The array of OpenAI models to deploy')
-param azureOpenAIModels array = [
-  {
+param azureOpenAIModel object = {
     name: 'gpt-4o'
     version: '2024-05-13'
   }
-]
 
 resource openAIAccount 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
   name: openAIAccountName
@@ -41,10 +39,9 @@ resource openAIAccount 'Microsoft.CognitiveServices/accounts@2024-06-01-preview'
   }
 }
 
-@batchSize(1)
-resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = [for model in azureOpenAIModels: {
+resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
   parent: openAIAccount
-  name: '${openAIAccountName}-${model.name}-deployment'
+  name: '${openAIAccountName}-${azureOpenAIModel.name}-deployment'
   sku: {
     name: azureOpenAiSkuName
     capacity: openAICapacity
@@ -52,14 +49,14 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
   properties: {
     model: {
       format: 'OpenAI'
-      name: model.name
-      version: model.version
+      name: azureOpenAIModel.name
+      version: azureOpenAIModel.version
     }
     versionUpgradeOption: 'NoAutoUpgrade'
     currentCapacity: openAICapacity
     raiPolicyName: 'Microsoft.Default'
   }
-}]
+}
 
 output openAIEndpoint string = filter(items(openAIAccount.properties.endpoints), endpoint => endpoint.key == 'OpenAI Language Model Instance API')[0].value
 output speechToTextEndpoint string = filter(items(openAIAccount.properties.endpoints), endpoint => endpoint.key == 'Speech Services Speech to Text')[0].value

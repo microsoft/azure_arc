@@ -75,6 +75,12 @@ param openAIEndpoint string
 @description('The URL of the Speech-to-text endpoint.')
 param speachToTextEndpoint string
 
+@description('The array of OpenAI models to deploy')
+param azureOpenAIModel object = {
+    name: 'gpt-4o'
+    version: '2024-05-13'
+}
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -190,7 +196,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon} -azureOpenAIModel ${azureOpenAIModel}'
     }
   }
 }
