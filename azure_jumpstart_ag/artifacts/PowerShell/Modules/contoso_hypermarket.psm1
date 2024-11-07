@@ -138,8 +138,9 @@ function Deploy-AIO-M3 {
         return
     }
 
+    $eventHubNamespace =$eventHubInfo[0].name
     $eventHubNamespaceId = $eventHubInfo[0].id
-    $evenHubNamespaceHost = "$($eventHubInfo[0].name).servicebus.windows.net:9093"
+    $evenHubNamespaceHost = "$($eventHubNamespace).servicebus.windows.net:9093"
 
     Write-Host "INFO: Found EventHub Namespace with Resource ID: $eventHubNamespaceId" -ForegroundColor DarkGray
 
@@ -299,10 +300,11 @@ function Deploy-AIO-M3 {
         # Get IoT Operations extension pricipalId
         Write-Host "[$(Get-Date -Format t)] INFO: Retrieving IoT Operations extension principalId" -ForegroundColor DarkGray
         $iotExtensionPrincipalId = (az k8s-extension list --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --query "[?extensionType=='microsoft.iotoperations'].identity.principalId" -o tsv)
+        Write-Host "[$(Get-Date -Format t)] INFO: IoT Operations extension principalId is $iotExtensionPrincipalId" -ForegroundColor DarkGray
 
         # Assign "Azure Event Hubs Data Sender" role to IoT managed identity
-        Write-Host "[$(Get-Date -Format t)] INFO: Assigning 'Azure Event Hubs Data Sender role' to EventHub namespace" -ForegroundColor DarkGray
-        az role assignment create --assignee $iotExtensionPrincipalId --role "Azure Event Hubs Data Sender" --scope $eventHubNamespaceId
+        Write-Host "[$(Get-Date -Format t)] INFO: Assigning 'Azure Event Hubs Data Sender role' to '$iotExtensionPrincipalId' to EventHub namespace" -ForegroundColor DarkGray
+        az role assignment create --assignee-object-id $iotExtensionPrincipalId --role "Azure Event Hubs Data Sender" --scope $eventHubNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
 
         # Deploy IoT DataFlows using bicep template
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying IoT DataFlows using bicep template" -ForegroundColor DarkGray
@@ -326,6 +328,7 @@ function Deploy-AIO-M3 {
 }
 
 function Set-MicrosoftFabric {
+
     # Load Agconfig
     $fabricWorkspacePrefix = $AgConfig.FabricConfig["WorkspacePrefix"]
     $fabricWorkspaceName = "$fabricWorkspacePrefix-$namingGuid"
@@ -334,26 +337,47 @@ function Set-MicrosoftFabric {
     $fabricConfigFile = "$fabricFolder\fabric-config.json"
     $eventHubKeyName = $AgConfig.FabricConfig["EventHubSharedAccessKeyName"]
 
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Fabric workspace configuration file $fabricConfigFile" -ForegroundColor DarkGray
+
     # Get Fabric capacity name from the resource group
     $fabricCapacityName = (az fabric capacity list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
     if (-not $fabricCapacityName) {
-        Write-Error "Fabric capacity not found in the resource group $Env:resourceGroup"
-        return
+        Write-Host "[$(Get-Date -Format t)] WARNING: Fabric capacity not found in the resource group $Env:resourceGroup. Make sure either you have Fabric Capacity or other Fabric license to create Farbric worspace." -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "[$(Get-Date -Format t)] INFO: Found fabric capacity '$fabricCapacityName' in the resource group $Env:resourceGroup." -ForegroundColor DarkGray
     }
 
     # Get EventHub namespace created in the resource group
-    $eventHubNS = (az eventhubs namespace list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
-    if (-not $eventHubNS) {
-        Write-Error "EventHub namespaces not found in the resource group $Env:resourceGroup"
+    $eventHubNamespace = (az eventhubs namespace list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $eventHubNamespace) {
+        Write-Error "$(Get-Date -Format t)] INFO: EventHub namespaces not found in the resource group $Env:resourceGroup" -ForegroundColor DarkRed
         return
     }
 
-    # Get EventHub name from the eventhub namespace created in the resource group
-    $eventHubName = (az eventhubs eventhub list --namespace $eventHubNS --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    # Get Event Hub from the Event Hub namespace
+    $eventHubs = az eventhubs eventhub list --namespace-name $eventHubNamespace --resource-group $resourceGroup | ConvertFrom-Json
+    $eventHubName = $eventHubs[0].name
     if (-not $eventHubName) {
-        Write-Error "No Event Hub created in the EventHub namespace $eventHubNS"
+        Write-Host "[$(Get-Date -Format t)] ERROR: Event Hub not found in the EventHub namespace $eventHubNamespace" -ForegroundColor DarkRed
         return
     }
+
+    # Get Event Hub credentials
+    Write-Host "INFO: Retrieving Event Hub key for '$eventHubKeyName' Shared Acess Policy."
+    $eventHubKeyName = $AgConfig.FabricConfig["EventHubSharedAccessKeyName"]
+    $eventHubKey = az eventhubs namespace authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --name $eventHubKeyName --query primaryKey --output tsv
+    if ($eventHubKey -eq '') {
+        Write-Host "$(Get-Date -Format t)] ERROR: Failed to retrieve Event Hub key." -ForegroundColor DarkRed
+        return
+    }
+
+    Write-Host "$(Get-Date -Format t)] INFO: Received Event Hub key." -ForegroundColor DarkGray
+
+    # Store EventHub key in the environment variable to use in Farbic setup script
+    [System.Environment]::SetEnvironmentVariable('eventHubPrimaryKey', $eventHubKey, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable('eventHubNamespace', $eventHubNamespace, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable('eventHubName', $eventHubName, [System.EnvironmentVariableTarget]::Machine)
 
     $configJson = @"
     {
@@ -365,19 +389,27 @@ function Set-MicrosoftFabric {
         "fabricCapacityName": "$fabricCapacityName",
         "templateBaseUrl": "$Env:templateBaseUrl",
         "fabricWorkspaceName": "$fabricWorkspaceName",
-        "eventHubKeyName": "$eventHubKeyName"
+        "eventHubNamespace": "$eventHubNamespace",
+        "eventHubName": "$eventHubName",
+        "eventHubKeyName": "$eventHubKeyName",
+        "eventHubPrimaryKey": "$eventHubKey"
     }
 "@
 
     $configJson | Set-Content -Path $fabricConfigFile
-    Write-Host "Fabric config file created at $fabricConfigFile"
+    Write-Host "$(Get-Date -Format t)] INFO: Fabric config file $fabricConfigFile created"
 
     # Download Fabric workspace setup script from GitHuB
-    $scriptFilePath = "$fabricFolder\SetupFabricWorkspace.ps1"
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/SetupFabricWorkspace.ps1") -OutFile $scriptFilePath
+    $fabricSetupScriptFile = "SetupFabricWorkspace.ps1"
+    $sriptFileUrl = $templateBaseUrl + "artifacts/PowerShell/$fabricSetupScriptFile"
+    Write-Host "$(Get-Date -Format t)] INFO: Downloading script file from $sriptFileUrl"
+
+    $scriptFilePath = "$fabricFolder\$fabricSetupScriptFile"
+    Invoke-WebRequest ($sriptFileUrl) -OutFile $scriptFilePath
     if (-not (Test-Path -Path $scriptFilePath)) {
-        Write-Error "Unable to download script file: 'SetupFabricWorkspace.ps1' from GitHub"
+        Write-Host "[$(Get-Date -Format t)] ERROR: Unable to download script file from $sriptFileUrl" -ForegroundColor DarkRed
     }
+    Write-Host "$(Get-Date -Format t)] INFO: Downloaded script file $scriptFilePath"
 }
 
 function Deploy-HypermarketConfigs {
