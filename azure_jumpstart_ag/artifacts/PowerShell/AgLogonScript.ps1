@@ -216,6 +216,11 @@ if ($scenario -eq "contoso_supermarket") {
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 }
 
+##############################################################
+# Deploy Kubernetes Prometheus Stack for Observability
+##############################################################
+Deploy-Prometheus -AgConfig $AgConfig
+
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
@@ -241,11 +246,6 @@ if ($scenario -eq "contoso_motors") {
     Deploy-HypermarketConfigs
     Set-LoadBalancerBackendPools
 }
-
-##############################################################
-# Deploy Kubernetes Prometheus Stack for Observability
-##############################################################
-Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
