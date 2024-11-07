@@ -59,7 +59,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
-    #$global:spnObjectId = $Env:spnObjectId
+    $global:azureOpenAIModel = $Env:azureOpenAIModel
     $global:openAIEndpoint = $Env:openAIEndpoint
     $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }

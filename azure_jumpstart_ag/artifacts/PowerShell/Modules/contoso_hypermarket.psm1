@@ -533,6 +533,8 @@ function Deploy-HypermarketConfigs {
 
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
+    $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
+    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -549,7 +551,9 @@ function Set-AIServiceSecrets {
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
             --from-literal=azure-openai-key=$AIServicesKey `
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
-            --from-literal=region=$location
+            --from-literal=region=$location `
+            --from-literal=azure-openai-model-name=$azureOpenAIModelName `
+            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion
     }
 }
 
@@ -630,10 +634,10 @@ function Set-LoadBalancerBackendPools {
         $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName  `
+        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName `
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
-        -o tsv `
+        --output tsv `
         --only-show-errors
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
@@ -761,7 +765,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:5003/api/docs"
+            $output = "http://${publicIPAddress}:5003"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
@@ -860,6 +864,14 @@ function Deploy-HypermarketBookmarks {
             $newContent | Set-Content -Path $bookmarksFileName
             Start-Sleep -Seconds 2
         }
+
+        # Matching url: Grafana
+        # Replace matching value in the Bookmarks file
+        $output = "http://${publicIPAddress}:3000"
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Grafana-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+        Start-Sleep -Seconds 2
     }
     Start-Sleep -Seconds 2
 
