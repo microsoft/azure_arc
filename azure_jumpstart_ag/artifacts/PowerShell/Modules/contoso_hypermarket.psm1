@@ -763,7 +763,6 @@ function Set-ACSA {
     $storageAccountName = $global:aioStorageAccountName     # Using $global:aioStorageAccountName
     $storageContainer = "shopper-videos"                     # Container name set to "shoppervideos"
     $resourceGroup = $global:resourceGroup
-    $location = $global:azureLocation
     $arcClusterName = $global:k3sArcClusterName
     $subscriptionId = $global:subscriptionId
 
@@ -779,11 +778,11 @@ function Set-ACSA {
         --auth-mode login
 
     # Assign necessary role to the extension principal
-    $principalID = az k8s-extension list `
+    $principalID = $(az k8s-extension list `
         --cluster-name $arcClusterName `
         --resource-group $resourceGroup `
         --cluster-type connectedClusters `
-        --query "[?extensionType=='microsoft.arc.containerstorage'].identity.principalId | [0]" -o tsv
+        --query "[?extensionType=='microsoft.arc.containerstorage'].identity.principalId | [0]" -o tsv)
 
     az role assignment create `
         --assignee-object-id $principalID `
