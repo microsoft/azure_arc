@@ -90,16 +90,11 @@ param deployGPUNodes bool = false
 param openAICapacity int = 10
 
 @description('The array of OpenAI models to deploy')
-param azureOpenAIModels array = [
-  {
-    name: 'gpt-35-turbo'
-    version: '0125'
-  }
-  {
-    name: 'gpt-4o-mini'
-    version: '2024-07-18'
-  }
-]
+param azureOpenAIModel object = {
+    name: 'gpt-4o'
+    version: '2024-05-13'
+    apiVersion: '2024-08-01-preview'
+}
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
@@ -225,6 +220,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
+    azureOpenAIModel: azureOpenAIModel
   }
 }
 module keyVault 'data/keyVault.bicep' = {
@@ -268,7 +264,7 @@ module azureOpenAI 'ai/aoai.bicep' = {
   params: {
     location: location
     openAIAccountName: 'openai${namingGuid}'
-    azureOpenAIModels: azureOpenAIModels
+    azureOpenAIModel: azureOpenAIModel
     openAICapacity: openAICapacity
   }
 }

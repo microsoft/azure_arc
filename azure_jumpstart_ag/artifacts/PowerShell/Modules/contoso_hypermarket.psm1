@@ -413,113 +413,129 @@ function Set-MicrosoftFabric {
 }
 
 function Deploy-HypermarketConfigs {
-
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-hypermarket.psd
+    Write-Host "INFO: Cloning the GitHub repository locally to get helm chart" -ForegroundColor Gray
+    git clone "https://github.com/Azure/jumpstart-apps.git"
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Start-Job -Name gitops -ScriptBlock {
-            $AgConfig = $using:AgConfig
-            $cluster = $using:cluster
-            $namingGuid = $using:namingGuid
-            $resourceGroup = $using:resourceGroup
-            $appClonedRepo = $using:appUpstreamRepo
-            $appsRepo = $using:appsRepo
-
-            $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
-                $app = $_
-                $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-                $branch = $cluster.value.Branch.ToLower()
-                $configName = $app.value.GitOpsConfigName.ToLower()
-                $namespace = $app.value.Namespace
-                $appName = $app.Value.KustomizationName
-                $appPath = $app.Value.KustomizationPath
-                $retryCount = 0
-                $maxRetries = 2
-
-                Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-                $type = "connectedClusters"
-
-                az k8s-configuration flux create `
-                    --cluster-name $clusterName `
-                    --resource-group $resourceGroup `
-                    --name $configName `
-                    --cluster-type $type `
-                    --scope cluster `
-                    --url $appClonedRepo `
-                    --branch $branch `
-                    --sync-interval 3s `
-                    --kustomization name=$appName path=$appPath prune=true retry_interval=1m `
-                    --timeout 10m `
-                    --namespace $namespace `
-                    --only-show-errors `
-                    2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                do {
-                    $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                    if ($configStatus.ComplianceState -eq "Compliant") {
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                    }
-                    else {
-                        if ($configStatus.ComplianceState -ne "Non-compliant") {
-                            Start-Sleep -Seconds 20
-                        }
-                        elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                            Start-Sleep -Seconds 20
-                            $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                            if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                                $retryCount++
-                                Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                                Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                                az k8s-configuration flux delete `
-                                    --resource-group $resourceGroup `
-                                    --cluster-name $clusterName `
-                                    --cluster-type $type `
-                                    --name $configName `
-                                    --force `
-                                    --yes `
-                                    --only-show-errors `
-                                    2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                                Start-Sleep -Seconds 10
-                                Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                                az k8s-configuration flux create `
-                                    --cluster-name $clusterName `
-                                    --resource-group $resourceGroup `
-                                    --name $configName `
-                                    --cluster-type $type `
-                                    --scope cluster `
-                                    --url $appClonedRepo `
-                                    --branch $branch `
-                                    --sync-interval 3s `
-                                    --kustomization name=$appName path=$appPath prune=true `
-                                    --timeout 30m `
-                                    --namespace $namespace `
-                                    --only-show-errors `
-                                    2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            }
-                        }
-                        elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
-                            Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            break
-                        }
-                    }
-                } until ($configStatus.ComplianceState -eq "Compliant")
-            }
-        }
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName
+        helm dependency build ".\jumpstart-apps\agora\contoso_hypermarket\charts\contoso-hypermarket" --namespace contoso-hypermarket
+        helm install contoso-hypermarket ".\jumpstart-apps\agora\contoso_hypermarket\charts\contoso-hypermarket" --create-namespace --namespace contoso-hypermarket
     }
-    while ($(Get-Job -Name gitops).State -eq 'Running') {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-        Receive-Job -Name gitops -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 60
-    }
-
-    Get-Job -name gitops | Remove-Job
-    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
-    Write-Host
 }
+
+# function Deploy-HypermarketConfigs {
+
+#     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-hypermarket.psd
+#     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+#         Start-Job -Name gitops -ScriptBlock {
+#             $AgConfig = $using:AgConfig
+#             $cluster = $using:cluster
+#             $namingGuid = $using:namingGuid
+#             $resourceGroup = $using:resourceGroup
+#             $appClonedRepo = $using:appUpstreamRepo
+#             $appsRepo = $using:appsRepo
+
+#             $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
+#                 $app = $_
+#                 $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
+#                 $branch = $cluster.value.Branch.ToLower()
+#                 $configName = $app.value.GitOpsConfigName.ToLower()
+#                 $namespace = $app.value.Namespace
+#                 $appName = $app.Value.KustomizationName
+#                 $appPath = $app.Value.KustomizationPath
+#                 $retryCount = 0
+#                 $maxRetries = 2
+
+#                 Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+#                 $type = "connectedClusters"
+
+#                 az k8s-configuration flux create `
+#                     --cluster-name $clusterName `
+#                     --resource-group $resourceGroup `
+#                     --name $configName `
+#                     --cluster-type $type `
+#                     --scope cluster `
+#                     --url $appClonedRepo `
+#                     --branch $branch `
+#                     --sync-interval 3s `
+#                     --kustomization name=$appName path=$appPath prune=true retry_interval=1m `
+#                     --timeout 10m `
+#                     --namespace $namespace `
+#                     --only-show-errors `
+#                     2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+#                 do {
+#                     $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
+#                     if ($configStatus.ComplianceState -eq "Compliant") {
+#                         Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+#                     }
+#                     else {
+#                         if ($configStatus.ComplianceState -ne "Non-compliant") {
+#                             Start-Sleep -Seconds 20
+#                         }
+#                         elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+#                             Start-Sleep -Seconds 20
+#                             $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
+#                             if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+#                                 $retryCount++
+#                                 Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+#                                 Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+#                                 az k8s-configuration flux delete `
+#                                     --resource-group $resourceGroup `
+#                                     --cluster-name $clusterName `
+#                                     --cluster-type $type `
+#                                     --name $configName `
+#                                     --force `
+#                                     --yes `
+#                                     --only-show-errors `
+#                                     2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+#                                 Start-Sleep -Seconds 10
+#                                 Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+#                                 az k8s-configuration flux create `
+#                                     --cluster-name $clusterName `
+#                                     --resource-group $resourceGroup `
+#                                     --name $configName `
+#                                     --cluster-type $type `
+#                                     --scope cluster `
+#                                     --url $appClonedRepo `
+#                                     --branch $branch `
+#                                     --sync-interval 3s `
+#                                     --kustomization name=$appName path=$appPath prune=true `
+#                                     --timeout 30m `
+#                                     --namespace $namespace `
+#                                     --only-show-errors `
+#                                     2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+#                             }
+#                         }
+#                         elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
+#                             Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+#                             break
+#                         }
+#                     }
+#                 } until ($configStatus.ComplianceState -eq "Compliant")
+#             }
+#         }
+#     }
+#     while ($(Get-Job -Name gitops).State -eq 'Running') {
+#         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+#         Receive-Job -Name gitops -WarningAction SilentlyContinue
+#         Start-Sleep -Seconds 60
+#     }
+
+#     Get-Job -name gitops | Remove-Job
+#     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+#     Write-Host
+# }
 
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
+    $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
+    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
+    $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -536,7 +552,10 @@ function Set-AIServiceSecrets {
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
             --from-literal=azure-openai-key=$AIServicesKey `
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
-            --from-literal=region=$location
+            --from-literal=region=$location `
+            --from-literal=azure-openai-model-name=$azureOpenAIModelName `
+            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion `
+            --from-literal=azure-openai-api-version=$azureOpenAIApiVersion
     }
 }
 
@@ -560,18 +579,15 @@ function Set-SQLSecret {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying SQL Secret to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        $decodeAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
         kubectx $clusterName
         kubectl create secret generic azure-sqlpassword-secret `
             --namespace=contoso-hypermarket `
-            --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+            --from-literal=azure-sqlpassword-secret=$decodeAdminPassword
     }
 }
 
 function Set-LoadBalancerBackendPools {
-
-    #$loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
-    #$loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
-    #$lbIndex = 0
     $vnetResourceId = $(az network vnet list -g $resourceGroup --query [].id -o tsv)
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
@@ -582,10 +598,19 @@ function Set-LoadBalancerBackendPools {
         $services.items | ForEach-Object {
             $service = $_
             $serviceName = $service.metadata.name
-            $servicePort = $service.spec.ports.port
+            $servicePorts = $service.spec.ports.port
             $serviceIp = $service.status.loadBalancer.ingress.ip
 
+            if($serviceName -eq "influxdb"){
+                $servicePort = $servicePorts[1]
+            }else{
+                $servicePort = $servicePorts[0]
+            }
+
             if ($null -ne $serviceIp) {
+                Write-Host "[$(Get-Date -Format t)] Creating backend pool for service: $serviceName" -ForegroundColor Gray
+                Write-Host "`n"
+
                 az network lb address-pool create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-pool" `
@@ -593,15 +618,17 @@ function Set-LoadBalancerBackendPools {
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
                     --only-show-errors
 
+                Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+                Write-Host "`n"
                 az network lb inbound-nat-rule create -g $resourceGroup `
                     --lb-name $loadBalancerName `
                     --name "$serviceName-NATRule" `
                     --protocol Tcp `
-                    --frontend-port-range-start $servicePort[0] `
-                    --frontend-port-range-end $servicePort[0] `
+                    --frontend-port-range-start $servicePort `
+                    --frontend-port-range-end $servicePort `
                     --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
-                    --backend-port $servicePort[0] `
+                    --backend-port $servicePort `
                     --only-show-errors
             }
         }
@@ -610,11 +637,14 @@ function Set-LoadBalancerBackendPools {
         $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName  `
+        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName `
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
-        -o tsv `
+        --output tsv `
         --only-show-errors
+
+        Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
 
         az network lb address-pool create -g $resourceGroup `
             --lb-name $loadBalancerName `
@@ -622,6 +652,9 @@ function Set-LoadBalancerBackendPools {
             --vnet $vnetResourceId `
             --backend-addresses "[{name:Grafana,ip-address:${clientVMIpAddress}}]" `
             --only-show-errors
+
+        Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
 
         az network lb inbound-nat-rule create -g $resourceGroup `
             --lb-name $loadBalancerName `
@@ -634,6 +667,9 @@ function Set-LoadBalancerBackendPools {
             --backend-port $servicePort `
             --only-show-errors
 
+        Write-Host "[$(Get-Date -Format t)] Creating outbound rule for service: $serviceName" -ForegroundColor Gray
+        Write-Host "`n"
+
         az network lb outbound-rule create --address-pool "$serviceName-pool"`
             --lb-name $loadBalancerName `
             --name "Grafana-outbound" `
@@ -642,8 +678,6 @@ function Set-LoadBalancerBackendPools {
             --frontend-ip-configs $loadBalancerPublicIp `
             --resource-group $resourceGroup `
             --only-show-errors
-
-        #$lbIndex++
     }
 
 }
@@ -734,7 +768,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:5003/api/docs"
+            $output = "http://${publicIPAddress}:5003"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
@@ -833,6 +867,14 @@ function Deploy-HypermarketBookmarks {
             $newContent | Set-Content -Path $bookmarksFileName
             Start-Sleep -Seconds 2
         }
+
+        # Matching url: Grafana
+        # Replace matching value in the Bookmarks file
+        $output = "http://${publicIPAddress}:3000"
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Grafana-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+        Start-Sleep -Seconds 2
     }
     Start-Sleep -Seconds 2
 
@@ -845,4 +887,161 @@ function Deploy-HypermarketBookmarks {
     $quickAccess = new-object -com shell.application
     $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
     $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+}
+
+function Set-GPU-Operator {
+    Write-Host "Starting GPU Operator installation..." -ForegroundColor Gray
+
+    # Add the NVIDIA Helm repository
+    Write-Host "Adding NVIDIA Helm repository..." -ForegroundColor Gray
+    helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
+    helm repo update
+
+    # Loop through each cluster and install the GPU operator
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "Switching context to cluster: $clusterName" -ForegroundColor Gray
+        kubectx $clusterName
+
+        # Create the namespace for the GPU operator
+        Write-Host "Creating GPU operator namespace in $clusterName..." -ForegroundColor Gray
+        kubectl create namespace gpu-operator -o yaml --dry-run=client | kubectl apply -f -
+
+        # Install the GPU operator using Helm
+        Write-Host "Installing GPU operator in $clusterName..." -ForegroundColor Gray
+        helm install --wait --generate-name `
+            -n gpu-operator `
+            nvidia/gpu-operator `
+            --create-namespace `
+            --values jumpstart-apps\agora\contoso_hypermarket\charts\gpu-operator\values.yaml
+
+        Write-Host "GPU operator installation completed on $clusterName." -ForegroundColor Green
+    }
+
+    Write-Host "GPU operator installation completed successfully on all clusters." -ForegroundColor Green
+}
+
+# Function to set the Azure Data Studio connections
+function Set-AzureDataStudioConnections {
+    param (
+        [PSCustomObject[]]$dbConnections
+    )
+
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating SQL Server connections in Azure Data Studio "
+    Write-Host "`n"
+
+    $settingsContent = @"
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+    {{DB_CONNECTION_LIST}}
+    ],
+    "window.zoomLevel": 2
+}
+"@ 
+    
+    $dbConnectionsJson = ""
+    $index = 0
+    foreach($connection in $dbConnections) {
+        $dagConnection = @"
+{
+    "options": {
+        "connectionName": "$($connection.sitename)",
+        "server": "$($connection.server)",
+        "database": "",
+        "authenticationType": "SqlLogin",
+        "user": "$($connection.username)",
+        "password": "$($connection.password)",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": "",
+        "trustServerCertificate": true
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+        $dbConnectionsJson += $dagConnection
+
+        if ($index -lt $dbConnections.Count - 1) {
+            $dbConnectionsJson += ",`n"
+        }
+        else {
+            $dbConnectionsJson += "`n"
+        }
+        $index += 1
+    }
+
+    $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
+
+    $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+    $settingsContent | Set-Content -Path $settingsFilePath
+}
+
+# Function to set the SQL Server connections file and Azure Data Studio connections shortcuts
+function Set-DatabaseConnectionsShortcuts {
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating Database Endpoints file Desktop shortcut"
+    Write-Host "`n"
+
+    $filename = "DatabaseConnectionEndpoints.txt"
+    $file = New-Item -Path $AgConfig.AgDirectories.AgDir -Name $filename -ItemType "file" -Force
+    $Endpoints = $file.FullName
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $dbConnections = @()
+   
+    # Get SQL server service IP and the port
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName
+        
+        # Get Loadbalancer IP and target port
+        $sqlService = kubectl get service mssql-service -n contoso-hypermarket -o json | ConvertFrom-Json
+        $endPoint = "$($sqlService.spec.loadBalancerIP),$($sqlService.spec.ports.targetPort)"
+        Add-Content $Endpoints "SQL Server external endpoint for $clusterName cluster:"
+        $endPoint | Add-Content $Endpoints 
+
+        # Get SQL server username and password
+        $secret = kubectl get secret azure-sqlpassword-secret -n contoso-hypermarket -o json | ConvertFrom-Json
+        $password = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($secret.data.'azure-sqlpassword-secret'))
+        Add-Content $Endpoints "Username: SA, Password: $password"
+        Add-Content $Endpoints ""
+        Add-Content $Endpoints ""
+
+        $dbConnectionInfo = @{
+            sitename = "$clusterName"  
+            server = "$endPoint" 
+            username="SA" 
+            password = "$password"
+        }
+    
+        # Add to the connection list
+        $dbConnections += $dbConnectionInfo
+    }    
+    
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $TargetFile = $Endpoints
+    $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQL Server Endpoints.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+
+    # Create Azure Data Studio connection
+    Set-AzureDataStudioConnections -dbConnections $dbConnections
 }

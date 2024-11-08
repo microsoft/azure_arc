@@ -128,7 +128,7 @@ LAX,Los Angeles,CA,United States
 .create-or-alter function expand_iot_data()
 {
   staging
-  | where subject == "topic/iot"
+  | where subject == "iot/devices"
   | extend data = parse_json(event_data) 
   | project 
   timestamp = todatetime(data.timestamp),
