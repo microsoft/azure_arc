@@ -577,10 +577,11 @@ function Set-SQLSecret {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying SQL Secret to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        $decodeAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
         kubectx $clusterName
         kubectl create secret generic azure-sqlpassword-secret `
             --namespace=contoso-hypermarket `
-            --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+            --from-literal=azure-sqlpassword-secret=$decodeAdminPassword
     }
 }
 
