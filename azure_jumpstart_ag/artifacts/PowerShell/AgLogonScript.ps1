@@ -62,6 +62,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:azureOpenAIModel = $Env:azureOpenAIModel
     $global:openAIEndpoint = $Env:openAIEndpoint
     $global:speachToTextEndpoint = $Env:speachToTextEndpoint
+    $global:openAIDeploymentName = $Env:openAIDeploymentName
 }
 
 #####################################################################

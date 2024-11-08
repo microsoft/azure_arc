@@ -221,6 +221,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
     azureOpenAIModel: azureOpenAIModel
+    openAIDeploymentName: azureOpenAI.outputs.openAIDeploymentName
   }
 }
 module keyVault 'data/keyVault.bicep' = {

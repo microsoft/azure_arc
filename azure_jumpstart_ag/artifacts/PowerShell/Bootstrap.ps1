@@ -32,7 +32,8 @@ param (
   [string]$vmAutologon,
   [string]$openAIEndpoint,
   [string]$speachToTextEndpoint,
-  [object]$azureOpenAIModel
+  [object]$azureOpenAIModel,
+  [string]$openAIDeploymentName
 )
 
 ##############################################################
@@ -75,6 +76,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 

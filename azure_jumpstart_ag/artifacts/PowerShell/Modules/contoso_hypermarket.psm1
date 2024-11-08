@@ -554,7 +554,7 @@ function Set-AIServiceSecrets {
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
             --from-literal=region=$location `
             --from-literal=azure-openai-model-name=$azureOpenAIModelName `
-            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion `
+            --from-literal=azure-openai-deployment-name=$openAIDeploymentName `
             --from-literal=azure-openai-api-version=$azureOpenAIApiVersion
     }
 }
