@@ -535,6 +535,7 @@ function Set-AIServiceSecrets {
     $location = $global:azureLocation
     $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
     $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
+    $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -553,7 +554,8 @@ function Set-AIServiceSecrets {
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
             --from-literal=region=$location `
             --from-literal=azure-openai-model-name=$azureOpenAIModelName `
-            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion
+            --from-literal=azure-openai-model-version=$azureOpenAIModelVersion `
+            --from-literal=azure-openai-api-version=$azureOpenAIApiVersion
     }
 }
 

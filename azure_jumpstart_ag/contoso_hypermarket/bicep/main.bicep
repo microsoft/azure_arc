@@ -93,6 +93,7 @@ param openAICapacity int = 10
 param azureOpenAIModel object = {
     name: 'gpt-4o'
     version: '2024-05-13'
+    apiVersion: '2024-08-01-preview'
 }
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
