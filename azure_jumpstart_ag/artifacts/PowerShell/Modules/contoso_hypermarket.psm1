@@ -577,10 +577,11 @@ function Set-SQLSecret {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying SQL Secret to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        $decodeAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
         kubectx $clusterName
         kubectl create secret generic azure-sqlpassword-secret `
             --namespace=contoso-hypermarket `
-            --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+            --from-literal=azure-sqlpassword-secret=$decodeAdminPassword
     }
 }
 
@@ -884,4 +885,36 @@ function Deploy-HypermarketBookmarks {
     $quickAccess = new-object -com shell.application
     $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
     $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+}
+
+function Set-GPU-Operator {
+    Write-Host "Starting GPU Operator installation..." -ForegroundColor Gray
+
+    # Add the NVIDIA Helm repository
+    Write-Host "Adding NVIDIA Helm repository..." -ForegroundColor Gray
+    helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
+    helm repo update
+
+    # Loop through each cluster and install the GPU operator
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "Switching context to cluster: $clusterName" -ForegroundColor Gray
+        kubectx $clusterName
+
+        # Create the namespace for the GPU operator
+        Write-Host "Creating GPU operator namespace in $clusterName..." -ForegroundColor Gray
+        kubectl create namespace gpu-operator -o yaml --dry-run=client | kubectl apply -f -
+
+        # Install the GPU operator using Helm
+        Write-Host "Installing GPU operator in $clusterName..." -ForegroundColor Gray
+        helm install --wait --generate-name `
+            -n gpu-operator `
+            nvidia/gpu-operator `
+            --create-namespace `
+            --values jumpstart-apps\agora\contoso_hypermarket\charts\gpu-operator\values.yaml
+
+        Write-Host "GPU operator installation completed on $clusterName." -ForegroundColor Green
+    }
+
+    Write-Host "GPU operator installation completed successfully on all clusters." -ForegroundColor Green
 }
