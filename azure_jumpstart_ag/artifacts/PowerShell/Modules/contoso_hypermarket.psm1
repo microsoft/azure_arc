@@ -921,21 +921,7 @@ function Set-GPU-Operator {
     Write-Host "GPU operator installation completed successfully on all clusters." -ForegroundColor Green
 }
 
-function Get-KubernetesSecretValue {
-    param (
-        [string]$secretName,
-        [string]$namespace
-    )
-
-    Write-Host "Retrieving secret value for $secretName in namespace $namespace" -ForegroundColor Gray
-    kubectx $clusterName
-    $secret = kubectl get secret $secretName -n $namespace -o json | ConvertFrom-Json
-    $secret.data.GetEnumerator() | ForEach-Object {
-        $decodedValue = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($_.Value))
-        Write-Host "$($_.Key): $decodedValue"
-    }
-}
-
+# Function to set the Azure Data Studio connections
 function Set-AzureDataStudioConnections {
     param (
         [PSCustomObject[]]$dbConnections
@@ -1002,6 +988,7 @@ function Set-AzureDataStudioConnections {
     $settingsContent | Set-Content -Path $settingsFilePath
 }
 
+# Function to set the SQL Server connections file and Azure Data Studio connections shortcuts
 function Set-DatabaseConnectionsShortcuts {
     # Creating endpoints file
     Write-Host "`n"
