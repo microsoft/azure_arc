@@ -666,7 +666,7 @@ function Set-PowerBI-Project {
   $pbipFileName = "Contoso_Hypermarket.zip"
   $localFilePath = "$pbipFolder\$pbipFileName"
   Write-Host "INFO: Downloading Power BI report zip file."
-  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/$pbipFileName" -OutFile $localFilePath
+  Invoke-WebRequest "https://aka.ms/JSContosoHypermarketReportFiles" -OutFile $localFilePath
 
   Write-Host "INFO: Unzipping Power BI report zip file."
   Expand-Archive -Path $localFilePath -DestinationPath $pbipFolder -Force

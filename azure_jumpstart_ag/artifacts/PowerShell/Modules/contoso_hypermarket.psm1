@@ -920,3 +920,128 @@ function Set-GPU-Operator {
 
     Write-Host "GPU operator installation completed successfully on all clusters." -ForegroundColor Green
 }
+
+# Function to set the Azure Data Studio connections
+function Set-AzureDataStudioConnections {
+    param (
+        [PSCustomObject[]]$dbConnections
+    )
+
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating SQL Server connections in Azure Data Studio "
+    Write-Host "`n"
+
+    $settingsContent = @"
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+    {{DB_CONNECTION_LIST}}
+    ],
+    "window.zoomLevel": 2
+}
+"@ 
+    
+    $dbConnectionsJson = ""
+    $index = 0
+    foreach($connection in $dbConnections) {
+        $dagConnection = @"
+{
+    "options": {
+        "connectionName": "$($connection.sitename)",
+        "server": "$($connection.server)",
+        "database": "",
+        "authenticationType": "SqlLogin",
+        "user": "$($connection.username)",
+        "password": "$($connection.password)",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": "",
+        "trustServerCertificate": true
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+        $dbConnectionsJson += $dagConnection
+
+        if ($index -lt $dbConnections.Count - 1) {
+            $dbConnectionsJson += ",`n"
+        }
+        else {
+            $dbConnectionsJson += "`n"
+        }
+        $index += 1
+    }
+
+    $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
+
+    $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+    $settingsContent | Set-Content -Path $settingsFilePath
+}
+
+# Function to set the SQL Server connections file and Azure Data Studio connections shortcuts
+function Set-DatabaseConnectionsShortcuts {
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating Database Endpoints file Desktop shortcut"
+    Write-Host "`n"
+
+    $filename = "DatabaseConnectionEndpoints.txt"
+    $file = New-Item -Path $AgConfig.AgDirectories.AgDir -Name $filename -ItemType "file" -Force
+    $Endpoints = $file.FullName
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $dbConnections = @()
+   
+    # Get SQL server service IP and the port
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName
+        
+        # Get Loadbalancer IP and target port
+        $sqlService = kubectl get service mssql-service -n contoso-hypermarket -o json | ConvertFrom-Json
+        $endPoint = "$($sqlService.spec.loadBalancerIP),$($sqlService.spec.ports.targetPort)"
+        Add-Content $Endpoints "SQL Server external endpoint for $clusterName cluster:"
+        $endPoint | Add-Content $Endpoints 
+
+        # Get SQL server username and password
+        $secret = kubectl get secret azure-sqlpassword-secret -n contoso-hypermarket -o json | ConvertFrom-Json
+        $password = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($secret.data.'azure-sqlpassword-secret'))
+        Add-Content $Endpoints "Username: SA, Password: $password"
+        Add-Content $Endpoints ""
+        Add-Content $Endpoints ""
+
+        $dbConnectionInfo = @{
+            sitename = "$clusterName"  
+            server = "$endPoint" 
+            username="SA" 
+            password = "$password"
+        }
+    
+        # Add to the connection list
+        $dbConnections += $dbConnectionInfo
+    }    
+    
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $TargetFile = $Endpoints
+    $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQL Server Endpoints.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+
+    # Create Azure Data Studio connection
+    Set-AzureDataStudioConnections -dbConnections $dbConnections
+}
