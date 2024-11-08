@@ -287,6 +287,14 @@ if($scenario -eq "contoso_supermarket"){
 }
 
 ##############################################################
+# Creating database connections desktop shortcuts
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating database connections desktop shortcuts (Step 16/17)" -ForegroundColor DarkGreen
+if($scenario -eq "contoso_hypermarket"){
+    Set-DatabaseConnectionsShortcuts
+}
+
+##############################################################
 # Cleanup
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs (Step 17/17)" -ForegroundColor DarkGreen
