@@ -169,7 +169,6 @@ function Set-Fabric-Workspace {
   $global:kqlDatabaseName = $kqlDatabaseName
   Write-Host "INFO: KQL database details. Database Name: $kqlDatabaseName, Database ID: $kqlDatabaseId, kqlQueryServiceUri: $kqlQueryServiceUri"
 
-
   # Download KQL script from GitHub
   $kqlScriptUrl = $templateBaseUrl + "contoso_hypermarket/bicep/data/script.kql"
   $kqlScript = (Invoke-WebRequest $kqlScriptUrl).Content
@@ -693,8 +692,21 @@ function Set-PowerBI-Project {
   $reportImport = Import-FabricItem -workspaceId $global:workspaceId -path $pbipReportPath -itemProperties @{"semanticModelId" = $semanticModelImport.Id}
   Write-Host "INFO: Imported PowerBI report with the item id $($reportImport.id)"
 
-  # Print Fabric workspace URL
+  # Refresh semantic model
+  $datasetUri = "https://api.powerbi.com/v1.0/myorg/groups/$($global:workspaceId)/datasets/$($semanticModelImport.Id)/refreshes"
+  $headers = @{"Authorization" = "Bearer $fabricAccessToken";}
 
+  $datsetResp = Invoke-WebRequest -Method Post -Uri $datasetUri -Headers $headers
+  if (($datsetResp.StatusCode -ge 200) -and ($datsetResp.StatusCode -le 204)){
+      Write-Host "INFO: Semantic model refreshed successfully."
+  }
+  else {
+      Write-Host "ERROR: Semantic model refresh failed. Refresh semantic model manually in Microsoft Fabric workspace."
+  }
+
+  # Print Fabric workspace URL
+  $workspaceUrl = "https://app.fabric.microsoft.com/groups/$($global:workspaceId)/"
+  Write-Host "INFO: Microsoft Fabric workspace URL: $workspaceUrl"
 }
 
 # Create Fabric workspace and KQL database
