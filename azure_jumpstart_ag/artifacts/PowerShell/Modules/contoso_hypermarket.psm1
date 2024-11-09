@@ -1027,8 +1027,9 @@ function Set-DatabaseConnectionsShortcuts {
         Add-Content $Endpoints ""
         Add-Content $Endpoints ""
 
+        $siteName = [cultureinfo]::GetCultureInfo("en-US").TextInfo.ToTitleCase($clusterName)
         $dbConnectionInfo = @{
-            sitename = "$clusterName"  
+            sitename = "$siteName"  
             server = "$endPoint" 
             username="SA" 
             password = "$password"
