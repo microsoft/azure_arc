@@ -42,6 +42,7 @@ $script:apiUrl = "https://api.fabric.microsoft.com/v1"
 
 $global:workspaceId = ""
 $global:kqlClusterUri = ""
+$global:kqlDatabaseName = ""
 
 Start-Transcript -Path ($AgLogsDir + "\SetupFabricWorkspace.log")
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Fabric Wrokspace" -ForegroundColor DarkGreen
@@ -165,6 +166,7 @@ function Set-Fabric-Workspace {
   $kqlDatabaseName = $kqlDatabaseInfo[0].displayName
 
   $global:kqlClusterUri = $kqlQueryServiceUri
+  $global:kqlDatabaseName = $kqlDatabaseName
   Write-Host "INFO: KQL database details. Database Name: $kqlDatabaseName, Database ID: $kqlDatabaseId, kqlQueryServiceUri: $kqlQueryServiceUri"
 
 
@@ -679,7 +681,7 @@ function Set-PowerBI-Project {
 
   # Replace KQL cluster URI for the model to connect
   Write-Host "INFO: Replace KQL cluster URI in the semantic model."
-  (Get-Content -Path $modelFilePath) -replace '{{FABRIC_KQL_CLUSTER_URI}}', $global:kqlClusterUri | Set-Content -Path $modelFilePath
+  (Get-Content -Path $modelFilePath) -replace '{{FABRIC_KQL_CLUSTER_URI}}', $global:kqlClusterUri -replace '{{FABRIC_KQL_DATABASE}}', $global:kqlDatabaseName| Set-Content -Path $modelFilePath
 
   # Import the semantic model and save the item id
   Write-Host "INFO: Import the semantic model and save the item id."
