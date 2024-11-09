@@ -985,6 +985,12 @@ function Set-AzureDataStudioConnections {
     $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
 
     $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+
+    # Verify file path and create new one if not found
+    if (-not (Test-Path -Path $settingsFilePath)){
+        New-Item -ItemType File -Path $settingsFilePath -Force
+    }
+
     $settingsContent | Set-Content -Path $settingsFilePath
 }
 
