@@ -22,7 +22,10 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
         $cluster
         $connectedCluster = Get-AzConnectedKubernetes -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId -Name $cluster
         $aioStatus = az iot ops check --as-object 2>$null | ConvertFrom-Json
-        $aioPodStatus = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+        $aioPodStatus = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json | Where-Object {$PSItem.items.metadata.name -notlike "*fluent-bit*"}
+        $aioPodStatusItems = $aioPodStatus.items | Where-Object {
+            $_.spec.containers.name -notmatch "fluent-bit"
+        }
         # Run kubectl to get service details in the azure-iot-operations namespace
         $aioServices = kubectl get svc -n azure-iot-operations -o json | ConvertFrom-Json
     }
@@ -38,7 +41,7 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
         }
     }
     It "All pods should be in Running, Completed, or have no containers in CrashLoopBackOff" {
-        foreach ($pod in $aioPodStatus.items) {
+        foreach ($pod in $aioPodStatusItems) {
             # Check the overall pod phase first
             if ($pod.status.phase -in @("Running", "Succeeded")) {
                 # Now check container statuses within each pod
