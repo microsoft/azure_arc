@@ -137,7 +137,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D8s_v5'
+      vmSize: 'Standard_D4s_v4'
     }
     storageProfile: {
       osDisk: {
