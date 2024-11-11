@@ -984,6 +984,12 @@ function Set-AzureDataStudioConnections {
     $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
 
     $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+
+    # Verify file path and create new one if not found
+    if (-not (Test-Path -Path $settingsFilePath)){
+        New-Item -ItemType File -Path $settingsFilePath -Force
+    }
+
     $settingsContent | Set-Content -Path $settingsFilePath
 }
 
@@ -1020,8 +1026,9 @@ function Set-DatabaseConnectionsShortcuts {
         Add-Content $Endpoints ""
         Add-Content $Endpoints ""
 
+        $siteName = [cultureinfo]::GetCultureInfo("en-US").TextInfo.ToTitleCase($clusterName)
         $dbConnectionInfo = @{
-            sitename = "$clusterName"
+            sitename = "$siteName"
             server = "$endPoint"
             username="SA"
             password = "$password"
