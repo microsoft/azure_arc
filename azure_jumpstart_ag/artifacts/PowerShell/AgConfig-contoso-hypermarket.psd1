@@ -98,7 +98,7 @@
         'thomasnordquist.MQTT-Explorer',
         'GitHub.cli',
         'Python.Python.3.12',
-        'k9s'
+        'Derailed.k9s'
     )
 
     # Pip packages list
