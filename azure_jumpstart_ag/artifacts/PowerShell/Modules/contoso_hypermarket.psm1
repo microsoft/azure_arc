@@ -534,7 +534,6 @@ function Deploy-HypermarketConfigs {
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
     $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
-    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
     $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
@@ -616,7 +615,7 @@ function Set-LoadBalancerBackendPools {
                     --name "$serviceName-pool" `
                     --vnet $vnetResourceId `
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
-                    --only-show-errors
+                    --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
                 Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
                 Write-Host "`n"
@@ -629,7 +628,7 @@ function Set-LoadBalancerBackendPools {
                     --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
                     --backend-port $servicePort `
-                    --only-show-errors
+                    --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
             }
         }
 
@@ -641,7 +640,7 @@ function Set-LoadBalancerBackendPools {
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
         --output tsv `
-        --only-show-errors
+        --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -651,7 +650,7 @@ function Set-LoadBalancerBackendPools {
             --name "$serviceName-pool" `
             --vnet $vnetResourceId `
             --backend-addresses "[{name:Grafana,ip-address:${clientVMIpAddress}}]" `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -665,7 +664,7 @@ function Set-LoadBalancerBackendPools {
             --frontend-ip $loadBalancerPublicIp `
             --backend-address-pool "$serviceName-pool" `
             --backend-port $servicePort `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
         Write-Host "[$(Get-Date -Format t)] Creating outbound rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -677,7 +676,7 @@ function Set-LoadBalancerBackendPools {
             --protocol All `
             --frontend-ip-configs $loadBalancerPublicIp `
             --resource-group $resourceGroup `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
     }
 
 }
@@ -1008,17 +1007,17 @@ function Set-DatabaseConnectionsShortcuts {
     Add-Content $Endpoints ""
 
     $dbConnections = @()
-   
+
     # Get SQL server service IP and the port
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName
-        
+
         # Get Loadbalancer IP and target port
         $sqlService = kubectl get service mssql-service -n contoso-hypermarket -o json | ConvertFrom-Json
         $endPoint = "$($sqlService.spec.loadBalancerIP),$($sqlService.spec.ports.targetPort)"
         Add-Content $Endpoints "SQL Server external endpoint for $clusterName cluster:"
-        $endPoint | Add-Content $Endpoints 
+        $endPoint | Add-Content $Endpoints
 
         # Get SQL server username and password
         $secret = kubectl get secret azure-sqlpassword-secret -n contoso-hypermarket -o json | ConvertFrom-Json
@@ -1034,11 +1033,11 @@ function Set-DatabaseConnectionsShortcuts {
             username="SA"
             password = "$password"
         }
-    
+
         # Add to the connection list
         $dbConnections += $dbConnectionInfo
-    }    
-    
+    }
+
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 
