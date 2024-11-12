@@ -640,7 +640,7 @@ function Set-LoadBalancerBackendPools {
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
         --output tsv `
-        --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log"))
+        --only-show-errors)
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
