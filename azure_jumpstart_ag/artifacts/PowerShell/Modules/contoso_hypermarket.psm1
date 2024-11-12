@@ -534,7 +534,6 @@ function Deploy-HypermarketConfigs {
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
     $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
-    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
     $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
@@ -985,6 +984,12 @@ function Set-AzureDataStudioConnections {
     $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
 
     $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+
+    # Verify file path and create new one if not found
+    if (-not (Test-Path -Path $settingsFilePath)){
+        New-Item -ItemType File -Path $settingsFilePath -Force
+    }
+
     $settingsContent | Set-Content -Path $settingsFilePath
 }
 
@@ -1021,8 +1026,9 @@ function Set-DatabaseConnectionsShortcuts {
         Add-Content $Endpoints ""
         Add-Content $Endpoints ""
 
+        $siteName = [cultureinfo]::GetCultureInfo("en-US").TextInfo.ToTitleCase($clusterName)
         $dbConnectionInfo = @{
-            sitename = "$clusterName"
+            sitename = "$siteName"
             server = "$endPoint"
             username="SA"
             password = "$password"

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "value": "Standard_D8s_v3"
+    },
+    "vmName": {
+      "value": "ACSA-Win-Demo"
+    },
+    "kubernetesDistribution": {
+      "value": "k3s"
+    },
+    "windowsNode": {
+      "value": false
+    },
+    "adminUsername": {
+      "value": "arcdemo"
+    },
+    "adminPassword": {
+      "value": "ArcPassword123!!"
+    },
+    "appId": {
+      "value": "XXXXXXXXX"
+    },
+    "password": {
+      "value": "XXXXXXXXXX"
+    },
+    "tenantId": {
+      "value": "XXXXXXXXX"
+    },
+    "subscriptionId": {
+      "value": "XXXXXXXXXX"
+    },
+    "location": {
+      "value": "XXXXXXXX"
+    },
+    "deployBastion": {
+      "value": true
+    },
+    "bastionHostName": {
+      "value": "Arc-Win-Demo-Bastion"
+    },
+    "storageAccountName": {
+      "value": "XXXXXXX"
+    },
+    "storageContainer": {
+      "value": "fault-detection"
+    }
+  }
+}
