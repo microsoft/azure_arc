@@ -44,8 +44,9 @@ param deployGPUNodes bool = false
 @allowed([
   'Standard_D8s_v5'
   'Standard_NV6ads_A10_v5'
+  'Standard_NV4as_v4'
 ])
-param k8sWorkerNodesSku string = 'Standard_D8s_v5'
+param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
 
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
