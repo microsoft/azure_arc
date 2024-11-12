@@ -636,11 +636,11 @@ function Set-LoadBalancerBackendPools {
         $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName `
+        $clientVMIpAddress = $(az vm list-ip-addresses --name $clientVMName `
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
         --output tsv `
-        --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
+        --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log"))
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
