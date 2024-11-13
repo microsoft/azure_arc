@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mqtt-listener
-        image: jumpstartprod.azurecr.io/contoso-bakeries-mqtt-listener:latest
+        image: mcr.microsoft.com/jumpstart/scenarios/mqtt_listener:1.0.0
         resources:
           limits:
             memory: "512Mi"

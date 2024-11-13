@@ -83,23 +83,25 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
-@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
-param deployGPUNodes bool = false
-
 @description('The capacity of the OpenAI Cognitive Services account')
 param openAICapacity int = 10
 
 @description('The array of OpenAI models to deploy')
-param azureOpenAIModels array = [
-  {
-    name: 'gpt-35-turbo'
-    version: '0125'
-  }
-  {
-    name: 'gpt-4o-mini'
-    version: '2024-07-18'
-  }
-]
+param azureOpenAIModel object = {
+    name: 'gpt-4o'
+    version: '2024-05-13'
+    apiVersion: '2024-08-01-preview'
+}
+
+@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
+param deployGPUNodes bool = false
+
+@description('The sku name of the K3s cluster worker nodes.')
+@allowed([
+  'Standard_D8s_v5'
+  'Standard_NV6ads_A10_v5'
+])
+param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
@@ -173,6 +175,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
     deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
@@ -192,6 +195,7 @@ module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
     deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
     ubuntuRancherK3sDeployment
@@ -225,6 +229,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
+    azureOpenAIModel: azureOpenAIModel
+    openAIDeploymentName: azureOpenAI.outputs.openAIDeploymentName
   }
 }
 module keyVault 'data/keyVault.bicep' = {
@@ -268,7 +274,7 @@ module azureOpenAI 'ai/aoai.bicep' = {
   params: {
     location: location
     openAIAccountName: 'openai${namingGuid}'
-    azureOpenAIModels: azureOpenAIModels
+    azureOpenAIModel: azureOpenAIModel
     openAICapacity: openAICapacity
   }
 }

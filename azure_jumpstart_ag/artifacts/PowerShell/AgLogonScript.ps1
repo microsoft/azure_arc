@@ -59,9 +59,10 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
-    #$global:spnObjectId = $Env:spnObjectId
+    $global:azureOpenAIModel = $Env:azureOpenAIModel
     $global:openAIEndpoint = $Env:openAIEndpoint
     $global:speachToTextEndpoint = $Env:speachToTextEndpoint
+    $global:openAIDeploymentName = $Env:openAIDeploymentName
 }
 
 #####################################################################
@@ -237,7 +238,6 @@ if ($scenario -eq "contoso_motors") {
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }elseif($scenario -eq "contoso_hypermarket"){
     Deploy-AIO-M3
-    Set-ACSA
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
     Set-AIServiceSecrets
@@ -284,6 +284,14 @@ if($scenario -eq "contoso_supermarket"){
     Deploy-MotorsBookmarks
 }elseif($scenario -eq "contoso_hypermarket"){
     Deploy-HypermarketBookmarks
+}
+
+##############################################################
+# Creating database connections desktop shortcuts
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating database connections desktop shortcuts (Step 16/17)" -ForegroundColor DarkGreen
+if($scenario -eq "contoso_hypermarket"){
+    Set-DatabaseConnectionsShortcuts
 }
 
 ##############################################################

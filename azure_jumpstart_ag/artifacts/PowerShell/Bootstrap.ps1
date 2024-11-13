@@ -31,7 +31,9 @@ param (
   [string]$k3sArcDataClusterName,
   [string]$vmAutologon,
   [string]$openAIEndpoint,
-  [string]$speachToTextEndpoint
+  [string]$speachToTextEndpoint,
+  [object]$azureOpenAIModel,
+  [string]$openAIDeploymentName
 )
 
 ##############################################################
@@ -73,6 +75,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
