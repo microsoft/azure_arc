@@ -6,10 +6,10 @@
       "value": ""
     },
     "windowsAdminUsername": {
-      "value": ""
+      "value": "agora"
     },
     "windowsAdminPassword": {
-      "value": ""
+      "value": "ArcPassword123!!"
     },
     "deployBastion": {
       "value": false
@@ -22,6 +22,9 @@
     },
     "fabricCapacityAdmin": {
       "value": ""
+    },
+    "deployGPUNodes": {
+      "value": "false"
     }
   }
 }
