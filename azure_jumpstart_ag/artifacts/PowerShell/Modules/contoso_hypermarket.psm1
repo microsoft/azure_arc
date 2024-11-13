@@ -821,7 +821,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:8080/maintenanceworkerdashboard"
+            $output = "http://${publicIPAddress}:8080/"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
