@@ -717,33 +717,3 @@ Set-PowerBI-Project
 
 # Stop logging into the log file
 Stop-Transcript
-
-
-
-$headers = @{"Authorization" = "Bearer $powerbiAccessToken"}
-$dataSets = (Invoke-RestMethod -Method Get -Uri "https://api.powerbi.com/v1.0/myorg/groups/42d58d96-f1e3-4946-9b43-f1165b122cd5/datasets/" -Headers $headers).value
-foreach($dataset in $dataSets) {
-  Write-Host "Dataset ID: $($dataset.id), Name: $($dataset.name)"
-}
-
-$headers = @{"Authorization" = "Bearer $powerbiAccessToken"; "Content-Type"  = "application/json"}
-$datasetId = $datasets[0].id
-
-# Get data sources
-$dataSources = (Invoke-RestMethod -Method Get -Uri "https://api.powerbi.com/v1.0/myorg/datasets/$datasetId/datasources" -Headers $headers).value
-$datasourceId = $dataSources[0].datasourceId
-
-$credentialDetails = @{
-    credentialType = "OAuth2"
-    OAuth2 = @{
-        accessToken = $kustoAccessToken
-    }
-}
-
-$body = @{
-  credentialDetails = $credentialDetails
-} | ConvertTo-Json
-
-$pbiGateways = (Invoke-RestMethod -Method Get -Uri "https://api.powerbi.com/v1.0/myorg/gateways" -Headers $headers).value
-
-Invoke-RestMethod -Method Patch -Uri "PATCH https://api.powerbi.com/v1.0/myorg/gateways/1f69e798-5852-4fdd-ab01-33bb14b6e934/datasources/252b9de8-d915-4788-aaeb-ec8c2395f970" -Headers $headers -Body $body
