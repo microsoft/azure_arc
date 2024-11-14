@@ -290,7 +290,7 @@ function Deploy-AIO-M3 {
         Write-Host "`n"
 
         az iot ops secretsync enable --name $arcClusterName.toLower() `
-            --instance $aio $arcClusterName.toLower() `
+            --instance $arcClusterName.toLower() `
             --kv-resource-id $keyVaultId `
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMICloudResourceId `
