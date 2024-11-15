@@ -533,6 +533,9 @@ function Deploy-HypermarketConfigs {
 
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
+    $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
+    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
+    $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -549,7 +552,10 @@ function Set-AIServiceSecrets {
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
             --from-literal=azure-openai-key=$AIServicesKey `
             --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
-            --from-literal=region=$location
+            --from-literal=region=$location `
+            --from-literal=azure-openai-model-name=$azureOpenAIModelName `
+            --from-literal=azure-openai-deployment-name=$openAIDeploymentName `
+            --from-literal=azure-openai-api-version=$azureOpenAIApiVersion
     }
 }
 
@@ -573,10 +579,11 @@ function Set-SQLSecret {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying SQL Secret to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        $decodeAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
         kubectx $clusterName
         kubectl create secret generic azure-sqlpassword-secret `
             --namespace=contoso-hypermarket `
-            --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+            --from-literal=azure-sqlpassword-secret=$decodeAdminPassword
     }
 }
 
@@ -630,10 +637,10 @@ function Set-LoadBalancerBackendPools {
         $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName  `
+        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName `
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
-        -o tsv `
+        --output tsv `
         --only-show-errors
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
@@ -761,7 +768,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:5003/api/docs"
+            $output = "http://${publicIPAddress}:5003"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
@@ -860,6 +867,14 @@ function Deploy-HypermarketBookmarks {
             $newContent | Set-Content -Path $bookmarksFileName
             Start-Sleep -Seconds 2
         }
+
+        # Matching url: Grafana
+        # Replace matching value in the Bookmarks file
+        $output = "http://${publicIPAddress}:3000"
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Grafana-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+        Start-Sleep -Seconds 2
     }
     Start-Sleep -Seconds 2
 
@@ -904,4 +919,129 @@ function Set-GPU-Operator {
     }
 
     Write-Host "GPU operator installation completed successfully on all clusters." -ForegroundColor Green
+}
+
+# Function to set the Azure Data Studio connections
+function Set-AzureDataStudioConnections {
+    param (
+        [PSCustomObject[]]$dbConnections
+    )
+
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating SQL Server connections in Azure Data Studio "
+    Write-Host "`n"
+
+    $settingsContent = @"
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+    {{DB_CONNECTION_LIST}}
+    ],
+    "window.zoomLevel": 2
+}
+"@ 
+    
+    $dbConnectionsJson = ""
+    $index = 0
+    foreach($connection in $dbConnections) {
+        $dagConnection = @"
+{
+    "options": {
+        "connectionName": "$($connection.sitename)",
+        "server": "$($connection.server)",
+        "database": "",
+        "authenticationType": "SqlLogin",
+        "user": "$($connection.username)",
+        "password": "$($connection.password)",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": "",
+        "trustServerCertificate": true
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+        $dbConnectionsJson += $dagConnection
+
+        if ($index -lt $dbConnections.Count - 1) {
+            $dbConnectionsJson += ",`n"
+        }
+        else {
+            $dbConnectionsJson += "`n"
+        }
+        $index += 1
+    }
+
+    $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
+
+    $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+    $settingsContent | Set-Content -Path $settingsFilePath
+}
+
+# Function to set the SQL Server connections file and Azure Data Studio connections shortcuts
+function Set-DatabaseConnectionsShortcuts {
+    # Creating endpoints file
+    Write-Host "`n"
+    Write-Header "Creating Database Endpoints file Desktop shortcut"
+    Write-Host "`n"
+
+    $filename = "DatabaseConnectionEndpoints.txt"
+    $file = New-Item -Path $AgConfig.AgDirectories.AgDir -Name $filename -ItemType "file" -Force
+    $Endpoints = $file.FullName
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $dbConnections = @()
+   
+    # Get SQL server service IP and the port
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName
+        
+        # Get Loadbalancer IP and target port
+        $sqlService = kubectl get service mssql-service -n contoso-hypermarket -o json | ConvertFrom-Json
+        $endPoint = "$($sqlService.spec.loadBalancerIP),$($sqlService.spec.ports.targetPort)"
+        Add-Content $Endpoints "SQL Server external endpoint for $clusterName cluster:"
+        $endPoint | Add-Content $Endpoints 
+
+        # Get SQL server username and password
+        $secret = kubectl get secret azure-sqlpassword-secret -n contoso-hypermarket -o json | ConvertFrom-Json
+        $password = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($secret.data.'azure-sqlpassword-secret'))
+        Add-Content $Endpoints "Username: SA, Password: $password"
+        Add-Content $Endpoints ""
+        Add-Content $Endpoints ""
+
+        $dbConnectionInfo = @{
+            sitename = "$clusterName"  
+            server = "$endPoint" 
+            username="SA" 
+            password = "$password"
+        }
+    
+        # Add to the connection list
+        $dbConnections += $dbConnectionInfo
+    }    
+    
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+
+    $TargetFile = $Endpoints
+    $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQL Server Endpoints.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+
+    # Create Azure Data Studio connection
+    Set-AzureDataStudioConnections -dbConnections $dbConnections
 }
