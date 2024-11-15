@@ -695,7 +695,10 @@
       },
       "text": "//Get refrigerator temps\niot_data\n| where equipment_type == \"Refrigerator\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , door_open = d.door_open\n| summarize arg_max(timestamp, door_open) by device_id\n| extend door_status = case(door_open == true, \"Open\", \"Closed\")\n| extend device_id_label = strcat(device_id, \" Door\")\n| sort  by device_id_label asc \n",
       "id": "a499aa12-4369-493d-93ea-409aa7dd483c",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
@@ -704,25 +707,34 @@
       },
       "text": "//Light Status Queries\niot_data\n| where equipment_type == \"LightingSystem\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , status = tostring(d.status)\n| summarize arg_max(timestamp, status) by device_id\n//change the status to Sentence case.\n| extend status_label = strcat(toupper(substring(status, 0, 1)), tolower(substring(status, 1, strlen(status)-1)))\n| sort  by device_id asc \n",
       "id": "e872f3db-a364-4f27-9c45-6302e6426a0a",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
         "kind": "inline",
         "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
       },
-      "text": "//Light Brightness Level\niot_data \n| where equipment_type == \"LightingSystem\" \n| where timestamp between (datetime(\"2024-11-01T01:39:51.330Z\") .. datetime(\"2024-11-01T01:49:51.330Z\"))\n| extend d = parse_json(data) \n| extend system_id = d.id , brightness_level = todecimal(d.brightness_level) \n| project timestamp, device_id, system_id, brightness_level ",
+      "text": "//Light Brightness Level\niot_data \n| where equipment_type == \"LightingSystem\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , brightness_level = todecimal(d.brightness_level) \n| project timestamp, device_id, system_id, brightness_level ",
       "id": "15b59907-6b86-47f5-947c-1d824ad91e38",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
         "kind": "inline",
         "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
       },
-      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"LightingSystem\" \n//| where device_id == \"LightingSystem01\"\n| where timestamp between (datetime(\"2024-11-01T01:39:51.330Z\") .. datetime(\"2024-11-01T01:49:51.330Z\"))\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"LightingSystem\" \n//| where device_id == \"LightingSystem01\"\n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
       "id": "baf31768-a72a-4d2f-9fea-7d546122263a",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
@@ -738,9 +750,12 @@
         "kind": "inline",
         "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
       },
-      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"HVAC\" \n| where timestamp between (datetime(\"2024-11-01T01:39:51.330Z\") .. datetime(\"2024-11-01T01:49:51.330Z\"))\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"HVAC\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
       "id": "1fa31e61-b4dd-4471-b5a6-c982c15cd9c8",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
@@ -765,9 +780,12 @@
         "kind": "inline",
         "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
       },
-      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"Refrigerator\" \n| where timestamp between (datetime(\"2024-11-01T01:39:51.330Z\") .. datetime(\"2024-11-01T01:49:51.330Z\"))\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"Refrigerator\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
       "id": "59c08389-4793-425f-b3b1-201ceec1c8f1",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     },
     {
       "dataSource": {
@@ -785,7 +803,10 @@
         "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
       },
       "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\niot_data\n| where device_id == \"SmartShelf02\"",
-      "usedVariables": []
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
     }
   ]
 }

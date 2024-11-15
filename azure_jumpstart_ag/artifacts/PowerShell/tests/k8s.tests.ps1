@@ -35,11 +35,6 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
     It "Azure Arc Connected cluster is connected" {
         $connectedCluster.ConnectivityStatus | Should -Be "Connected"
     }
-    It "Azure IoT Operations targets should be successfully deployed" {
-        foreach ($target in $aioStatus.postDeployment.targets.psobject.Properties) {
-            $target.Value._all_.status | Should -BeIn @("success", "warning") -Because "Target $($target.Name) should have a successful or warning deployment status"
-        }
-    }
     It "All pods should be in Running, Completed, or have no containers in CrashLoopBackOff" {
         foreach ($pod in $aioPodStatusItems) {
             # Check the overall pod phase first

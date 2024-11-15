@@ -289,7 +289,7 @@ function Deploy-AIO-M3 {
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
 
-        az iot ops secretsync enable --name $arcClusterName.toLower() `
+        az iot ops secretsync enable --instance $arcClusterName.toLower() `
             --kv-resource-id $keyVaultId `
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMICloudResourceId `
@@ -535,7 +535,6 @@ function Deploy-HypermarketConfigs {
 function Set-AIServiceSecrets {
     $location = $global:azureLocation
     $azureOpenAIModelName = ($Env:azureOpenAIModel | ConvertFrom-Json).name
-    $azureOpenAIModelVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).version
     $azureOpenAIApiVersion = ($Env:azureOpenAIModel | ConvertFrom-Json).apiVersion
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
@@ -617,7 +616,7 @@ function Set-LoadBalancerBackendPools {
                     --name "$serviceName-pool" `
                     --vnet $vnetResourceId `
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
-                    --only-show-errors
+                    --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
                 Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
                 Write-Host "`n"
@@ -630,7 +629,7 @@ function Set-LoadBalancerBackendPools {
                     --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
                     --backend-port $servicePort `
-                    --only-show-errors
+                    --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
             }
         }
 
@@ -638,11 +637,11 @@ function Set-LoadBalancerBackendPools {
         $clientVMName = "Ag-VM-Client"
         $serviceName = "Grafana"
         $servicePort = "3000"
-        $clientVMIpAddress = az vm list-ip-addresses --name $clientVMName `
+        $clientVMIpAddress = $(az vm list-ip-addresses --name $clientVMName `
         --resource-group $resourceGroup `
         --query "[].virtualMachine.network.privateIpAddresses[0]" `
         --output tsv `
-        --only-show-errors
+        --only-show-errors)
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -652,7 +651,7 @@ function Set-LoadBalancerBackendPools {
             --name "$serviceName-pool" `
             --vnet $vnetResourceId `
             --backend-addresses "[{name:Grafana,ip-address:${clientVMIpAddress}}]" `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
         Write-Host "[$(Get-Date -Format t)] Creating inbound NAT rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -666,7 +665,7 @@ function Set-LoadBalancerBackendPools {
             --frontend-ip $loadBalancerPublicIp `
             --backend-address-pool "$serviceName-pool" `
             --backend-port $servicePort `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
 
         Write-Host "[$(Get-Date -Format t)] Creating outbound rule for service: $serviceName" -ForegroundColor Gray
         Write-Host "`n"
@@ -678,7 +677,7 @@ function Set-LoadBalancerBackendPools {
             --protocol All `
             --frontend-ip-configs $loadBalancerPublicIp `
             --resource-group $resourceGroup `
-            --only-show-errors
+            --only-show-errors | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\loadBalancer.log")
     }
 
 }
@@ -811,7 +810,7 @@ function Deploy-HypermarketBookmarks {
         $backendApiIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($backendApiIp in $backendApiIps) {
-            $output = "http://${publicIPAddress}:8080/maintenanceworkerdashboard"
+            $output = "http://${publicIPAddress}:8080/"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
@@ -978,6 +977,12 @@ function Set-AzureDataStudioConnections {
     $settingsContent = $settingsContent -replace '{{DB_CONNECTION_LIST}}', $dbConnectionsJson
 
     $settingsFilePath = "$Env:APPDATA\azuredatastudio\User\settings.json"
+
+    # Verify file path and create new one if not found
+    if (-not (Test-Path -Path $settingsFilePath)){
+        New-Item -ItemType File -Path $settingsFilePath -Force
+    }
+
     $settingsContent | Set-Content -Path $settingsFilePath
 }
 
@@ -995,17 +1000,17 @@ function Set-DatabaseConnectionsShortcuts {
     Add-Content $Endpoints ""
 
     $dbConnections = @()
-   
+
     # Get SQL server service IP and the port
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName
-        
+
         # Get Loadbalancer IP and target port
         $sqlService = kubectl get service mssql-service -n contoso-hypermarket -o json | ConvertFrom-Json
         $endPoint = "$($sqlService.spec.loadBalancerIP),$($sqlService.spec.ports.targetPort)"
         Add-Content $Endpoints "SQL Server external endpoint for $clusterName cluster:"
-        $endPoint | Add-Content $Endpoints 
+        $endPoint | Add-Content $Endpoints
 
         # Get SQL server username and password
         $secret = kubectl get secret azure-sqlpassword-secret -n contoso-hypermarket -o json | ConvertFrom-Json
@@ -1014,17 +1019,18 @@ function Set-DatabaseConnectionsShortcuts {
         Add-Content $Endpoints ""
         Add-Content $Endpoints ""
 
+        $siteName = [cultureinfo]::GetCultureInfo("en-US").TextInfo.ToTitleCase($clusterName)
         $dbConnectionInfo = @{
-            sitename = "$clusterName"  
-            server = "$endPoint" 
-            username="SA" 
+            sitename = "$siteName"
+            server = "$endPoint"
+            username="SA"
             password = "$password"
         }
-    
+
         # Add to the connection list
         $dbConnections += $dbConnectionInfo
-    }    
-    
+    }
+
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 

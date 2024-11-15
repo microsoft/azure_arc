@@ -83,9 +83,6 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
-@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
-param deployGPUNodes bool = false
-
 @description('The capacity of the OpenAI Cognitive Services account')
 param openAICapacity int = 10
 
@@ -95,6 +92,17 @@ param azureOpenAIModel object = {
     version: '2024-05-13'
     apiVersion: '2024-08-01-preview'
 }
+
+@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
+param deployGPUNodes bool = false
+
+@description('The sku name of the K3s cluster worker nodes.')
+@allowed([
+  'Standard_D8s_v5'
+  'Standard_NV6ads_A10_v5'
+  'Standard_NV4as_v4'
+])
+param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
@@ -168,6 +176,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
     deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
@@ -187,6 +196,7 @@ module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
     deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
     ubuntuRancherK3sDeployment

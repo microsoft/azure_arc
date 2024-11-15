@@ -97,7 +97,8 @@
         'FireDaemon.OpenSSL',
         'thomasnordquist.MQTT-Explorer',
         'GitHub.cli',
-        'Python.Python.3.12'
+        'Python.Python.3.12',
+        'Derailed.k9s'
     )
 
     # Pip packages list

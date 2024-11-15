@@ -40,9 +40,16 @@ param namingGuid string
 @description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
 param deployGPUNodes bool = false
 
+@description('The sku name of the K3s cluster worker nodes.')
+@allowed([
+  'Standard_D8s_v5'
+  'Standard_NV6ads_A10_v5'
+  'Standard_NV4as_v4'
+])
+param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
+
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var vmSize = deployGPUNodes ? 'Standard_NV6ads_A10_v5' : 'Standard_D8s_v5'
 var diskSize = 512
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
@@ -71,7 +78,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: vmSize
+      vmSize: k8sWorkerNodesSku
     }
     storageProfile: {
       osDisk: {

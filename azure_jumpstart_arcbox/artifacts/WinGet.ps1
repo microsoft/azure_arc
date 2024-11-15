@@ -8,8 +8,8 @@ $logFilePath = Join-Path -Path $Env:ArcBoxLogsDir -ChildPath ('WinGet-provisioni
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
 # Install WinGet PowerShell modules
-Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
-Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
+Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
 # Install DSC resources required for ArcBox
 Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
@@ -17,7 +17,9 @@ Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustR
 Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
 # Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers
+$null = Repair-WinGetPackageManager -AllUsers -Force -Latest
+
+Get-WinGetVersion
 
 Write-Header 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
