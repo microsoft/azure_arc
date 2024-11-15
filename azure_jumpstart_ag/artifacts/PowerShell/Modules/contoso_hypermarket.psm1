@@ -289,8 +289,7 @@ function Deploy-AIO-M3 {
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
 
-        az iot ops secretsync enable --name $arcClusterName.toLower() `
-            --instance $arcClusterName.toLower() `
+        az iot ops secretsync enable --instance $arcClusterName.toLower() `
             --kv-resource-id $keyVaultId `
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMICloudResourceId `

@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 12,
+  "id": 6,
   "links": [],
   "panels": [
     {
@@ -55,7 +55,7 @@
         "content": "<div style=\"font-size: 30px; color: black; background-color: #2E8B57; text-align: center;\">\n  Aisle Zone\n</div>\n",
         "mode": "html"
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -92,7 +92,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Shoppers in the store"
+                "value": "Total Shoppers in the zone"
               }
             ]
           }
@@ -122,7 +122,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -169,6 +169,18 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "shoppers_age_10_Aisle_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 10"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "shoppers_age_20_Aisle_Camera"
             },
             "properties": [
@@ -193,7 +205,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "{__name__=\"shoppers_age_40_Aisle Camera\", camera=\"Aisle Camera\", container=\"shopper-insights-api\", endpoint=\"shopper-insights-metrics\", instance=\"10.42.1.75:5001\", job=\"shopper-insights-api\", namespace=\"contoso-hypermarket\", pod=\"shopper-insights-api-7bf8cc6578-6gdth\", service=\"shopper-insights-api\"}"
+              "options": "shoppers_age_40_Aisle_Camera"
             },
             "properties": [
               {
@@ -205,7 +217,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "{__name__=\"shoppers_age_50_Aisle Camera\", camera=\"Aisle Camera\", container=\"shopper-insights-api\", endpoint=\"shopper-insights-metrics\", instance=\"10.42.1.75:5001\", job=\"shopper-insights-api\", namespace=\"contoso-hypermarket\", pod=\"shopper-insights-api-7bf8cc6578-6gdth\", service=\"shopper-insights-api\"}"
+              "options": "shoppers_age_50_Aisle_Camera"
             },
             "properties": [
               {
@@ -240,7 +252,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -249,7 +261,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_20_Aisle_Camera",
+          "expr": "shoppers_age_10_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -263,7 +275,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_30_Aisle_Camera",
+          "expr": "shoppers_age_20_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -277,7 +289,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_40_Aisle_Camera",
+          "expr": "shoppers_age_30_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -291,12 +303,26 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_50_Aisle_Camera",
+          "expr": "shoppers_age_40_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_50_Aisle_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "E"
         }
       ],
       "title": "",
@@ -414,6 +440,18 @@
                 "value": "Shoppers Age 50"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_10_Aisle_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 10"
+              }
+            ]
           }
         ]
       },
@@ -436,7 +474,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -444,7 +482,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_20_Aisle_Camera",
+          "expr": "shoppers_age_10_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -457,7 +495,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_30_Aisle_Camera",
+          "expr": "shoppers_age_20_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -470,7 +508,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_40_Aisle_Camera",
+          "expr": "shoppers_age_30_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -483,12 +521,25 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_50_Aisle_Camera",
+          "expr": "shoppers_age_40_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_50_Aisle_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "Shoppers (by Age)",
@@ -530,12 +581,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "detected_total_persons"
+              "options": "current_shoppers"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Shoppers detected"
+                "value": "Shoppers detected in the zone"
               }
             ]
           }
@@ -565,7 +616,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -574,7 +625,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detected_total_persons{camera=~\"Aisle Camera\"}",
+          "expr": "current_shoppers{camera=~\"Aisle Camera\"}",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -687,7 +738,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -778,7 +829,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -900,7 +951,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -963,7 +1014,7 @@
         "content": "<div style=\"font-size: 30px; color: black; background-color: #4169E1; text-align: center;\">\n  Produce Zone\n</div>\n",
         "mode": "html"
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -1000,7 +1051,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Shoppers in the store"
+                "value": "Total shoppers in the zone"
               }
             ]
           }
@@ -1030,7 +1081,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1077,6 +1128,18 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "shoppers_age_10_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 10"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "shoppers_age_20_Produce_Camera"
             },
             "properties": [
@@ -1095,6 +1158,30 @@
               {
                 "id": "displayName",
                 "value": "Shoppers Age 30"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_40_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 40"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_50_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 50"
               }
             ]
           }
@@ -1124,7 +1211,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1133,7 +1220,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_20_Produce_Camera",
+          "expr": "shoppers_age_10_Produce_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -1147,12 +1234,54 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_30_Produce_Camera",
+          "expr": "shoppers_age_20_Produce_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_30_Produce_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_40_Produce_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_50_Produce_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "E"
         }
       ],
       "title": "",
@@ -1246,6 +1375,42 @@
                 "value": "Shoppers Age 30"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_10_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 10"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_40_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 40"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_50_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 50"
+              }
+            ]
           }
         ]
       },
@@ -1268,7 +1433,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1276,7 +1441,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_20_Produce_Camera",
+          "expr": "shoppers_age_10_Produce_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -1289,12 +1454,51 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_30_Produce_Camera",
+          "expr": "shoppers_age_20_Produce_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_30_Produce_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_40_Produce_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_50_Produce_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "Shoppers (by Age)",
@@ -1336,12 +1540,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "detected_total_persons"
+              "options": "current_shoppers"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Shoppers detected"
+                "value": "Shoppers detected in the zone"
               }
             ]
           }
@@ -1371,7 +1575,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1380,7 +1584,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detected_total_persons{camera=~\"Produce Camera\"}",
+          "expr": "current_shoppers{camera=~\"Produce Camera\"}",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -1493,7 +1697,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1584,7 +1788,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1706,7 +1910,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1756,7 +1960,7 @@
         "content": "",
         "mode": "markdown"
       },
-      "pluginVersion": "11.3.0",
+      "pluginVersion": "11.3.0+security-01",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -1773,7 +1977,7 @@
       {
         "current": {
           "text": "chicago",
-          "value": "ce2zptqpjpibkd"
+          "value": "de3ubqvmlxaf4d"
         },
         "includeAll": false,
         "label": "Store",
@@ -1787,13 +1991,13 @@
     ]
   },
   "time": {
-    "from": "2024-11-05T21:30:03.000Z",
-    "to": "2024-11-05T22:30:03.000Z"
+    "from": "now-5m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Store / Shopper Insights",
-  "uid": "5d29f483-58a9-4d52-bd94-87d00d223aad",
-  "version": 2,
+  "uid": "23e1bc2e-e700-4a2b-b562-34e9eaef68b8",
+  "version": 5,
   "weekStart": ""
 }
