@@ -907,6 +907,10 @@ function Set-GPU-Operator {
         Write-Host "Creating GPU operator namespace in $clusterName..." -ForegroundColor Gray
         kubectl create namespace gpu-operator -o yaml --dry-run=client | kubectl apply -f -
 
+        # Apply the time-slicing configuration YAML
+        Write-Host "Applying time-slicing configuration to $clusterName..." -ForegroundColor Gray
+        kubectl apply -f "jumpstart-apps/agora/contoso_hypermarket/charts/gpu-operator/time-slicing-config.yaml" -n gpu-operator
+
         # Install the GPU operator using Helm
         Write-Host "Installing GPU operator in $clusterName..." -ForegroundColor Gray
         helm install --wait --generate-name `
