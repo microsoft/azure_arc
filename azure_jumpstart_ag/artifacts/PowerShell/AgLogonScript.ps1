@@ -243,6 +243,9 @@ if ($scenario -eq "contoso_motors") {
     Set-AIServiceSecrets
     Set-EventHubSecrets
     Set-SQLSecret
+    if ($Env:deployGPUNodes -eq "true") {
+        Set-GPUOperator
+    }
     Deploy-HypermarketConfigs
     Set-LoadBalancerBackendPools
 }
