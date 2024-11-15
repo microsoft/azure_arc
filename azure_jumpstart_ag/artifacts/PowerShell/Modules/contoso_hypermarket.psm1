@@ -413,6 +413,7 @@ function Set-MicrosoftFabric {
 }
 
 function Deploy-HypermarketConfigs {
+    $storageAccountName = $global:aioStorageAccountName  
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-hypermarket.psd
     Write-Host "INFO: Cloning the GitHub repository locally to get helm chart" -ForegroundColor Gray
     git clone "https://github.com/Azure/jumpstart-apps.git"
@@ -421,7 +422,7 @@ function Deploy-HypermarketConfigs {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName
         helm dependency build ".\jumpstart-apps\agora\contoso_hypermarket\charts\contoso-hypermarket" --namespace contoso-hypermarket
-        helm install contoso-hypermarket ".\jumpstart-apps\agora\contoso_hypermarket\charts\contoso-hypermarket" --create-namespace --namespace contoso-hypermarket
+        helm install contoso-hypermarket ".\jumpstart-apps\agora\contoso_hypermarket\charts\contoso-hypermarket" --create-namespace --namespace contoso-hypermarket --set shopper-insights.storageAccount=$storageAccountName
     }
 }
 
@@ -717,18 +718,6 @@ function Set-ACSA {
         --role "Storage Blob Data Owner" `
         --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
 
-    # Deploy the ACSA application #NEED TO BE CHANGED
-    $acsadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/acsa_fault_detection/yaml/acsa-edge-sub-volume.yaml"
-    $acsadeployYamlPath = "acsa-edge-sub-volume.yaml"
-    Invoke-WebRequest -Uri $acsadeployYamlUrl -OutFile $acsadeployYamlPath
-
-    # Replace {STORAGEACCOUNT} with the actual storage account name
-    (Get-Content $acsadeployYamlPath) -replace '{STORAGEACCOUNT}', $storageAccountName | Set-Content $acsadeployYamlPath
-
-    # Apply the acsa-deploy.yaml file using kubectl
-    Write-Host "Applying acsa-deploy.yaml configuration..."
-    kubectl apply -f $acsadeployYamlPath
-    Write-Host "acsa-deploy.yaml configuration applied successfully."
 }
 
 function Deploy-HypermarketBookmarks {

@@ -246,6 +246,7 @@ if ($scenario -eq "contoso_motors") {
     if ($Env:deployGPUNodes -eq "true") {
         Set-GPUOperator
     }
+    Set-ACSA
     Deploy-HypermarketConfigs
     Set-LoadBalancerBackendPools
 }
