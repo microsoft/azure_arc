@@ -176,7 +176,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
-    deployGPUNodes: deployGPUNodes
+    //deployGPUNodes: deployGPUNodes
     k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
@@ -196,7 +196,7 @@ module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [
     vmName : '${k3sArcClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
-    deployGPUNodes: deployGPUNodes
+    //deployGPUNodes: deployGPUNodes
     k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
