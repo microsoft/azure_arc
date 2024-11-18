@@ -32,11 +32,17 @@ function Deploy-AzCLI {
 }
 
 function Deploy-AzPowerShell {
-    $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-    $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-    Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+    if($scenario -eq "contoso_hypermarket"){
+        Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $subscriptionId
+    }
+    else {
+        $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+        Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+    }
+
     Set-AzContext -Subscription $subscriptionId
-    # Install PowerShell modules
+
     # Making module install dynamic
     if ($AgConfig.PowerShellModules.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules" -ForegroundColor Gray
@@ -56,7 +62,7 @@ function Deploy-AzPowerShell {
     }
 
     # Register Azure providers
-    if ($AgConfig.AzureProviders.Count -ne 0) {
+    if ($AgConfig.AzureProviders.Count -ne 0 -and $scenario -ne "contoso_hypermarket") {
         Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
         foreach ($provider in $AgConfig.AzureProviders) {
             Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
@@ -255,7 +261,7 @@ function Deploy-VirtualizationInfrastructure {
     # Create an array with VM names
     $VMnames = (Get-VM).Name
 
-    $sourcePath = "$PsHome\Profile.ps1"
+    $sourcePath = "$AgPowerShellDir\Profile.ps1"
     $destinationPath = "C:\Deployment\Profile.ps1"
     $maxRetries = 3
 
@@ -308,26 +314,24 @@ function Deploy-VirtualizationInfrastructure {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
+    $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
+    $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
+    $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
     $AKSEESchemaVersions = @()
-    if($AKSEEPinnedSchemaVersion -eq "useLatest"){
-        $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
-        $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
-        $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
 
-        for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
-            $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
-            $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
-            $output = Join-Path $AgToolsDir "$releaseTag.zip"
-            Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-            Expand-Archive $output -DestinationPath $AgToolsDir -Force
-            $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
-            $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-            $schemaVersion = $jsonContent.SchemaVersion
-            $AKSEESchemaVersions += $schemaVersion
-            # Clean up the downloaded release files
-            Remove-Item -Path $output -Force
-            Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
-        }
+    for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
+        $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
+        $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
+        $output = Join-Path $AgToolsDir "$releaseTag.zip"
+        Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+        Expand-Archive $output -DestinationPath $AgToolsDir -Force
+        $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
+        $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+        $schemaVersion = $jsonContent.SchemaVersion
+        $AKSEESchemaVersions += $schemaVersion
+        # Clean up the downloaded release files
+        Remove-Item -Path $output -Force
+        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
     }
 
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
@@ -360,7 +364,6 @@ function Deploy-VirtualizationInfrastructure {
         $AgConfig = $using:AgConfig
         $AgToolsDir = $using:AgToolsDir
         $websiteUrls = $using:websiteUrls
-        $AKSEEPinnedSchemaVersion = $using:AKSEEPinnedSchemaVersion
 
         ##########################################
         # Deploying AKS Edge Essentials clusters
@@ -414,14 +417,11 @@ function Deploy-VirtualizationInfrastructure {
 
         # Fetch schemaVersion release from the AgConfig file
         $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
-        if ($AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
+        if ($AKSEESchemaVersionUseLatest) {
             $SchemaVersion = $using:AKSEESchemaVersions[0]
         }
-        elseif (!$AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
+        else {
             $SchemaVersion = $using:AKSEESchemaVersions[1]
-        }
-        elseif ($AKSEEPinnedSchemaVersion -ne "useLatest") {
-            $SchemaVersion = $AKSEEPinnedSchemaVersion
         }
 
         $replacementParams = @{
@@ -506,10 +506,10 @@ function Deploy-VirtualizationInfrastructure {
     #####################################################################
     Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
     $kubeconfigpath = ""
-    foreach ($VMName in $VMNames) {
+    foreach ($VMName in $VMNames) { # Create a kubeconfig path for each VM
         $kubeconfigpath = $kubeconfigpath + "$Env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
     }
-    $Env:KUBECONFIG = $kubeconfigpath
+    $Env:KUBECONFIG = $kubeconfigpath # Set the KUBECONFIG environment variable to the merged kubeconfig path
     kubectl config view --merge --flatten > "$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
     kubectl config get-clusters --kubeconfig="$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
     Rename-Item -Path "$Env:USERPROFILE\.kube\config-raw" -NewName "$Env:USERPROFILE\.kube\config"
@@ -529,7 +529,12 @@ function Deploy-VirtualizationInfrastructure {
 }
 
 function Deploy-AzContainerRegistry {
-    az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+    if($scenario -eq "contoso_hypermarket"){
+        az login --identity
+    }
+    else {
+        az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+    }
     az account set -s $Env:subscriptionId
     az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -554,7 +559,7 @@ function Deploy-ClusterSecrets {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         foreach ($namespace in $AgConfig.Namespaces) {
-            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
+            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache" -or $namespace -eq "contoso-hypermarket") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
                 kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
                 kubectl create secret docker-registry acr-secret `
@@ -569,7 +574,7 @@ function Deploy-ClusterSecrets {
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
-    if ($Env:industry -eq "retail") {
+    if ($Env:scenario -eq "contoso_supermarket") {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
         $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
         foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -589,7 +594,7 @@ function Deploy-ClusterSecrets {
     }
 }
 
-function Deploy-AzArcK8s {
+function Deploy-AzArcK8sAKSEE {
     # Running pre-checks to ensure that the aksedge ConfigMap is present on all clusters
     $maxRetries = 5
     $retryInterval = 30 # seconds
@@ -625,6 +630,7 @@ function Deploy-AzArcK8s {
         $tenantId = $Env:spnTenantId
         $location = $Env:azureLocation
         $resourceGroup = $Env:resourceGroup
+        $subscriptionId = $Env:subscriptionId
 
         Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
             # Install prerequisites
@@ -638,9 +644,13 @@ function Deploy-AzArcK8s {
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
-            $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
-            $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
-            Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
+            if($scenario -eq "contoso_hypermarket"){
+                Connect-AzAccount -Identity -Tenant $using:tenantId-Subscription $subscriptionId
+            }else{
+                $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
+                $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
+                Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
+            }
             Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
             Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
 
@@ -696,7 +706,7 @@ function Deploy-AzArcK8s {
 
 function Deploy-ClusterFluxExtension {
     $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
-    $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+    $resources = Get-AzResource -ResourceGroupName $resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
     $jobs = @()
     foreach ($resource in $resources) {
@@ -744,7 +754,13 @@ function Deploy-ClusterFluxExtension {
                 }
             }
 
-            az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+            if($using:scenario -eq "contoso_hypermarket"){
+                az login --identity
+            }
+            else {
+                az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+            }
+            az account set -s $Env:subscriptionId
             $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
             $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
@@ -839,7 +855,7 @@ function Deploy-Prometheus {
     helm repo add prometheus-community $websiteUrls["prometheus"] | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-    if ($Env:industry -eq "retail") {
+    if ($Env:scenario -eq "contoso_supermarket") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
@@ -853,7 +869,7 @@ function Deploy-Prometheus {
         (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
         }
     }
-    elseif ($Env:industry -eq "manufacturing") {
+    elseif ($Env:scenario -eq "contoso_motors") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso-motors.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso-motors.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
@@ -865,6 +881,20 @@ function Deploy-Prometheus {
         # Reset Grafana UI
         Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
         (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Motors' | Set-Content $_.FullName
+        }
+    }
+    elseif ($Env:scenario -eq "contoso_hypermarket") {
+        # Update Grafana Icons
+        Copy-Item -Path $AgIconsDir\contoso-hypermarket.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+        Copy-Item -Path $AgIconsDir\contoso-hypermarket.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+
+        Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+        (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso-hypermarket.png"' | Set-Content $_.FullName
+        }
+
+        # Reset Grafana UI
+        Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+        (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Hypermarket' | Set-Content $_.FullName
         }
     }
 
@@ -946,7 +976,6 @@ function Deploy-Prometheus {
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
         kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'
@@ -1023,12 +1052,60 @@ function Deploy-Prometheus {
         }
 
         Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        # Add dashboards
+        # Deploying dashboards (one dashboard for each store)
+        if ($Env:scenario -ne "contoso_hypermarket") {
+            foreach ($dashboard in $observabilityDashboardstoImport) {
+                $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
+                # Replace the datasource
+                $replacementParams = @{
+                    "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                }
+                $content = Get-Content $grafanaDBPath
+                foreach ($key in $replacementParams.Keys) {
+                    $content = $content -replace $key, $replacementParams[$key]
+                }
+                # Set dashboard JSON
+                $dashboardObject = $content | ConvertFrom-Json
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+                # Need to set this to null to let Grafana generate a new ID
+                $dashboardObject.id = $null
+                # # Set dashboard title
+                $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+                # Request body with dashboard to add
+                $grafanaDBBody = @{
+                    dashboard = $dashboardObject
+                    overwrite = $true
+                } | ConvertTo-Json -Depth 10
+
+                if ($_.Value.IsProduction) {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+                    $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
+                }
+                else {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+                    $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
+                }
+
+                # Make HTTP request to the API
+                $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
+
+                Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+            }
+        }
+    }
+
+    # Deploying dashboard for Contoso Hypermarket (One dashboard for all stores)
+    if ($Env:scenario -eq "contoso_hypermarket") {
         foreach ($dashboard in $observabilityDashboardstoImport) {
             $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
-                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                "\$\{DS_PROMETHEUS}" = "prometheus"
             }
             $content = Get-Content $grafanaDBPath
             foreach ($key in $replacementParams.Keys) {
@@ -1036,29 +1113,24 @@ function Deploy-Prometheus {
             }
             # Set dashboard JSON
             $dashboardObject = $content | ConvertFrom-Json
-            # Best practice is to generate a random UID, such as a GUID
-            $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+            # Set Dashboard UID for parent dashboards
+            if ($dashboard -notlike '*app-pods*') {
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+            }
 
             # Need to set this to null to let Grafana generate a new ID
             $dashboardObject.id = $null
-            # Set dashboard title
-            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
             # Request body with dashboard to add
             $grafanaDBBody = @{
                 dashboard = $dashboardObject
                 overwrite = $true
-            } | ConvertTo-Json -Depth 8
+            } | ConvertTo-Json -Depth 10
 
-            if ($_.Value.IsProduction) {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-                $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
-            }
-            else {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
-                $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
-            }
+            # Set Grafana Dashboard endpoint
+            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
 
             # Make HTTP request to the API
             $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
@@ -1066,7 +1138,307 @@ function Deploy-Prometheus {
             Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         }
-
     }
     Write-Host
+}
+
+function Update-AzureIoTOpsExtension {
+    try {
+        Write-Host "Starting patching of azure-iot-ops extension..." -ForegroundColor Green
+        & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "C:\Program Files\Microsoft SDKs\Azure\CLI2\Lib\site-packages\azure-cli-extensions\azure-iot-ops" azure-identity==1.17.1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Installation of azure-iot-ops extension completed successfully." -ForegroundColor Green
+        } else {
+            Write-Host "Installation of azure-iot-ops extension failed with exit code $LASTEXITCODE." -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "An error occurred during the patching of the azure-iot-ops extension." -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+}
+
+# Deploys Azure IoT Operations on all k8s clusters in the config file
+function Deploy-AIO {
+    $sites = $AgConfig.SiteConfig.GetEnumerator()
+    foreach ($site in $sites) {
+        if ($site.Value.Type -eq "AKSEE") {
+    ##############################################################
+    # Preparing clusters for aio
+    ##############################################################
+    $VMnames = $AgConfig.SiteConfig.GetEnumerator().Name.ToLower()
+
+    Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+        $ProgressPreference = "SilentlyContinue"
+        ###########################################
+        # Preparing environment folders structure
+        ###########################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+        Write-Host "`n"
+        try {
+            $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+            & kubectl apply -f $localPathProvisionerYaml
+            $pvcYaml = @"
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: local-path-pvc
+              namespace: default
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: local-path
+              resources:
+                requests:
+                  storage: 15Gi
+"@
+
+            $pvcYaml | kubectl apply -f -
+
+            Write-Host "Successfully deployment the local path provisioner"
+        }
+        catch {
+            Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
+        }
+
+        Write-Host "Configuring firewall specific to AIO"
+        Write-Host "Add firewall rule for AIO MQTT Broker"
+        New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+        try {
+            $deploymentInfo = Get-AksEdgeDeploymentInfo
+            # Get the service ip address start to determine the connect address
+            $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+            $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
+            if ( $null -eq $portProxyRulExists ) {
+                Write-Host "Configure port proxy for AIO"
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
+            }
+            else {
+                Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
+            }
+        }
+        catch {
+            Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
+        }
+        Write-Host "Update the iptables rules"
+        try {
+            $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
+            if ( $null -eq $iptableRulesExist ) {
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
+                Write-Host "Updated runtime iptable rules for node exporter"
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
+                Write-Host "Persisted iptable rules for node exporter"
+                # increase the maximum number of files
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+            }
+            else {
+                Write-Host "iptable rule exists, skip configuring iptable rules..."
+            }
+        }
+        catch {
+            Write-Host "Error: iptable rule update failed" -ForegroundColor Red
+        }
+    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        }
+    }
+
+    #############################################################
+    # Deploying AIO on the clusters
+    #############################################################
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $kvIndex = 0
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+        $retryCount = 0
+        $maxRetries = 5
+        $aioStatus = "notDeployed"
+
+        # Enable custom locations on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az connectedk8s enable-features --name $arcClusterName `
+        --resource-group $resourceGroup `
+        --features cluster-connect custom-locations `
+        --custom-locations-oid $customLocationRPOID `
+        --only-show-errors
+
+        Start-Sleep -Seconds 10
+
+        do {
+            az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+        $kvIndex++
+    }
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+        $retryCount = 0
+        $maxRetries = 25
+        kubectx $clusterName
+        do {
+            $output = az iot ops check --as-object --only-show-errors
+            $output = $output | ConvertFrom-Json
+            $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+            if ($mqServiceStatus -ne "Success") {
+                if($retryCount -eq 20 -and $mqServiceStatus -eq "warning"){
+                    break;
+                }
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
+                $retryCount++
+            }
+        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+            exit 1 # Exit the script
+        }
+
+        do{
+            $extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
+            if($null -eq $extensionPrincipalId){
+                Write-Host "Waiting for the mq extension to be installed...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
+            }
+        }until($null -ne $extensionPrincipalId)
+
+        Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
+        Write-Host "`n"
+        Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
+        #$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations']" --output json | ConvertFrom-Json).identity.principalId
+        #$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
+        $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+        $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+        $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+        $eventGridNamespacePrincipalId = (az eventgrid namespace list --resource-group $resourceGroup -o json --only-show-errors | ConvertFrom-Json)[0].identity.principalId
+
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $eventGridNamespacePrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+
+        Start-Sleep -Seconds 60
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
+        $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
+        az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
+
+        Start-Sleep -Seconds 60
+
+        ## Adding MQTT bridge to Event Grid MQTT
+        $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
+        Copy-Item $mqconfigfile "$AgToolsDir\mq_cloudConnector_$clusterName.yml" -Force
+        $bridgeConfig = "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
+        (Get-Content $bridgeConfig) -replace 'clusterName', $clusterName | Set-Content $bridgeConfig
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+        $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
+        (Get-Content -Path $bridgeConfig) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $bridgeConfig
+        kubectl apply -f $bridgeConfig -n $aioNamespace
+
+        ## Patching MQTT listener
+    }
+}
+
+function Set-MQTTIpAddress {
+    $mqttIpArray = @()
+    $clusters = $AgConfig.SiteConfig.GetEnumerator()
+    foreach ($cluster in $clusters) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
+
+        do {
+            $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+            $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+            if($scenario -ne 'contoso_hypermarket'){
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-mq-dmqtt" -and
+                    $_.status.phase -notmatch "running"
+                }
+            }
+            else{
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-operator" -and
+                    $_.status.phase -notmatch "Running"
+                }
+            }
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+            Start-Sleep -Seconds 20
+        } while (
+            $null -eq $mqttIp -and $matchingServices.Count -ne 0
+        )
+        if (-not [string]::IsNullOrEmpty($mqttIp)) {
+            $newObject = [PSCustomObject]@{
+                cluster = $clusterName
+                ip = $mqttIp
+            }
+            $mqttIpArray += $newObject
+        }
+        if($cluster.Value.type -eq "AKSEE"){
+            Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
+            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
+            }
+        }
+    }
+
+    $mqttIpArray = $mqttIpArray | Where-Object { $_ -ne "" }
+
+    return $mqttIpArray
+}
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+function Deploy-MQTTExplorer {
+    param (
+        [array]$mqttIpArray
+    )
+    Write-Host "`n"
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+    Write-Host "`n"
+    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+    $mqttExplorerSettings = "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json"
+    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $versionToDownload = $latestReleaseTag.Split("v")[1]
+    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+    $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+    $clusters = $AgConfig.SiteConfig.GetEnumerator()
+
+    $ProgressPreference = "SilentlyContinue"
+    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+    Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+    Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+    Start-Sleep -Seconds 5
+    Stop-Process -Name "MQTT Explorer"
+    Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination $mqttExplorerSettings -Force
+    foreach ($cluster in $clusters) {
+        $clusterName = $cluster.Name.ToLower()
+        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
+        (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
+    }
+    $ProgressPreference = "Continue"
 }

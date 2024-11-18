@@ -1,0 +1,812 @@
+{
+  "$schema": "https://msitpbiadx.powerbi.com/static/d/schema/54/dashboard.json",
+  "id": "4ca6d90b-dda9-444c-a3c9-eb99bde78b66",
+  "eTag": "\"0d986902e12d44e9b7187e3eb61e2b85\"",
+  "schema_version": "54",
+  "title": "OT Dashboard",
+  "tiles": [
+    {
+      "id": "6c5c8567-04ee-470d-ab31-eee08a9c26ee",
+      "title": "Refrigerator Status",
+      "visualType": "multistat",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 0,
+        "y": 6,
+        "width": 3,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "a499aa12-4369-493d-93ea-409aa7dd483c"
+      },
+      "hideTitle": true,
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "door_status",
+        "colorRulesDisabled": false,
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "device_id_label",
+        "multiStat__slot": {
+          "width": 1,
+          "height": 2
+        },
+        "colorRules": [
+          {
+            "id": "c807c2d3-43f7-4af9-8a9e-9e756b71e1d8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "door_status",
+                "values": [
+                  "Open"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": null,
+            "ruleName": "Temperature Gauge",
+            "visualType": "multistat"
+          },
+          {
+            "id": "85140876-c125-4982-ba46-0e018c1d9aec",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "door_status",
+                "values": [
+                  "Closed"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": null,
+            "ruleName": "Sensor Lag",
+            "visualType": "multistat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bbd3ed7e-296d-4784-a2ab-3341f0019572",
+      "title": "New tile",
+      "visualType": "multistat",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 3,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "e872f3db-a364-4f27-9c45-6302e6426a0a"
+      },
+      "hideTitle": true,
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "status_label",
+        "colorRulesDisabled": false,
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "device_id",
+        "multiStat__slot": {
+          "width": 1,
+          "height": 2
+        },
+        "colorRules": [
+          {
+            "id": "b832c4c4-64a6-41b5-bffa-11d82d15cd3b",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "status",
+                "values": [
+                  "on"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          },
+          {
+            "id": "a4203fa2-9755-4080-b83b-731edced75c8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "status",
+                "values": [
+                  "off"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "7d5ce537-2733-4aca-9ca4-292b77384659",
+      "title": "Brightness Level (Lumens)",
+      "visualType": "line",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 3,
+        "y": 0,
+        "width": 10,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "15b59907-6b86-47f5-947c-1d824ad91e38"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": 100,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": false,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "timestamp",
+        "yColumns": [
+          "brightness_level"
+        ],
+        "seriesColumns": [
+          "device_id"
+        ],
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "e8fd7d81-3e06-4485-aef1-ba3c341f6461",
+      "title": "Lighting Power Utilization (kWh)",
+      "visualType": "area",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 13,
+        "y": 0,
+        "width": 8,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "baf31768-a72a-4d2f-9fea-7d546122263a"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": true
+        },
+        "hideLegend": true,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "timestamp",
+        "yColumns": [
+          "power_usage_kwh"
+        ],
+        "seriesColumns": [
+          "device_id"
+        ],
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "8ba8d51e-4ca9-4ac4-8838-c40363090d18",
+      "title": "New tile",
+      "visualType": "multistat",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 0,
+        "y": 12,
+        "width": 3,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "658a1393-d464-4626-97ed-915df835eda0"
+      },
+      "hideTitle": true,
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "operating_mode_label",
+        "colorRulesDisabled": false,
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "device_id_label",
+        "multiStat__slot": {
+          "width": 1,
+          "height": 2
+        },
+        "colorRules": [
+          {
+            "id": "b832c4c4-64a6-41b5-bffa-11d82d15cd3b",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "operating_mode",
+                "values": [
+                  "heating"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          },
+          {
+            "id": "a4203fa2-9755-4080-b83b-731edced75c8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "operating_mode",
+                "values": [
+                  "cooling"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "blue",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ead1d757-b659-4e8a-b4b3-99b704ad191b",
+      "title": "HVAC Power Utilization (kWh)",
+      "visualType": "area",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 3,
+        "y": 12,
+        "width": 8,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "1fa31e61-b4dd-4471-b5a6-c982c15cd9c8"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": true
+        },
+        "hideLegend": true,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "timestamp",
+        "yColumns": [
+          "power_usage_kwh"
+        ],
+        "seriesColumns": [
+          "device_id"
+        ],
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "d0be5ee7-a268-4389-8553-a479fe3581ec",
+      "title": "Refrigerator Temperature (Celsius)",
+      "visualType": "multistat",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 3,
+        "y": 6,
+        "width": 10,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "cf05490c-b613-4a3d-b194-d75d840b8fc5"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "temperature_celsius_label",
+        "colorRulesDisabled": false,
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "device_id",
+        "multiStat__slot": {
+          "width": 1,
+          "height": 2
+        },
+        "colorRules": [
+          {
+            "id": "c807c2d3-43f7-4af9-8a9e-9e756b71e1d8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "values": [
+                  "2"
+                ],
+                "operator": ">",
+                "column": "temperature_celsius"
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "Food Safety Risk",
+            "icon": "warning",
+            "ruleName": "Temperature Gauge",
+            "visualType": "multistat"
+          },
+          {
+            "id": "85140876-c125-4982-ba46-0e018c1d9aec",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "values": [
+                  "2024-11-01T10:13:50Z"
+                ],
+                "operator": ">",
+                "column": "temperature_celsius"
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "yellow",
+            "tag": "Sensor Read Error",
+            "icon": null,
+            "ruleName": "Sensor Lag",
+            "visualType": "multistat"
+          },
+          {
+            "id": "b1060aba-4b62-4d00-91f1-ac8971f074b9",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "<=",
+                "column": "temperature_celsius",
+                "values": [
+                  "2"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "da08f950-8ba9-4712-b512-225bf790f8d6",
+      "title": "Temp (Celsius)",
+      "visualType": "column",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 11,
+        "y": 12,
+        "width": 5,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "338ebed5-284b-4251-828e-f1eb290c624a"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": 25,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": true,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "device_id",
+        "yColumns": [
+          "temperature_celsius"
+        ],
+        "seriesColumns": null,
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "7bb594f5-7b06-4b5f-870c-524babd709b5",
+      "title": "Refrigerator Power Utilization (kWh)",
+      "visualType": "area",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 13,
+        "y": 6,
+        "width": 8,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "59c08389-4793-425f-b3b1-201ceec1c8f1"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": true
+        },
+        "hideLegend": true,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "timestamp",
+        "yColumns": [
+          "power_usage_kwh"
+        ],
+        "seriesColumns": [
+          "device_id"
+        ],
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "a3711b00-ce16-4416-b092-a137a55e1688",
+      "title": "Humidity",
+      "visualType": "multistat",
+      "pageId": "e813fc9f-4788-43f3-a890-ca213b19d6e9",
+      "layout": {
+        "x": 16,
+        "y": 12,
+        "width": 5,
+        "height": 6
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "1e4dd09f-5439-4b45-91c3-2bf340158b6d"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "humidity_percent_label",
+        "colorRulesDisabled": false,
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "device_id",
+        "multiStat__slot": {
+          "width": 1,
+          "height": 2
+        },
+        "colorRules": [
+          {
+            "id": "b832c4c4-64a6-41b5-bffa-11d82d15cd3b",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "operating_mode",
+                "values": [
+                  "heating"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          },
+          {
+            "id": "a4203fa2-9755-4080-b83b-731edced75c8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "operating_mode",
+                "values": [
+                  "cooling"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "colorStyle": "bold",
+            "color": "blue",
+            "tag": "",
+            "icon": null,
+            "ruleName": "",
+            "visualType": "multistat"
+          }
+        ]
+      }
+    }
+  ],
+  "baseQueries": [
+    {
+      "id": "96a651b3-ce60-4f37-8c85-1db19332b6ec",
+      "queryId": "02787624-cc81-471a-9dd3-89e876a0b0d4",
+      "variableName": "test"
+    }
+  ],
+  "parameters": [
+    {
+      "kind": "duration",
+      "id": "bb1650a2-322a-4c35-acf3-2fecaf349561",
+      "displayName": "Time range",
+      "description": "",
+      "beginVariableName": "_startTime",
+      "endVariableName": "_endTime",
+      "defaultValue": {
+        "kind": "dynamic",
+        "count": 1,
+        "unit": "hours"
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    }
+  ],
+  "dataSources": [
+    {
+      "id": "84a721cf-89b0-46ec-8a2e-24f267bb60e6",
+      "kind": "kusto-trident",
+      "clusterUri": "{{KQL_CLUSTER_URI}}",
+      "database": "{{KQL_DATABASE_ID}}",
+      "name": "contosohypermarket",
+      "scopeId": "kusto-trident",
+      "workspace": "{{FABRIC_WORKSPACE_ID}}"
+    }
+  ],
+  "pages": [
+    {
+      "name": "OT Dashboard",
+      "id": "e813fc9f-4788-43f3-a890-ca213b19d6e9"
+    }
+  ],
+  "queries": [
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Get refrigerator temps\niot_data\n| where equipment_type == \"Refrigerator\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , door_open = d.door_open\n| summarize arg_max(timestamp, door_open) by device_id\n| extend door_status = case(door_open == true, \"Open\", \"Closed\")\n| extend device_id_label = strcat(device_id, \" Door\")\n| sort  by device_id_label asc \n",
+      "id": "a499aa12-4369-493d-93ea-409aa7dd483c",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Light Status Queries\niot_data\n| where equipment_type == \"LightingSystem\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , status = tostring(d.status)\n| summarize arg_max(timestamp, status) by device_id\n//change the status to Sentence case.\n| extend status_label = strcat(toupper(substring(status, 0, 1)), tolower(substring(status, 1, strlen(status)-1)))\n| sort  by device_id asc \n",
+      "id": "e872f3db-a364-4f27-9c45-6302e6426a0a",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Light Brightness Level\niot_data \n| where equipment_type == \"LightingSystem\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , brightness_level = todecimal(d.brightness_level) \n| project timestamp, device_id, system_id, brightness_level ",
+      "id": "15b59907-6b86-47f5-947c-1d824ad91e38",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"LightingSystem\" \n//| where device_id == \"LightingSystem01\"\n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "id": "baf31768-a72a-4d2f-9fea-7d546122263a",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "// HVAC operating_mode\niot_data\n| where equipment_type == \"HVAC\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , operating_mode = tostring(d.operating_mode)\n| summarize arg_max(timestamp, operating_mode) by device_id\n| extend device_id_label = strcat(device_id, \" Mode\")\n//change the operating_mode to Sentence case.\n| extend operating_mode_label = strcat(toupper(substring(operating_mode, 0, 1)), tolower(substring(operating_mode, 1, strlen(operating_mode)-1)))\n| sort  by device_id asc \n\n",
+      "id": "658a1393-d464-4626-97ed-915df835eda0",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"HVAC\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "id": "1fa31e61-b4dd-4471-b5a6-c982c15cd9c8",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Get refrigerator temps\niot_data\n| where equipment_type == \"Refrigerator\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , temperature_celsius = todecimal(d.temperature_celsius)\n| summarize arg_max(timestamp, temperature_celsius) by device_id\n| extend temperature_celsius_label = strcat(round(temperature_celsius, 2), \"\\u00B0C\")\n| sort  by device_id asc \n",
+      "id": "cf05490c-b613-4a3d-b194-d75d840b8fc5",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "// HVAC operating_mode\niot_data\n| where equipment_type == \"HVAC\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , temperature_celsius = todecimal(d.temperature_celsius)\n| summarize arg_max(timestamp, temperature_celsius) by device_id\n| sort  by device_id asc \n\n",
+      "id": "338ebed5-284b-4251-828e-f1eb290c624a",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "//Light Power Utilization\niot_data \n| where equipment_type == \"Refrigerator\" \n| where timestamp between (_startTime .. _endTime)\n| extend d = parse_json(data) \n| extend system_id = d.id , power_usage_kwh = todecimal(d.power_usage_kwh) \n| project timestamp, device_id, system_id, power_usage_kwh ",
+      "id": "59c08389-4793-425f-b3b1-201ceec1c8f1",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "// HVAC humidity\niot_data\n| where equipment_type == \"HVAC\"\n| extend d = parse_json(data) \n| extend system_id = d.id\n        , humidity_percent = tostring(d.humidity_percent)\n| summarize arg_max(timestamp, humidity_percent) by device_id\n| extend humidity_percent_label = strcat(humidity_percent, \"%\")\n| sort  by device_id asc \n\n",
+      "id": "1e4dd09f-5439-4b45-91c3-2bf340158b6d",
+      "usedVariables": []
+    },
+    {
+      "id": "02787624-cc81-471a-9dd3-89e876a0b0d4",
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "84a721cf-89b0-46ec-8a2e-24f267bb60e6"
+      },
+      "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\niot_data\n| where device_id == \"SmartShelf02\"",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"        
+      ]
+    }
+  ]
+}

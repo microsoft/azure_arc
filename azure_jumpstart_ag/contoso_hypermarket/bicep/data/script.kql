@@ -1,0 +1,142 @@
+.execute database script with (ContinueOnErrors=true)
+<|
+
+// Check if the table exists
+.drop table staging ifexists
+
+// Create new staging table
+.create table staging (source: string, subject: string, event_data: dynamic)
+
+// Create staging ingestion mapping
+.create table staging ingestion json mapping "staging_mapping"
+```
+[
+{"column":"source","path":"$['source']","datatype":"string"},
+{"column":"subject","path":"$['subject']","datatype":"string"},
+{"column":"event_data","path":"$['event_data']","datatype":""}
+]
+```
+
+//  Modify the ingestion batching policy to ingest data frequently
+.alter table staging policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+
+// Delete existing table
+.drop table sales ifexists
+
+// Create sales table
+.create table sales (sale_id: string, sale_date: datetime, store_id: string, store_city:string, product_id: string, product_category:string, product_name:string, price: real, discount: real, quantity: int, item_total: real, profit: real, payment_method: string, customer_id:string, register_id: string)
+
+// Create function to expand sales data
+.create-or-alter function expand_sales_data()
+{
+  staging
+  | where subject == "topic/sales"
+  | extend data = parse_json(event_data) 
+  | project 
+  sale_id = tostring(data.sale_id),
+  sale_date = todatetime(data.sale_date),
+  store_id = tostring(data.store_id),
+  store_city = tostring(data.store_city),
+  product_id = tostring(data.product_id),
+  product_category = tostring(data.product_category),
+  product_name = tostring(data.product_name),
+  price = toreal(data.price),
+  discount = toreal(data.discount),
+  quantity = toint(data.quantity),
+  item_total = toreal(data.item_total),
+  profit = toreal(data.profit),
+  payment_method = tostring(data.payment_method),
+  customer_id = tostring(data.customer_id),
+  register_id = tostring(data.register_id)
+}
+
+// Create policy to update sales table
+.alter table sales policy update @'[{"Source": "staging", "Query": "expand_sales_data()", "IsEnabled": "True"}]'
+
+// Delete existing table
+.drop table inventory ifexists
+
+// Create inventory table
+.create table inventory (date_time: datetime, store_id: string, product_id: string, retail_price: real, stock_level: int, reorder_threshold: int, last_restocked: datetime)
+
+// Create function to expand inventory data
+.create-or-alter function expand_inventory_data()
+{
+  staging
+  | where subject == "topic/inventory"
+  | extend data = parse_json(event_data) 
+  | project 
+  date_time = todatetime(data.date_time),
+  store_id = tostring(data.store_id),
+  product_id = tostring(data.product_id),
+  retail_price = toreal(data.retail_price),
+  stock_level = toint(data.in_stock),
+  reorder_threshold = toint(data.reorder_threshold),
+  last_restocked = todatetime(data.last_restocked)
+}
+
+// Create policy
+.alter table inventory policy update @'[{"Source": "staging", "Query": "expand_inventory_data()", "IsEnabled": "True"}]'
+
+// Create product table
+.drop table products ifexists
+.create table products (product_id:string, name:string, price:real, stock:int, category: string, photo_path:string)
+.ingest inline into table products <|
+1,Red Apple,0.2,1000,Fruits,static/img/product1.jpg
+2,Banana,0.2,300,Fruits,static/img/product2.jpg
+3,Avocado,1.25,1000,Vegetables,static/img/product3.jpg
+4,Bread,3.0,200,Bakery,static/img/product4.jpg
+5,Milk,2.5,200,Dairy,static/img/product5.jpg
+6,Orange Juice,3.25,100,Fruits,static/img/product6.jpg
+7,Chips,0.25,1000,Snacks,static/img/product7.jpg
+8,Red Pepper,0.5,800,Vegetables,static/img/product8.jpg
+9,Lettuce,0.3,2000,Vegetables,static/img/product9.jpg
+10,Tomato,0.4,5000,Vegetables,static/img/product10.jpg
+11,Strawberry,2.0,500,Fruits,static/img/product11.jpg
+12,Eggs,3.0,10000,Poultry,static/img/product12.jpg
+
+// Create stores table
+.drop table stores ifexists
+.create table stores (store_id:string, city:string, state:string, country:string)
+.ingest inline into table stores <|
+CHI,Chicago,IL,United States
+SEA,Seattle, WA,United States
+NYC,New York, NY,United States
+DAL,Dallas,TX,United States
+ATL,Atlanta,GA,United States
+LAS,Las Vegas,NV,United States
+MIA,Miami,FL,United States
+LAX,Los Angeles,CA,United States
+
+// Create Industrial Operations Data Tables
+.drop table iot_data ifexists
+.create table iot_data (timestamp: datetime, store_id: string, device_id: string, equipment_type: string, data: dynamic )
+
+// Create staging ingestion mapping
+.create table iot_data ingestion json mapping "iot_data_mapping"
+```
+[
+{"column":"timestamp","path":"$['timestamp']","datatype":"datetime"},
+{"column":"store_id","path":"$['store_id']","datatype":"string"},
+{"column":"device_id","path":"$['device_id']","datatype":"string"},
+{"column":"equipment_type","path":"$['equipment_type']","datatype":"string"},
+{"column":"data","path":"$['data']","datatype":""}
+]
+```
+
+// Create function to expand inventory data
+.create-or-alter function expand_iot_data()
+{
+  staging
+  | where subject == "iot/devices"
+  | extend data = parse_json(event_data) 
+  | project 
+  timestamp = todatetime(data.timestamp),
+  store_id = tostring(data.store_id),
+  device_id = tostring(data.device_id),
+  equipment_type = tostring(data.equipment_type),
+  data = data.data
+}
+
+// Create policy
+.alter table iot_data policy update @'[{"Source": "staging", "Query": "expand_iot_data()", "IsEnabled": "True"}]'
