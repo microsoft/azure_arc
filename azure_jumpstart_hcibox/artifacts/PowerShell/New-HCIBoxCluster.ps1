@@ -640,20 +640,20 @@ function Set-NICs {
             # Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
             # Enable CredSSP Settings
-            Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
-                $fqdn = $Using:HCIBoxConfig.SDNDomainFQDN
+            # Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
+            #     $fqdn = $Using:HCIBoxConfig.SDNDomainFQDN
 
-                Write-Host "Enabling CredSSP on $env:COMPUTERNAME"
-                Enable-WSManCredSSP -Role Server -Force
-                Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
-                Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
-                Enable-WSManCredSSP -Role Client -DelegateComputer $fqdn -Force
-                Enable-WSManCredSSP -Role Client -DelegateComputer "*.$fqdn" -Force
-                New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation `
-                    -Name AllowFreshCredentialsWhenNTLMOnly -Force
-                New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly `
-                    -Name 1 -Value * -PropertyType String -Force
-            } -InDisconnectedSession | Out-Null
+            #     Write-Host "Enabling CredSSP on $env:COMPUTERNAME"
+            #     Enable-WSManCredSSP -Role Server -Force
+            #     Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
+            #     Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
+            #     Enable-WSManCredSSP -Role Client -DelegateComputer $fqdn -Force
+            #     Enable-WSManCredSSP -Role Client -DelegateComputer "*.$fqdn" -Force
+            #     New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation `
+            #         -Name AllowFreshCredentialsWhenNTLMOnly -Force
+            #     New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly `
+            #         -Name 1 -Value * -PropertyType String -Force
+            # } -InDisconnectedSession | Out-Null
         }
     }
 }
