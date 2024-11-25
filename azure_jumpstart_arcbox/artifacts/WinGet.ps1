@@ -16,10 +16,9 @@ Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustR
 Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
 Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
-Get-WinGetVersion
-
-Write-Header 'Installing WinGet packages and DSC configurations'
-$winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
+# Update WinGet package manager to the latest version (running twice due to a known issue regarding WinAppSDK)
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
 
 # Apply WinGet Configuration files
 winget configure --file C:\ArcBox\DSC\common.dsc.yml --accept-configuration-agreements --disable-interactivity
