@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mqtt-simulator
-          image: agoraarmbladev.azurecr.io/mqtt-simulator:latest
+          image: jumpstartprod.azurecr.io/contoso-supermarket-mqtt-simulator:latest
           resources:
             limits:
               cpu: "1"

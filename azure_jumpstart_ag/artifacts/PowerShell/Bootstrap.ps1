@@ -6,6 +6,7 @@ param (
   [string]$spnObjectId,
   [string]$spnTenantId,
   [string]$spnAuthority,
+  [string]$tenantId,
   [string]$subscriptionId,
   [string]$resourceGroup,
   [string]$azureLocation,
@@ -13,7 +14,6 @@ param (
   [string]$workspaceName,
   [string]$aksStagingClusterName,
   [string]$iotHubHostName,
-  [string]$acrName,
   [string]$cosmosDBName,
   [string]$cosmosDBEndpoint,
   [string]$templateBaseUrl,
@@ -24,11 +24,16 @@ param (
   [string]$githubUser,
   [string]$adxClusterName,
   [string]$namingGuid,
-  [string]$industry,
+  [string]$scenario,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
-  [string]$stcontainerName,
-  [string]$AKSEEPinnedSchemaVersion
+  [string]$k3sArcClusterName,
+  [string]$k3sArcDataClusterName,
+  [string]$vmAutologon,
+  [string]$openAIEndpoint,
+  [string]$speachToTextEndpoint,
+  [object]$azureOpenAIModel,
+  [string]$openAIDeploymentName
 )
 
 ##############################################################
@@ -44,6 +49,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
@@ -52,7 +58,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBName', $cosmosDBName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBEndpoint', $cosmosDBEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
@@ -63,11 +68,15 @@ param (
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('scenario', $scenario, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -102,15 +111,33 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+
+if ($vmAutologon -eq "true") {
+
+  Write-Host "Configuring VM Autologon"
+
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+  if($flavor -eq "DataOps"){
+      Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
+  }
+} else {
+
+  Write-Host "Not configuring VM Autologon"
+
+}
 
 ##############################################################
 # Download configuration data file and declaring directories
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 
-switch ($industry) {
-  "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-retail.psd1") -OutFile $ConfigurationDataFile }
-  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
+switch ($scenario) {
+  "contoso_supermarket" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-supermarket.psd1") -OutFile $ConfigurationDataFile }
+  "contoso_motors" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd1") -OutFile $ConfigurationDataFile}
+  "contoso_hypermarket" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-hypermarket.psd1") -OutFile $ConfigurationDataFile}
 }
 
 $AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
@@ -219,7 +246,31 @@ foreach ($url in $websiteUrls.Values) {
 # Copy PowerShell Profile and Reload
 ##############################################################
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile "$AgPowerShellDir\Profile.ps1"
 .$PsHome\Profile.ps1
+
+##############################################################
+# Installing PowerShell 7
+##############################################################
+$ProgressPreference = 'SilentlyContinue'
+$url = "https://github.com/PowerShell/PowerShell/releases/latest"
+$latestVersion = (Invoke-WebRequest -UseBasicParsing -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
+$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/$latestVersion/PowerShell-$($latestVersion.Substring(1,5))-win-x64.msi"
+Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -OutFile .\PowerShell7.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1'
+Remove-Item .\PowerShell7.msi
+
+Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
+
+# Installing PowerShell Modules
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+$modules = @("Az", "Az.ConnectedMachine", "Az.ConnectedKubernetes", "Az.CustomLocation", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
+
+foreach ($module in $modules) {
+    Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+}
 
 ##############################################################
 # Get latest Grafana OSS release
@@ -234,8 +285,9 @@ Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/common.psm1") -OutFile "$AgPowerShellDir\common.psm1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/retail.psm1") -OutFile "$AgPowerShellDir\retail.psm1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/manufacturing.psm1") -OutFile "$AgPowerShellDir\manufacturing.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_supermarket.psm1") -OutFile "$AgPowerShellDir\contoso_supermarket.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_motors.psm1") -OutFile "$AgPowerShellDir\contoso_motors.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_hypermarket.psm1") -OutFile "$AgPowerShellDir\contoso_hypermarket.psm1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
@@ -249,83 +301,50 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -OutFile $AgIconsDir\contoso-motors.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Winget.ps1") -OutFile "$AgPowerShellDir\Winget.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$AgDirectory\tests\common.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/k8s.tests.ps1") -OutFile "$AgDirectory\tests\k8s.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$AgDirectory\tests\Invoke-Test.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/ag-bginfo.bgi") -OutFile "$AgDirectory\tests\ag-bginfo.bgi"
 
-if($industry -eq "retail"){
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
+if($scenario -eq "contoso_supermarket"){
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 }
-elseif ($industry -eq "manufacturing") {
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
+elseif ($scenario -eq "contoso_motors") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-motors") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings_motors.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
+elseif ($scenario -eq "contoso_hypermarket") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipRbac.yml") -OutFile "$AgToolsDir\kubeVipRbac.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipDaemon.yml") -OutFile "$AgToolsDir\kubeVipDaemon.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
+  #Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings_hypermarket.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-workloads.json") -OutFile "$AgMonitoringDir\grafana-app-workloads.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full-v2.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full-v2.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-asset.json") -OutFile "$AgMonitoringDir\grafana-app-store-asset.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-shoppers.json") -OutFile "$AgMonitoringDir\grafana-app-store-shoppers.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-pos.json") -OutFile "$AgMonitoringDir\grafana-app-store-pos.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.png") -OutFile $AgIconsDir\contoso-hypermarket.png
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.svg") -OutFile $AgIconsDir\contoso-hypermarket.svg
+}
+
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
-##############################################################
-# Install Chocolatey packages
-##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
-
-$retryCount = 0
-$success = $false
-
-while (-not $success -and $retryCount -lt $maxRetries) {
-  try {
-    Write-Header "Installing Chocolatey packages"
-    try {
-      choco config get cacheLocation
-    }
-    catch {
-      Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
-    }
-
-    Write-Host "Chocolatey packages specified"
-
-    foreach ($app in $AgConfig.ChocolateyPackagesList) {
-      Write-Host "Installing $app"
-      & choco install $app /y -Force | Write-Output
-    }
-
-    # If the command succeeds, set $success to $true to exit the loop
-    $success = $true
-  }
-  catch {
-    # If an exception occurs, increment the retry count
-    $retryCount++
-
-    # If the maximum number of retries is not reached yet, display an error message
-    if ($retryCount -lt $maxRetries) {
-      Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-      Start-Sleep -Seconds $retryDelay
-    }
-    else {
-      Write-Host "All attempts failed. Exiting..."
-      exit 1  # Stop script execution if maximum retries reached
-    }
-  }
-}
-
-##############################################################
-# Install Azure CLI (64-bit not available via Chocolatey)
-##############################################################
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-Remove-Item .\AzureCLI.msi
 
 ##############################################################
 # Create Docker Desktop group
 ##############################################################
 New-LocalGroup -Name "docker-users" -Description "docker Users Group"
 Add-LocalGroupMember -Group "docker-users" -Member $adminUsername
-
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 ##############################################################
 # Disable Network Profile prompt
@@ -373,12 +392,15 @@ New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgC
 ##############################################################
 # Installing Posh-SSH PowerShell Module
 ##############################################################
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
+$ScheduledTaskExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
-Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument $AgPowerShellDir\WinGet.ps1
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+Register-ScheduledTask -TaskName "AgLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
 # Disabling Windows Server Manager Scheduled Task
@@ -388,11 +410,30 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 ##############################################################
 # Install Hyper-V, WSL and reboot
 ##############################################################
-Write-Header "Installing Hyper-V"
-Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+  Write-Header "Installing Hyper-V"
+  Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+  Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+}else{
+  Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+}
+
+# Restart machine to initiate VM autologon
+$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-Command "Restart-Computer -Force"'
+$trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddSeconds(10))
+$taskName = "Restart-Computer-Delayed"
+
+# Define the restart action and schedule it to run after 10 seconds
+$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-Command "Restart-Computer -Force"'
+$trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddSeconds(10))
+
+# Configure the task to run with highest privileges and use the current user's credentials
+$principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskName -Principal $principal -Description "Restart computer after script exits"
+
 
 Stop-Transcript
 

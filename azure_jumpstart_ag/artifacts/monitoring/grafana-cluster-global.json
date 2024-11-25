@@ -2638,8 +2638,7 @@
   "schemaVersion": 37,
   "style": "dark",
   "tags": [
-    "Kubernetes",
-    "Prometheus"
+    "Kubernetes"
   ],
   "templating": {
     "list": [
@@ -2715,7 +2714,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "Kubernetes / Views / Global",
   "uid": "k8s_views_global",
   "version": 28,
