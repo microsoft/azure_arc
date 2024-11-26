@@ -320,17 +320,28 @@ If (-NOT (Test-Path $RegistryPath)) {
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Set Diagnostic Data settings
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 3
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "MaxTelemetryAllowed" -Value 3
 
-# Load the Default User hive
-reg load HKU\Default "C:\Users\Default\NTUSER.DAT"
+$telemetryPath = "HKLM:\Software\Policies\Microsoft\Windows\DataCollection"
+$telemetryProperty = "AllowTelemetry"
+$telemetryValue = 3
 
-# Create or update the Diagnostics registry key and values
-reg add "HKU\Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "ShowedToastAtLevel" /t REG_DWORD /d 3 /f
+$oobePath = "HKLM:\Software\Policies\Microsoft\Windows\OOBE"
+$oobeProperty = "DisablePrivacyExperience"
+$oobeValue = 1
 
-# Unload the Default User hive
-reg unload HKU\Default
+# Create the registry key and set the value for AllowTelemetry
+if (-not (Test-Path $telemetryPath)) {
+    New-Item -Path $telemetryPath -Force | Out-Null
+}
+Set-ItemProperty -Path $telemetryPath -Name $telemetryProperty -Value $telemetryValue
+
+# Create the registry key and set the value for DisablePrivacyExperience
+if (-not (Test-Path $oobePath)) {
+    New-Item -Path $oobePath -Force | Out-Null
+}
+Set-ItemProperty -Path $oobePath -Name $oobeProperty -Value $oobeValue
+
+Write-Host "Registry keys and values for Diagnostic Data settings have been set successfully."
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
