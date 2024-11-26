@@ -452,7 +452,7 @@ $payLoad = @"
 
             # Renaming the nested VMs
             Write-Header "Renaming the nested Windows VMs"
-            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k12vmName -Restart } -Credential $winCreds
+            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
             Invoke-Command -VMName $Win2k25vmName -ScriptBlock { Rename-Computer -newName $using:Win2k25vmName -Restart } -Credential $winCreds
 
             Get-VM *Win* | Wait-VM -For IPAddress
