@@ -319,8 +319,9 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
-# Set Diagnostic Data Level to Required Only (Basic)
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 1
+# Set Diagnostic Data Level
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 3
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "MaxTelemetryAllowed" -Value 3
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
