@@ -76,7 +76,21 @@ check_dpkg_lock() {
 check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+max_retries=5
+retry_count=0
+success=false
+
+while [ $retry_count -lt $max_retries ]; do
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    if [ $? -eq 0 ]; then
+        success=true
+        break
+    else
+        echo "Failed to install Az CLI. Retrying (Attempt $((retry_count+1)))..."
+        retry_count=$((retry_count+1))
+        sleep 10
+    fi
+done
 
 echo ""
 echo "Log in to Azure"
@@ -156,7 +170,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     azcopy cp $localPath "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/config"
     azcopy cp $k3sClusterNodeConfig "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/k3sClusterNodeConfig.yaml"
 
-    # Onboard the cluster to Azure Arc
+        # Onboard the cluster to Azure Arc
     echo ""
     echo "Onboarding the cluster to Azure Arc"
     echo ""
@@ -164,7 +178,27 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
     echo "Log Analytics workspace id $workspaceResourceId"
 
-    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
+    max_retries=5
+    retry_count=0
+    success=false
+
+    while [ $retry_count -lt $max_retries ]; do
+        sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
+        if [ $? -eq 0 ]; then
+            success=true
+            break
+        else
+            echo "Failed to onboard cluster to Azure Arc. Retrying (Attempt $((retry_count+1)))..."
+            retry_count=$((retry_count+1))
+            sleep 10
+        fi
+    done
+
+    if [ "$success" = false ]; then
+        echo "Error: Failed to onboard the cluster to Azure Arc after $max_retries attempts."
+        exit 1
+    fi
+
     echo "Onboarding the k3s cluster to Azure Arc completed"
 
     # Verify if cluster is connected to Azure Arc successfully
