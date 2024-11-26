@@ -319,9 +319,18 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
-# Set Diagnostic Data Level
+# Set Diagnostic Data settings
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 3
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "MaxTelemetryAllowed" -Value 3
+
+# Load the Default User hive
+reg load HKU\Default "C:\Users\Default\NTUSER.DAT"
+
+# Create or update the Diagnostics registry key and values
+reg add "HKU\Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "ShowedToastAtLevel" /t REG_DWORD /d 3 /f
+
+# Unload the Default User hive
+reg unload HKU\Default
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
