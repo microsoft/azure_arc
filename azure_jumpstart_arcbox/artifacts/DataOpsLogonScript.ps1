@@ -35,11 +35,30 @@ foreach ($key in $keys) {
 
 # Create Windows Terminal desktop shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+
+# Locate the Windows Terminal executable dynamically
+$WindowsAppsPath = "C:\Program Files\WindowsApps"
+$WinTerminalExecutable = Get-ChildItem -Path $WindowsAppsPath -Recurse -Filter "wt.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if ($WinTerminalExecutable) {
+
+    # Create the shortcut
+    $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+    $Shortcut.TargetPath = $WinTerminalExecutable.FullName
+
+    # Set the icon for the shortcut using the dynamically located wt.exe
+    $Shortcut.IconLocation = "$($WinTerminalExecutable.FullName),0"  # Use the first icon in wt.exe
+
+    # Set the shortcut window style (3 = Maximized)
+    $Shortcut.WindowStyle = 3
+
+    # Save the shortcut
+    $Shortcut.Save()
+
+    Write-Host "Windows Terminal shortcut created successfully."
+} else {
+    Write-Host "Windows Terminal executable not found. Ensure it is installed on the system."
+}
 
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
