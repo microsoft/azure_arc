@@ -460,8 +460,8 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             Start-Sleep -Seconds 10
 
             Write-Host "Creating custom location on $clusterName"
-            #kubectx $cluster.context | Out-Null
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup  --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
             Start-Sleep -Seconds 10
 
