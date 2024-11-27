@@ -28,9 +28,29 @@ switch ($env:flavor) {
 Write-Output "Tests succeeded: $tests_passed"
 Write-Output "Tests failed: $tests_failed"
 
-Write-Header "Adding deployment test results to wallpaper using BGInfo"
+Write-Output "Adding deployment test results to wallpaper using BGInfo"
 
 Set-Content "$Env:windir\TEMP\arcbox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\arcbox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
+
+# Setup scheduled task for running tests on each logon
+$TaskName = "ArcBox Pester tests"
+$ActionScript = "C:\ArcBox\Tests\Invoke-Test.ps1"
+
+# Check if the scheduled task exists
+if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
+    Write-Host "Scheduled task '$TaskName' already exists."
+} else {
+    # Create the task trigger
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+
+    # Create the task action to use pwsh.exe
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File $ActionScript"
+
+    # Register the scheduled task for the current user
+    Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $Env:UserName
+
+    Write-Host "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
+}
