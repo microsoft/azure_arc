@@ -35,11 +35,30 @@ foreach ($key in $keys) {
 
 # Create Windows Terminal desktop shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+
+# Locate the Windows Terminal executable dynamically
+$WindowsAppsPath = "C:\Program Files\WindowsApps"
+$WinTerminalExecutable = Get-ChildItem -Path $WindowsAppsPath -Recurse -Filter "wt.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if ($WinTerminalExecutable) {
+
+    # Create the shortcut
+    $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+    $Shortcut.TargetPath = $WinTerminalExecutable.FullName
+
+    # Set the icon for the shortcut using the dynamically located wt.exe
+    $Shortcut.IconLocation = "$($WinTerminalExecutable.FullName),0"  # Use the first icon in wt.exe
+
+    # Set the shortcut window style (3 = Maximized)
+    $Shortcut.WindowStyle = 3
+
+    # Save the shortcut
+    $Shortcut.Save()
+
+    Write-Host "Windows Terminal shortcut created successfully."
+} else {
+    Write-Host "Windows Terminal executable not found. Ensure it is installed on the system."
+}
 
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
@@ -551,21 +570,6 @@ $Favorite.Save()
 Get-process WindowsTerminal | Stop-Process -Force
 
 # Changing to Jumpstart ArcBox wallpaper
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
-
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-
-            public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-            }
-        }
-    }
-'@
-
 
   Write-Header "Changing wallpaper"
 
@@ -573,8 +577,6 @@ namespace Win32{
   Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
 
   Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
-
-
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"

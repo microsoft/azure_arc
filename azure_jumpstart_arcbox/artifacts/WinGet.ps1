@@ -16,24 +16,17 @@ Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustR
 Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
 Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
-# Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers -Force -Latest
-
-Get-WinGetVersion
-
-Write-Header 'Installing WinGet packages and DSC configurations'
-$winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
-
-# Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
-& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
+# Update WinGet package manager to the latest version (running twice due to a known issue regarding WinAppSDK)
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
 
 # Apply WinGet Configuration files
-& $winget configure --file C:\ArcBox\DSC\common.dsc.yml --accept-configuration-agreements --disable-interactivity
+winget configure --file C:\ArcBox\DSC\common.dsc.yml --accept-configuration-agreements --disable-interactivity
 
 switch ($env:flavor) {
-    'DevOps' { & $winget configure --file C:\ArcBox\DSC\devops.dsc.yml --accept-configuration-agreements --disable-interactivity }
-    'DataOps' { & $winget configure --file C:\ArcBox\DSC\dataops.dsc.yml --accept-configuration-agreements --disable-interactivity }
-    'ITPro' { & $winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity }
+    'DevOps' { winget configure --file C:\ArcBox\DSC\devops.dsc.yml --accept-configuration-agreements --disable-interactivity }
+    'DataOps' { winget configure --file C:\ArcBox\DSC\dataops.dsc.yml --accept-configuration-agreements --disable-interactivity }
+    'ITPro' { winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity }
 }
 
 # Start remaining logon scripts

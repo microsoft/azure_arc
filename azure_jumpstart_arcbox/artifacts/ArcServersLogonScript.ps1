@@ -18,7 +18,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/prod/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -45,11 +45,30 @@ foreach ($key in $keys) {
 
 # Create Windows Terminal desktop shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+
+# Locate the Windows Terminal executable dynamically
+$WindowsAppsPath = "C:\Program Files\WindowsApps"
+$WinTerminalExecutable = Get-ChildItem -Path $WindowsAppsPath -Recurse -Filter "wt.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if ($WinTerminalExecutable) {
+
+    # Create the shortcut
+    $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+    $Shortcut.TargetPath = $WinTerminalExecutable.FullName
+
+    # Set the icon for the shortcut using the dynamically located wt.exe
+    $Shortcut.IconLocation = "$($WinTerminalExecutable.FullName),0"  # Use the first icon in wt.exe
+
+    # Set the shortcut window style (3 = Maximized)
+    $Shortcut.WindowStyle = 3
+
+    # Save the shortcut
+    $Shortcut.Save()
+
+    Write-Host "Windows Terminal shortcut created successfully."
+} else {
+    Write-Host "Windows Terminal executable not found. Ensure it is installed on the system."
+}
 
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
@@ -406,11 +425,11 @@ $payLoad = @"
     if ($Env:flavor -eq "ITPro") {
         Write-Header "Fetching Nested VMs"
 
-        $Win2k19vmName = "$namingPrefix-Win2K19"
-        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K19.vhdx"
-
         $Win2k22vmName = "$namingPrefix-Win2K22"
         $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K22.vhdx"
+
+        $Win2k25vmName = "$namingPrefix-Win2K25"
+        $Win2k25vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K25.vhdx"
 
         $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
         $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-01.vhdx"
@@ -419,11 +438,11 @@ $payLoad = @"
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-02.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
-        if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
+        if (!((Test-Path $Win2K25vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K22.vhdx;ArcBox-Win2K25.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
         }
 
         # Create the nested VMs if not already created
@@ -444,16 +463,24 @@ $payLoad = @"
         # Restarting Windows VM Network Adapters
         Write-Header "Restarting Network Adapters"
         Start-Sleep -Seconds 5
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+        Invoke-Command -VMName $Win2k25vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Start-Sleep -Seconds 10
 
         if ($namingPrefix -ne "ArcBox") {
 
             # Renaming the nested VMs
             Write-Header "Renaming the nested Windows VMs"
-            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
             Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+
+            Invoke-Command -VMName $Win2k25vmName -ScriptBlock {
+
+# if host name not equals to VM name, rename the VM and restart
+                if ($env:computername -cne $using:Win2k25vmName) {
+                    Rename-Computer -NewName $using:Win2k25vmName -Restart
+                }
+
+            } -Credential $winCreds
 
             Get-VM *Win* | Wait-VM -For IPAddress
 
@@ -511,8 +538,8 @@ $payLoad = @"
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
-        Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
         Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+        Copy-VMFile $Win2k25vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
         # Update Linux VM onboarding script connect toAzure Arc, get new token as it might have been expired by the time execution reached this line.
         $accessToken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token) -AsPlainText
@@ -523,18 +550,38 @@ $payLoad = @"
 
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$agentScript\installArcAgentModifiedUbuntu.sh" -DestinationPath "/home/$nestedLinuxUsername" -FileSource Host -Force
 
+        Write-Output "Activating operating system on Windows VMs..."
+
+        Invoke-Command -VMName $Win2k22vmName -ScriptBlock {
+
+            cscript C:\Windows\system32\slmgr.vbs -ipk VDYBN-27WPP-V4HQT-9VMD4-VMK7H
+            cscript C:\Windows\system32\slmgr.vbs -skms kms.core.windows.net
+            cscript C:\Windows\system32\slmgr.vbs -ato
+            cscript C:\Windows\system32\slmgr.vbs -dlv
+
+         } -Credential $winCreds
+
+         Invoke-Command -VMName $Win2k25vmName -ScriptBlock {
+
+            cscript C:\Windows\system32\slmgr.vbs -ipk D764K-2NDRG-47T6Q-P8T8W-YP6DF
+            cscript C:\Windows\system32\slmgr.vbs -skms kms.core.windows.net
+            cscript C:\Windows\system32\slmgr.vbs -ato
+            cscript C:\Windows\system32\slmgr.vbs -dlv
+
+         } -Credential $winCreds
+
         Write-Header "Onboarding Arc-enabled servers"
 
         # Onboarding the nested VMs as Azure Arc-enabled servers
         Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-        Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+        Invoke-Command -VMName $Win2k22vmName,$Win2k25vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp,$Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
         Invoke-JSSudoCommand -Session $UbuntuSessions -Command "sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 
         Write-Header "Enabling SSH access and triggering update assessment for Arc-enabled servers"
-        $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K19", "$namingPrefix-Win2K22")
+        $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K22", "$namingPrefix-Win2K25")
         $VMs | ForEach-Object -Parallel {
             $null = Connect-AzAccount -Identity -Tenant $using:tenantId -Subscription $using:subscriptionId -Scope Process -WarningAction SilentlyContinue
 
