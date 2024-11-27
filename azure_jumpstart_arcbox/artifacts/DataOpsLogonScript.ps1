@@ -439,7 +439,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.33.0 `
+            --version 1.34.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"
@@ -461,7 +461,15 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             Write-Host "Creating custom location on $clusterName"
 
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup  --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+            if ($context -ne 'k3s') {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            } else {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            }
 
             Start-Sleep -Seconds 10
 
