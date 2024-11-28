@@ -457,7 +457,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             Write-Host "Creating custom location on $clusterName"
 
@@ -471,7 +471,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             }
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             try {
                 az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
@@ -480,7 +480,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
                 Exit 1
             }
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context
