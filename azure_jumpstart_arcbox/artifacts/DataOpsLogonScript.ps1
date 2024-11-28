@@ -421,7 +421,7 @@ Stop-Transcript
 wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-k3s-data" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
-$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
+$clusters | Foreach-Object {
     $cluster = $_
     $context = $cluster.context
     $clusterName = $cluster.clusterName
@@ -492,7 +492,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $dataController | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
