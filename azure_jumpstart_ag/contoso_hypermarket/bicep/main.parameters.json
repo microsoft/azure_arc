@@ -22,9 +22,6 @@
     },
     "fabricCapacityAdmin": {
       "value": ""
-    },
-    "deployGPUNodes": {
-      "value": "false"
     }
   }
 }
