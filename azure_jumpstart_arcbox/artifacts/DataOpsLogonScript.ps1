@@ -575,8 +575,6 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Get-process WindowsTerminal | Stop-Process -Force
-
 # Changing to Jumpstart ArcBox wallpaper
 
   Write-Header "Changing wallpaper"
@@ -609,3 +607,5 @@ Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory
 Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
 
 Stop-Transcript
+
+Get-Process WindowsTerminal | Stop-Process -Force
