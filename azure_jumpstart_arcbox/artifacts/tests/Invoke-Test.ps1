@@ -33,6 +33,8 @@ Write-Output "Adding deployment test results to wallpaper using BGInfo"
 Set-Content "$Env:windir\TEMP\arcbox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\arcbox-tests-failed.txt" $tests_failed
 
+Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
+
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 # Setup scheduled task for running tests on each logon
@@ -49,8 +51,14 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
     # Create the task action to use pwsh.exe
     $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File $ActionScript"
 
+    if ($flavor -eq "DataOps") {
+        $UserName = $Env:UserName
+    } else {
+        $UserName = "jumpstart\" + $Env:UserName
+    }
+
     # Register the scheduled task for the current user
-    Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $Env:UserName
+    Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $UserName
 
     Write-Host "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
 }
