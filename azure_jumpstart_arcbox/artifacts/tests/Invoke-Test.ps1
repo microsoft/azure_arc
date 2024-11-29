@@ -51,10 +51,10 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
     # Create the task action to use pwsh.exe
     $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File $ActionScript"
 
-    if ($flavor -eq "DataOps") {
-        $UserName = $Env:UserName
-    } else {
+    if ($env:flavor -eq "DataOps") {
         $UserName = "jumpstart\" + $Env:UserName
+    } else {
+        $UserName = $Env:UserName
     }
 
     # Register the scheduled task for the current user
