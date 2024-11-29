@@ -57,6 +57,9 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
         $UserName = $Env:UserName
     }
 
+    # Rename the local user account to avoid scheduled task triggering issues
+    Rename-LocalUser -Name $Env:UserName -NewName "$($Env:UserName)_local"
+
     # Register the scheduled task for the current user
     Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $UserName
 
