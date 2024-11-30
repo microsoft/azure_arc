@@ -33,33 +33,6 @@ foreach ($key in $keys) {
     }
 }
 
-# Create Windows Terminal desktop shortcut
-$WshShell = New-Object -comObject WScript.Shell
-
-# Locate the Windows Terminal executable dynamically
-$WindowsAppsPath = "C:\Program Files\WindowsApps"
-$WinTerminalExecutable = Get-ChildItem -Path $WindowsAppsPath -Recurse -Filter "wt.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-
-if ($WinTerminalExecutable) {
-
-    # Create the shortcut
-    $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-    $Shortcut.TargetPath = $WinTerminalExecutable.FullName
-
-    # Set the icon for the shortcut using the dynamically located wt.exe
-    $Shortcut.IconLocation = "$($WinTerminalExecutable.FullName),0"  # Use the first icon in wt.exe
-
-    # Set the shortcut window style (3 = Maximized)
-    $Shortcut.WindowStyle = 3
-
-    # Save the shortcut
-    $Shortcut.Save()
-
-    Write-Host "Windows Terminal shortcut created successfully."
-} else {
-    Write-Host "Windows Terminal executable not found. Ensure it is installed on the system."
-}
-
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
 $LogsPath = "C:\ArcBox\Logs"
@@ -421,7 +394,7 @@ Stop-Transcript
 wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-k3s-data" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
-$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
+$clusters | Foreach-Object {
     $cluster = $_
     $context = $cluster.context
     $clusterName = $cluster.clusterName
@@ -457,13 +430,21 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             Write-Host "Creating custom location on $clusterName"
-            #kubectx $cluster.context | Out-Null
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
-            Start-Sleep -Seconds 10
+            if ($context -ne 'k3s') {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            } else {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            }
+
+            Start-Sleep -Seconds 30
 
             try {
                 az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
@@ -472,7 +453,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
                 Exit 1
             }
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context
@@ -484,7 +465,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $dataController | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
@@ -567,8 +548,6 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Get-process WindowsTerminal | Stop-Process -Force
-
 # Changing to Jumpstart ArcBox wallpaper
 
   Write-Header "Changing wallpaper"
@@ -601,3 +580,5 @@ Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory
 Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
 
 Stop-Transcript
+
+Get-Process WindowsTerminal | Stop-Process -Force
