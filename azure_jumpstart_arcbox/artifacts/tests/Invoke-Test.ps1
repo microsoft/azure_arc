@@ -65,7 +65,8 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
     Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $UserName
 
     Write-Host "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
-}
 
-# logoff the user to apply the wallpaper in proper scaling and refresh tests results at first logon
-logoff.exe
+    # logoff the user to apply the wallpaper in proper scaling and refresh tests results at first logon
+    logoff.exe
+
+}
