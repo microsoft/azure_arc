@@ -14,7 +14,7 @@ $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
 
 $certdns = "arcbox.devops.com"
 
-$appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
+$appClonedRepo = "https://github.com/$Env:githubUser/jumpstart-apps"
 
 $clusters = @(
     [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = "$namingPrefix-k3s-data" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
