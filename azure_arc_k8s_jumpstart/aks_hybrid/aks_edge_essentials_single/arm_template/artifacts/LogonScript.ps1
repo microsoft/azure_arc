@@ -139,6 +139,13 @@ Write-Host "`n"
 Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
 Write-Host "`n"
 
+Write-Host "`n"
+Write-Host "Setting kubectl environment variable" -ForegroundColor Green
+Write-Host "`n"
+
+[System.Environment]::SetEnvironmentVariable('KUBECTL_CLIENT_PATH', 'C:\Program Files\AksEdge\kubectl\kubectl.exe', [System.EnvironmentVariableTarget]::Machine)
+
+
 try {
     function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
     download2
