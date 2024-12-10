@@ -88,6 +88,14 @@ param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm for
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
 
+@description('The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM')
+@allowed([
+  '1'
+  '2'
+  '3'
+])
+param zones string = '1'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
 var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
@@ -196,6 +204,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownTimezone: autoShutdownTimezone
     autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
     sqlServerEdition: sqlServerEdition
+    zones: zones
   }
   dependsOn: [
     updateVNetDNSServers

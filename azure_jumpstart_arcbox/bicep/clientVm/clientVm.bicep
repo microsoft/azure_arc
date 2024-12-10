@@ -115,7 +115,7 @@ param addsDomainName string = 'jumpstart.local'
 param customLocationRPOID string = ''
 
 @description('The SKU of the VMs disk')
-param vmsDiskSku string = 'Premium_LRS'
+param vmsDiskSku string = 'PremiumV2_LRS'
 
 @description('Use this parameter to enable or disable debug mode for the automation scripts on the client VM, effectively configuring PowerShell ErrorActionPreference to Break. Default is false.')
 param debugEnabled bool = false
@@ -124,6 +124,14 @@ param autoShutdownEnabled bool = false
 param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm format (24-hour clock)
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
+
+@description('The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM')
+@allowed([
+  '1'
+  '2'
+  '3'
+])
+param zones string = '1'
 
 var bastionName = '${namingPrefix}-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -154,6 +162,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
+  zones: [zones]
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -167,6 +176,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (
 resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
   location: location
   name: '${vmName}-VMsDisk'
+  zones: [zones]
   sku: {
     name: vmsDiskSku
   }
@@ -182,6 +192,7 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
+  zones: [zones]
   identity: {
     type: 'SystemAssigned'
   }
