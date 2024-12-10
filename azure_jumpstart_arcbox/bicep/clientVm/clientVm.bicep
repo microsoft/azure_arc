@@ -120,7 +120,7 @@ param vmsDiskSku string = 'PremiumV2_LRS'
 @description('Use this parameter to enable or disable debug mode for the automation scripts on the client VM, effectively configuring PowerShell ErrorActionPreference to Break. Default is false.')
 param debugEnabled bool = false
 
-param autoShutdownEnabled bool = false
+param autoShutdownEnabled bool = true
 param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm format (24-hour clock)
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
