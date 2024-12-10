@@ -141,6 +141,11 @@ if ($Env:flavor -ne "DevOps") {
     Write-Header "Az PowerShell Login"
     Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
 
+    $existingVMDisk = Get-AzDisk -ResourceGroupName $env:resourceGroup | Where-Object name -like *VMsDisk
+
+    # Update disk IOPS and throughput before downloading nested VMs
+    az disk update --resource-group $env:resourceGroup --name $existingVMDisk.Name --disk-iops-read-write 80000 --disk-mbps-read-write 1200
+
     # Enable defender for cloud for SQL Server
     # Get workspace information
     $workspaceResourceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "id" -o tsv)
@@ -417,6 +422,9 @@ $payLoad = @"
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
             azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K22.vhdx;ArcBox-Win2K25.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
         }
+
+        # Update disk IOPS and throughput after downloading nested VMs (note: a disk's performance tier can be downgraded only once every 12 hours)
+        az disk update --resource-group $env:resourceGroup --name $existingVMDisk.Name --disk-iops-read-write $existingVMDisk.DiskIOPSReadWrite --disk-mbps-read-write $existingVMDisk.DiskMBpsReadWrite
 
         # Create the nested VMs if not already created
         Write-Header "Create Hyper-V VMs"
