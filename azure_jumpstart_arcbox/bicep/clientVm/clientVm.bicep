@@ -185,7 +185,7 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
       createOption: 'Empty'
     }
     diskSizeGB: 256
-    burstingEnabled: true
+    burstingEnabled: false
     diskMBpsReadWrite: 200
     diskIOPSReadWrite: 5000
   }
