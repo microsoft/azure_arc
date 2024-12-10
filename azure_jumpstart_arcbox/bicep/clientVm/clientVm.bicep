@@ -169,7 +169,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
 }
 
@@ -184,8 +184,10 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
     creationData: {
       createOption: 'Empty'
     }
-    diskSizeGB: 1024
+    diskSizeGB: 256
     burstingEnabled: true
+    diskMBpsReadWrite: 200
+    diskIOPSReadWrite: 5000
   }
 }
 
@@ -208,7 +210,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         managedDisk: {
           storageAccountType: osDiskType
         }
-        diskSizeGB: 1024
+        diskSizeGB: 127
       }
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
