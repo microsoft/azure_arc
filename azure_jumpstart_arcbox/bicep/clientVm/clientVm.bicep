@@ -133,6 +133,9 @@ param autoShutdownEmailRecipient string = ''
 ])
 param zones string = '1'
 
+@description('Option to enable spot pricing for the ArcBox Client VM')
+param enableAzureSpotPricing bool = false
+
 var bastionName = '${namingPrefix}-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -244,6 +247,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         enableAutomaticUpdates: false
       }
     }
+    priority: enableAzureSpotPricing ? 'Spot' : 'Regular'
+    evictionPolicy: enableAzureSpotPricing ? 'Deallocate' : null
+    billingProfile: enableAzureSpotPricing ? {
+      maxPrice: -1
+    } : null
   }
 }
 

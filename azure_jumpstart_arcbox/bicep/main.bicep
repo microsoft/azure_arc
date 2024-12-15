@@ -88,6 +88,9 @@ param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm for
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
 
+@description('Option to enable spot pricing for the ArcBox Client VM')
+param enableAzureSpotPricing bool = false
+
 @description('The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM')
 @allowed([
   '1'
@@ -205,6 +208,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
     sqlServerEdition: sqlServerEdition
     zones: zones
+    enableAzureSpotPricing: enableAzureSpotPricing
   }
   dependsOn: [
     updateVNetDNSServers
