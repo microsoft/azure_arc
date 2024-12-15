@@ -467,15 +467,3 @@ Start-Sleep -Seconds 5
 Write-Header "Running tests to verify infrastructure"
 
 & "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
-
-Write-Header "Creating deployment logs bundle"
-
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
-$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
-
-#required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
-
-Stop-Transcript

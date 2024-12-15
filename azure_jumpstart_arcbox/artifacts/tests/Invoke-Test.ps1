@@ -102,7 +102,40 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
     # Register the scheduled task for the current user
     Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $UserName
 
-    Write-Host "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
+    Write-Header "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
+
+    Write-Header "Creating deployment logs bundle"
+
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+    $LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+    $null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+    #required to avoid "file is being used by another process" error when compressing the logs
+    Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+    Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
+
+    # Enabling Azure VM Auto-shutdown
+    if ($env:autoShutdownEnabled -eq "true") {
+
+        Write-Header "Enabling Azure VM Auto-shutdown"
+
+        $ScheduleResource = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType Microsoft.DevTestLab/schedules
+        $Uri = "https://management.azure.com$($ScheduleResource.ResourceId)?api-version=2018-09-15"
+
+        $Schedule = Invoke-AzRestMethod -Uri $Uri
+
+        $ScheduleSettings = $Schedule.Content | ConvertFrom-Json
+        $ScheduleSettings.properties.status = "Enabled"
+
+        Invoke-AzRestMethod -Uri $Uri -Method PUT -Payload ($ScheduleSettings | ConvertTo-Json)
+
+    } else {
+
+        Write-Header "Auto-shutdown is not enabled, skipping."
+
+    }
+
+    Stop-Transcript
 
     # logoff the user to apply the wallpaper in proper scaling and refresh tests results at first logon
     logoff.exe
