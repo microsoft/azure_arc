@@ -37,7 +37,8 @@ param (
     [object]$resourceTags,
     [string]$namingPrefix,
     [string]$debugEnabled,
-    [string]$sqlServerEdition
+    [string]$sqlServerEdition,
+    [string]$autoShutdownEnabled
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -72,6 +73,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('namingPrefix', $namingPrefix, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ArcBoxDir', "C:\ArcBox", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('sqlServerEdition', $sqlServerEdition, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoShutdownEnabled', $autoShutdownEnabled, [System.EnvironmentVariableTarget]::Machine)
 
 if ($debugEnabled -eq "true") {
     [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
@@ -178,6 +180,21 @@ Set-Secret -Name registryPassword -Secret $registryPassword
 
 Write-Output "Added the following secrets to Azure Key Vault"
 Get-SecretInfo
+
+# Temporarily disabling Azure VM Auto-shutdown while automation is in progress
+if ($autoShutdownEnabled -eq "true") {
+
+    $ScheduleResource = Get-AzResource -ResourceGroup $resourceGroup -ResourceType Microsoft.DevTestLab/schedules
+    $Uri = "https://management.azure.com$($ScheduleResource.ResourceId)?api-version=2018-09-15"
+
+    $Schedule = Invoke-AzRestMethod -Uri $Uri
+
+    $ScheduleSettings = $Schedule.Content | ConvertFrom-Json
+    $ScheduleSettings.properties.status = "Disabled"
+
+    Invoke-AzRestMethod -Uri $Uri -Method PUT -Payload ($ScheduleSettings | ConvertTo-Json)
+
+}
 
 # Installing DHCP service
 Write-Output "Installing DHCP service"

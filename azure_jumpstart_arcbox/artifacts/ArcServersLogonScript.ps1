@@ -656,4 +656,19 @@ $null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
 Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
 Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
 
+# Enabling Azure VM Auto-shutdown
+if ($env:autoShutdownEnabled -eq "true") {
+
+    $ScheduleResource = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType Microsoft.DevTestLab/schedules
+    $Uri = "https://management.azure.com$($ScheduleResource.ResourceId)?api-version=2018-09-15"
+
+    $Schedule = Invoke-AzRestMethod -Uri $Uri
+
+    $ScheduleSettings = $Schedule.Content | ConvertFrom-Json
+    $ScheduleSettings.properties.status = "Enabled"
+
+    Invoke-AzRestMethod -Uri $Uri -Method PUT -Payload ($ScheduleSettings | ConvertTo-Json)
+
+}
+
 Stop-Transcript
