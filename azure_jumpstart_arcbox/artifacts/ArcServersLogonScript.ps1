@@ -659,6 +659,8 @@ Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:A
 # Enabling Azure VM Auto-shutdown
 if ($env:autoShutdownEnabled -eq "true") {
 
+    Write-Header "Enabling Azure VM Auto-shutdown"
+
     $ScheduleResource = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType Microsoft.DevTestLab/schedules
     $Uri = "https://management.azure.com$($ScheduleResource.ResourceId)?api-version=2018-09-15"
 
@@ -668,6 +670,10 @@ if ($env:autoShutdownEnabled -eq "true") {
     $ScheduleSettings.properties.status = "Enabled"
 
     Invoke-AzRestMethod -Uri $Uri -Method PUT -Payload ($ScheduleSettings | ConvertTo-Json)
+
+} else {
+
+    Write-Header "Auto-shutdown is not enabled, skipping."
 
 }
 
