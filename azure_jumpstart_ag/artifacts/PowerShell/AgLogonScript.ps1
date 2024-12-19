@@ -146,7 +146,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
-if ($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
     Deploy-VirtualizationInfrastructure
 }
@@ -161,7 +161,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Get clusters config files
 #####################################################################
-if($scenario -eq "contoso_hypermarket"){
+if($scenario -eq "contoso_hypermarket" -or $scenario -eq "contoso_motors"){
     Get-K3sConfigFile
     Merge-K3sConfigFiles
     Set-K3sClusters
@@ -191,7 +191,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+if($scenario -eq "contoso_supermarket"){
     Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
     Deploy-AzArcK8sAKSEE
 }
