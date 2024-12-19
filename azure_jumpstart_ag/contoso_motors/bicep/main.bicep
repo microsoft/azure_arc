@@ -27,6 +27,9 @@ param windowsAdminUsername string
 @secure()
 param windowsAdminPassword string
 
+@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
+param sshRSAPublicKey string
+
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
@@ -43,10 +46,10 @@ param deployBastion bool = false
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
 @description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
+param subnetNameCloudK3s string = 'Ag-Subnet-K3s'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
+param subnetNameCloud string = 'Ag-Subnet-Cloud'
 
 @description('Name of the storage queue')
 param storageQueueName string = 'aioqueue'
@@ -78,6 +81,12 @@ param adxClusterName string = 'agadx${namingGuid}'
 @description('The custom location RPO ID')
 param customLocationRPOID string
 
+@description('The name of the Azure Arc K3s cluster')
+param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
+
+@description('The name of the Azure Arc K3s data cluster')
+param k3sArcClusterName string = 'Ag-K3s-Chicago-${namingGuid}'
+
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -92,7 +101,17 @@ param vmAutologon bool = true
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_motors'
 
+@description('The sku name of the K3s cluster worker nodes.')
+@allowed([
+  'Standard_D8s_v5'
+  'Standard_NV6ads_A10_v5'
+  'Standard_NV4as_v4'
+])
+param k8sWorkerNodesSku string = 'Standard_D8s_v5'
+//param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -106,8 +125,8 @@ module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
-    subnetNameCloudAksStaging: subnetNameCloudAksStaging
-    subnetNameCloudAksInnerLoop: subnetNameCloudAksInnerLoop
+    subnetNameCloudK3s: subnetNameCloudK3s
+    subnetNameCloud: subnetNameCloud    
     deployBastion: deployBastion
     location: location
   }
@@ -120,8 +139,82 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   }
 }
 
+module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
+  name: 'ubuntuRancherK3s2Deployment'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : k3sArcDataClusterName
+    storageContainerName: toLower(k3sArcDataClusterName)
+    namingGuid: namingGuid
+  }
+}
+
+module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
+  name: 'ubuntuRancherK3sDeployment'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : k3sArcClusterName
+    storageContainerName: toLower(k3sArcClusterName)
+    namingGuid: namingGuid
+  }
+}
+
+module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
+  name: 'ubuntuRancherK3sNodesDeployment-${i}'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : '${k3sArcDataClusterName}-Node-0${i}'
+    storageContainerName: toLower(k3sArcDataClusterName)
+    namingGuid: namingGuid
+    //deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
+  }
+  dependsOn: [
+    ubuntuRancherK3sDataSvcDeployment
+  ]
+}]
+
+module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
+  name: 'ubuntuRancherK3sNodes2Deployment-${i}'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : '${k3sArcClusterName}-Node-0${i}'
+    storageContainerName: toLower(k3sArcClusterName)
+    namingGuid: namingGuid
+    //deployGPUNodes: deployGPUNodes
+    k8sWorkerNodesSku: k8sWorkerNodesSku
+  }
+  dependsOn: [
+    ubuntuRancherK3sDeployment
+  ]
+}]
+
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
+  dependsOn: [
+    ubuntuRancherK3sNodesDeployment
+    ubuntuRancherK3sDataSvcNodesDeployment
+  ]  
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
