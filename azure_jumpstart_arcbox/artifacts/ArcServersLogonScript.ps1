@@ -407,16 +407,16 @@ $payLoad = @"
         Write-Header "Fetching Nested VMs"
 
         $Win2k19vmName = "$namingPrefix-Win2K19"
-        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K19.vhdx"
+        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Win2K19.vhdx"
 
         $Win2k22vmName = "$namingPrefix-Win2K22"
-        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K22.vhdx"
+        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Win2K22.vhdx"
 
         $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
-        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-01.vhdx"
+        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Ubuntu-01.vhdx"
 
         $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
-        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-02.vhdx"
+        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Ubuntu-02.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
         if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
