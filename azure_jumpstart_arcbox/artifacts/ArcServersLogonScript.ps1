@@ -512,19 +512,19 @@ $payLoad = @"
 
                 Invoke-Command -HostName $Ubuntu01VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
 
-                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName;sudo systemctl reboot"
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName"
 
                 }
 
-                Restart-VM -Name $ubuntu01vmName
+                Restart-VM -Name $ubuntu01vmName -Force
 
                 Invoke-Command -HostName $Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
 
-                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName;sudo systemctl reboot"
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName"
 
                 }
 
-                Restart-VM -Name $ubuntu02vmName
+                Restart-VM -Name $ubuntu02vmName -Force
 
             }
 
