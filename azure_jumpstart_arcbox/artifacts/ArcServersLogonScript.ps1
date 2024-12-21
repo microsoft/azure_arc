@@ -477,14 +477,14 @@ $payLoad = @"
 
             # Renaming the nested VMs
             Write-Header "Renaming the nested Windows VMs"
-            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
-            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -NewName $using:Win2k19vmName } -Credential $winCreds
+            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -NewName $using:Win2k22vmName } -Credential $winCreds
 
-            Get-VM *Win* | Wait-VM -For IPAddress
+            Write-Host "Waiting for the nested Windows VMs to come back online..."
 
-            Write-Host "Waiting for the nested Windows VMs to come back online...waiting for 10 seconds"
+            Get-VM *Win* | Restart-VM -Force
+            Get-VM *Win* | Wait-VM -For Heartbeat
 
-            Start-Sleep -Seconds 10
 
         }
 
