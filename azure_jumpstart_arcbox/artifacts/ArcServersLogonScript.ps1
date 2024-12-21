@@ -498,8 +498,12 @@ $payLoad = @"
         $null = New-Item -Path ~ -Name .ssh -ItemType Directory
         ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
 
-        # Avoid timing issue with copying the authorized_keys file to the Linux VMs
-        Start-Sleep -Seconds 5
+        # Avoid timing issue with copying the authorized_keys file
+        do {
+            Write-Output "Waiting for SSH public key to become available..."
+            $fileSize = (Get-Item "$Env:USERPROFILE\.ssh\id_rsa.pub").Length
+            Start-Sleep -Seconds 1
+        } while ($fileSize -eq 0)
 
         Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$($Env:ArcBoxDir)\authorized_keys"
 
