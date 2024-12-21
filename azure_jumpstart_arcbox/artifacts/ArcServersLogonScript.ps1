@@ -503,6 +503,9 @@ $payLoad = @"
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
 
+        # Avoid timing issue with copying the authorized_keys file to the Linux VMs
+        Start-Sleep -Seconds 5
+
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
         if ($namingPrefix -ne "ArcBox") {
