@@ -516,6 +516,9 @@ $payLoad = @"
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$($Env:ArcBoxDir)\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$($Env:ArcBoxDir)\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
+        # Remove the authorized_keys file from the local machine
+        Remove-Item -Path "$($Env:ArcBoxDir)\authorized_keys"
+
         if ($namingPrefix -ne "ArcBox") {
 
                 # Renaming the nested linux VMs
