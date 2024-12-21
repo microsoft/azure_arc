@@ -488,6 +488,15 @@ $payLoad = @"
 
         }
 
+        # Copy installation script to nested Windows VMs
+        Write-Output "Transferring installation script to nested Windows VMs..."
+        Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+        Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+
+        # Onboarding the nested VMs as Azure Arc-enabled servers
+        Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+        Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
         $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -497,13 +506,6 @@ $payLoad = @"
 
         $null = New-Item -Path ~ -Name .ssh -ItemType Directory
         ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
-
-        # Avoid timing issue with copying the authorized_keys file
-        do {
-            Write-Output "Waiting for SSH public key to become available..."
-            $fileSize = (Get-Item "$Env:USERPROFILE\.ssh\id_rsa.pub").Length
-            Start-Sleep -Seconds 1
-        } while ($fileSize -eq 0)
 
         Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$($Env:ArcBoxDir)\authorized_keys"
 
@@ -523,32 +525,22 @@ $payLoad = @"
 
                     Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName"
 
-                }
+                    hostnamectl
 
-                Restart-VM -Name $ubuntu01vmName -Force
+                }
 
                 Invoke-Command -HostName $Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
 
                     Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName"
 
+                    hostnamectl
+
                 }
 
-                Restart-VM -Name $ubuntu02vmName -Force
 
             }
 
-        Get-VM *Ubuntu* | Wait-VM -For IPAddress
-
-        Write-Host "Waiting for the nested Linux VMs to come back online...waiting for 10 seconds"
-
-        Start-Sleep -Seconds 10
-
-        # Copy installation script to nested Windows VMs
-        Write-Output "Transferring installation script to nested Windows VMs..."
-        Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
-        Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
-
-        # Update Linux VM onboarding script connect toAzure Arc, get new token as it might have been expired by the time execution reached this line.
+        # Update Linux VM onboarding script connect to Azure Arc, get new token as it might have been expired by the time execution reached this line.
         $accessToken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token) -AsPlainText
         (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$accessToken', "'$accessToken'" -replace '\$resourceGroup', "'$resourceGroup'" -replace '\$tenantId', "'$Env:tenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
@@ -556,12 +548,6 @@ $payLoad = @"
         Write-Output "Transferring installation script to nested Linux VMs..."
 
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$agentScript\installArcAgentModifiedUbuntu.sh" -DestinationPath "/home/$nestedLinuxUsername" -FileSource Host -Force
-
-        Write-Header "Onboarding Arc-enabled servers"
-
-        # Onboarding the nested VMs as Azure Arc-enabled servers
-        Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-        Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp,$Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
