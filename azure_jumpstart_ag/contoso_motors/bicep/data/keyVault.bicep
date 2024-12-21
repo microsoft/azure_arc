@@ -24,6 +24,9 @@ param resourceTags object = {
   Project: 'Jumpstart_azure_aio'
 }
 
+@description('Azure service principal object id')
+param spnObjectId string
+
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvNameSite1
   location: location
@@ -33,7 +36,15 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
-    accessPolicies: []
+    accessPolicies: [
+      {
+      tenantId: tenantId
+      objectId: spnObjectId
+      permissions: {
+        secrets: ['get', 'list']
+      }
+    }
+  ]
     enableSoftDelete: false
     tenantId: tenantId
   }
