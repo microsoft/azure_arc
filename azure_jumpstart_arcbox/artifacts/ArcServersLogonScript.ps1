@@ -418,12 +418,37 @@ $payLoad = @"
         $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Ubuntu-02.vhdx"
 
+        $files = "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;"
+
         # Verify if VHD files already downloaded especially when re-running this script
         if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern $files --recursive=true --check-length=false --log-level=ERROR
+        }
+
+        if ($namingPrefix -ne "ArcBox") {
+
+            # Split the string into an array
+            $fileList = $files -split ';' | Where-Object { $_ -ne '' }
+
+            # Set the path to search for files
+            $searchPath = $Env:ArcBoxVMDir
+
+            # Loop through each file and rename if found
+            foreach ($file in $fileList) {
+                $filePath = Join-Path -Path $searchPath -ChildPath $file
+                if (Test-Path $filePath) {
+                    $newFileName = $file -replace "ArcBox", $namingPrefix
+
+                    Rename-Item -Path $filePath -NewName $newFileName
+                    Write-Output "Renamed $file to $newFileName"
+                }
+                else {
+                    Write-Output "$file not found in $searchPath"
+                }
+            }
         }
 
         # Create the nested VMs if not already created
