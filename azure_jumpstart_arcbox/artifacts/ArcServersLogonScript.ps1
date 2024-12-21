@@ -501,12 +501,12 @@ $payLoad = @"
         # Avoid timing issue with copying the authorized_keys file to the Linux VMs
         Start-Sleep -Seconds 5
 
-        Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$Env:TEMP\authorized_keys"
+        Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$($Env:ArcBoxDir)\authorized_keys"
 
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
 
-        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$($Env:ArcBoxDir)\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
         if ($namingPrefix -ne "ArcBox") {
 
