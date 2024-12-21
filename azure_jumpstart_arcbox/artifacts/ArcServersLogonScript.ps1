@@ -498,13 +498,13 @@ $payLoad = @"
         $null = New-Item -Path ~ -Name .ssh -ItemType Directory
         ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
 
+        # Avoid timing issue with copying the authorized_keys file to the Linux VMs
+        Start-Sleep -Seconds 5
+
         Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$Env:TEMP\authorized_keys"
 
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
-
-        # Avoid timing issue with copying the authorized_keys file to the Linux VMs
-        Start-Sleep -Seconds 5
 
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
