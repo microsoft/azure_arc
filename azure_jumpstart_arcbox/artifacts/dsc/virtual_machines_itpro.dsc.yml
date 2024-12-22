@@ -9,7 +9,7 @@ properties:
       settings:
         Name: namingPrefixStage-Win2K19
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Win2K19.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Win2K19.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
@@ -25,7 +25,7 @@ properties:
       settings:
         Name: namingPrefixStage-Win2K22
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Win2K22.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Win2K22.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
@@ -41,7 +41,7 @@ properties:
       settings:
         Name: namingPrefixStage-Ubuntu-01
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-01.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Ubuntu-01.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
@@ -57,7 +57,7 @@ properties:
       settings:
         Name: namingPrefixStage-Ubuntu-02
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-02.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Ubuntu-02.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
