@@ -220,6 +220,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/arcbox-bginfo.bgi") -OutF
 Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/common.tests.ps1") -OutFile $Env:ArcBoxTestsDir\common.tests.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/Invoke-Test.ps1") -OutFile $Env:ArcBoxTestsDir\Invoke-Test.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/WinGet.ps1") -OutFile $Env:ArcBoxDir\WinGet.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/azcopy_install.ps1") -OutFile $Env:ArcBoxDir\azcopy_install.ps1
 
 # Workbook template
 if ($flavor -eq "ITPro") {
