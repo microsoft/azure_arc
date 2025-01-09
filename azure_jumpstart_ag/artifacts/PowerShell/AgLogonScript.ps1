@@ -74,7 +74,9 @@ Import-Module "$AgPowerShellDir\contoso_motors.psm1" -Force -DisableNameChecking
 Import-Module "$AgPowerShellDir\contoso_hypermarket.psm1" -Force -DisableNameChecking
 
 Start-Transcript -Path ($AgLogsDir + "\AgLogonScript.log")
-Write-Host "Executing Jumpstart Agora automation scripts"
+Write-Host "Executing Jumpstart Agora automation scripts..."
+Write-Host "Selected global scenario:" $global:scenario
+Write-Host "Selected scenario:" $scenario
 $startTime = Get-Date
 
 # Remove registry keys that are used to automatically logon the user (only used for first-time setup)
