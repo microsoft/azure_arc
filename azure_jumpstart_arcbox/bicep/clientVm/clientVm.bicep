@@ -244,7 +244,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       adminPassword: windowsAdminPassword
       windowsConfiguration: {
         provisionVMAgent: true
-        enableAutomaticUpdates: false
+        enableAutomaticUpdates: true
       }
     }
     priority: enableAzureSpotPricing ? 'Spot' : 'Regular'
