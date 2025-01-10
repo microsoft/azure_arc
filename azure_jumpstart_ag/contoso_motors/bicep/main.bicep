@@ -34,10 +34,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'nabeelmsft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'contosomotorswork'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
