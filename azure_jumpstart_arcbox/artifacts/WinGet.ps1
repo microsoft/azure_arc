@@ -36,6 +36,9 @@ switch ($env:flavor) {
     'ITPro' { & $winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity }
 }
 
+# Temporary workaround for AzCopy installation due to CDN issues
+& $Env:ArcBoxDir\azcopy_install.ps1
+
 # Start remaining logon scripts
 Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 

@@ -407,23 +407,48 @@ $payLoad = @"
         Write-Header "Fetching Nested VMs"
 
         $Win2k19vmName = "$namingPrefix-Win2K19"
-        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K19.vhdx"
+        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Win2K19.vhdx"
 
         $Win2k22vmName = "$namingPrefix-Win2K22"
-        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K22.vhdx"
+        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Win2K22.vhdx"
 
         $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
-        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-01.vhdx"
+        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Ubuntu-01.vhdx"
 
         $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
-        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-02.vhdx"
+        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\$namingPrefix-Ubuntu-02.vhdx"
+
+        $files = "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;"
 
         # Verify if VHD files already downloaded especially when re-running this script
         if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern $files --recursive=true --check-length=false --log-level=ERROR
+        }
+
+        if ($namingPrefix -ne "ArcBox") {
+
+            # Split the string into an array
+            $fileList = $files -split ';' | Where-Object { $_ -ne '' }
+
+            # Set the path to search for files
+            $searchPath = $Env:ArcBoxVMDir
+
+            # Loop through each file and rename if found
+            foreach ($file in $fileList) {
+                $filePath = Join-Path -Path $searchPath -ChildPath $file
+                if (Test-Path $filePath) {
+                    $newFileName = $file -replace "ArcBox", $namingPrefix
+
+                    Rename-Item -Path $filePath -NewName $newFileName
+                    Write-Output "Renamed $file to $newFileName"
+                }
+                else {
+                    Write-Output "$file not found in $searchPath"
+                }
+            }
         }
 
         # Create the nested VMs if not already created
@@ -452,16 +477,25 @@ $payLoad = @"
 
             # Renaming the nested VMs
             Write-Header "Renaming the nested Windows VMs"
-            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
-            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -NewName $using:Win2k19vmName } -Credential $winCreds
+            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -NewName $using:Win2k22vmName } -Credential $winCreds
 
-            Get-VM *Win* | Wait-VM -For IPAddress
+            Write-Host "Waiting for the nested Windows VMs to come back online..."
 
-            Write-Host "Waiting for the nested Windows VMs to come back online...waiting for 10 seconds"
+            Get-VM *Win* | Restart-VM -Force
+            Get-VM *Win* | Wait-VM -For Heartbeat
 
-            Start-Sleep -Seconds 10
 
         }
+
+        # Copy installation script to nested Windows VMs
+        Write-Output "Transferring installation script to nested Windows VMs..."
+        Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+        Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+
+        # Onboarding the nested VMs as Azure Arc-enabled servers
+        Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+        Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -473,12 +507,17 @@ $payLoad = @"
         $null = New-Item -Path ~ -Name .ssh -ItemType Directory
         ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
 
-        Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$Env:TEMP\authorized_keys"
+        Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$($Env:ArcBoxDir)\authorized_keys"
 
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
 
-        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
+        # Running twice due to a race condition where the target file is sometimes empty
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$($Env:ArcBoxDir)\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$($Env:ArcBoxDir)\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
+
+        # Remove the authorized_keys file from the local machine
+        Remove-Item -Path "$($Env:ArcBoxDir)\authorized_keys"
 
         if ($namingPrefix -ne "ArcBox") {
 
@@ -487,34 +526,24 @@ $payLoad = @"
 
                 Invoke-Command -HostName $Ubuntu01VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
 
-                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName;sudo systemctl reboot"
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName"
+
+                    hostnamectl
 
                 }
-
-                Restart-VM -Name $ubuntu01vmName
 
                 Invoke-Command -HostName $Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
 
-                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName;sudo systemctl reboot"
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName"
+
+                    hostnamectl
 
                 }
 
-                Restart-VM -Name $ubuntu02vmName
 
             }
 
-        Get-VM *Ubuntu* | Wait-VM -For IPAddress
-
-        Write-Host "Waiting for the nested Linux VMs to come back online...waiting for 10 seconds"
-
-        Start-Sleep -Seconds 10
-
-        # Copy installation script to nested Windows VMs
-        Write-Output "Transferring installation script to nested Windows VMs..."
-        Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
-        Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
-
-        # Update Linux VM onboarding script connect toAzure Arc, get new token as it might have been expired by the time execution reached this line.
+        # Update Linux VM onboarding script connect to Azure Arc, get new token as it might have been expired by the time execution reached this line.
         $accessToken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token) -AsPlainText
         (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$accessToken', "'$accessToken'" -replace '\$resourceGroup', "'$resourceGroup'" -replace '\$tenantId', "'$Env:tenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
@@ -522,12 +551,6 @@ $payLoad = @"
         Write-Output "Transferring installation script to nested Linux VMs..."
 
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$agentScript\installArcAgentModifiedUbuntu.sh" -DestinationPath "/home/$nestedLinuxUsername" -FileSource Host -Force
-
-        Write-Header "Onboarding Arc-enabled servers"
-
-        # Onboarding the nested VMs as Azure Arc-enabled servers
-        Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-        Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp,$Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
