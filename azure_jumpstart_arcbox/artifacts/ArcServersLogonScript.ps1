@@ -551,16 +551,6 @@ $payLoad = @"
 
          } -Credential $winCreds
 
-        Set-Item WSMan:\localhost\Client\TrustedHosts -Value * -Force
-
-        Invoke-Command -VMName $Win2k25vmName -ScriptBlock {
-
-            DISM /online /Set-Edition:ServerDatacenter /ProductKey:D764K-2NDRG-47T6Q-P8T8W-YP6DF /AcceptEula /NoRestart
-
-         } -Credential $winCreds
-
-         Restart-Computer -Credential $winCreds -ComputerName $Win2k25vmName -Wait -For PowerShell
-
         Write-Header "Onboarding Arc-enabled servers"
 
         # Onboarding the nested VMs as Azure Arc-enabled servers
