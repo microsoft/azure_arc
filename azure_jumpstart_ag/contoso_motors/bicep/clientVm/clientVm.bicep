@@ -66,10 +66,10 @@ param adxClusterName string
 param rdpPort string = '3389'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'nabeelmsft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'contosomotorswork'
 
 //@description('GitHub Personal access token for the user account')
 //@secure()

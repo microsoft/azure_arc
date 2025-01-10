@@ -79,7 +79,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
-
+Write-Host "Scenario from the configuration is $scenario"
 ##############################################################
 # Change RDP Port
 ##############################################################
