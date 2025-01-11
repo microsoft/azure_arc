@@ -74,6 +74,7 @@ if ($null -ne $tags) {
 }
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
 # Setup scheduled task for running tests on each logon
 $TaskName = "ArcBox Pester tests"
