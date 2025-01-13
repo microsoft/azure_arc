@@ -56,8 +56,8 @@ param deployBastion bool = false
 ])
 param bastionSku string = 'Basic'
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'microsoft'
+@description('User github account where they have forked https://github.com/Azure/jumpstart-apps')
+param githubUser string = 'Azure'
 
 @description('Active directory domain services domain name')
 param addsDomainName string = 'jumpstart.local'

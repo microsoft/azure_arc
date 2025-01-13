@@ -67,13 +67,24 @@ $DeploymentStatusString = "Tests succeeded: $tests_passed Tests failed: $tests_f
 
 $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
 
-if ($null -ne $tags) {
-    $tags["DeploymentStatus"] = $DeploymentStatusString
+if ($tests_failed -gt 0) {
+    $DeploymentProgressString = 'Failed'
 } else {
-    $tags = @{"DeploymentStatus" = $DeploymentStatusString}
+    $DeploymentProgressString = 'Completed'
+}
+
+if ($null -ne $tags) {
+    $tags['DeploymentStatus'] = $DeploymentStatusString
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{
+        'DeploymentStatus'   = $DeploymentStatusString
+        'DeploymentProgress' = $DeploymentProgressString
+    }
 }
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
 # Setup scheduled task for running tests on each logon
 $TaskName = "ArcBox Pester tests"

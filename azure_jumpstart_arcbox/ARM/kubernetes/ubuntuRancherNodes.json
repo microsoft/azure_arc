@@ -5,13 +5,13 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "2610071627031689606"
+      "templateHash": "439311248032936140"
     }
   },
   "parameters": {
     "vmName": {
       "type": "string",
-      "defaultValue": "[format('{0}-K3s', parameters('namingPrefix'))]",
+      "defaultValue": "[format('{0}-K3s-Node', parameters('namingPrefix'))]",
       "metadata": {
         "description": "The name of you Virtual Machine"
       }
@@ -47,13 +47,6 @@
         "description": "Location for all resources."
       }
     },
-    "vmSize": {
-      "type": "string",
-      "defaultValue": "Standard_B4ms",
-      "metadata": {
-        "description": "The size of the VM"
-      }
-    },
     "subnetId": {
       "type": "string",
       "metadata": {
@@ -78,12 +71,6 @@
         "description": "The base URL used for accessing artifacts and automation artifacts"
       }
     },
-    "storageContainerName": {
-      "type": "string",
-      "metadata": {
-        "description": "Storage account container name for artifacts"
-      }
-    },
     "flavor": {
       "type": "string",
       "allowedValues": [
@@ -93,6 +80,12 @@
       ],
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      }
+    },
+    "storageContainerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage account container name for artifacts"
       }
     },
     "namingPrefix": {
@@ -105,61 +98,30 @@
     }
   },
   "variables": {
-    "publicIpAddressName": "[format('{0}-PIP', parameters('vmName'))]",
     "networkInterfaceName": "[format('{0}-NIC', parameters('vmName'))]",
     "osDiskType": "Premium_LRS",
-    "k3sControlPlane": "true",
-    "diskSize": "[if(equals(parameters('flavor'), 'DataOps'), 512, 64)]",
-    "numberOfIPAddresses": "[if(equals(parameters('flavor'), 'DataOps'), 8, 5)]"
+    "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B2ms', 'Standard_B8ms')]",
+    "diskSize": "[if(equals(parameters('flavor'), 'DataOps'), 512, 64)]"
   },
   "resources": [
-    {
-      "copy": {
-        "name": "publicIpAddresses",
-        "count": "[length(range(1, variables('numberOfIPAddresses')))]"
-      },
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2022-01-01",
-      "name": "[format('{0}{1}', variables('publicIpAddressName'), range(1, variables('numberOfIPAddresses'))[copyIndex()])]",
-      "location": "[parameters('azureLocation')]",
-      "properties": {
-        "publicIPAllocationMethod": "Static",
-        "publicIPAddressVersion": "IPv4",
-        "idleTimeoutInMinutes": 4
-      },
-      "sku": {
-        "name": "Basic"
-      }
-    },
     {
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2022-01-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
       "properties": {
-        "copy": [
+        "ipConfigurations": [
           {
-            "name": "ipConfigurations",
-            "count": "[length(range(1, variables('numberOfIPAddresses')))]",
-            "input": {
-              "name": "[format('ipconfig{0}', range(1, variables('numberOfIPAddresses'))[copyIndex('ipConfigurations')])]",
-              "properties": {
-                "subnet": {
-                  "id": "[parameters('subnetId')]"
-                },
-                "privateIPAllocationMethod": "Dynamic",
-                "publicIPAddress": {
-                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}{1}', variables('publicIpAddressName'), range(1, variables('numberOfIPAddresses'))[sub(range(1, variables('numberOfIPAddresses'))[copyIndex('ipConfigurations')], 1)]))]"
-                },
-                "primary": "[if(equals(range(1, variables('numberOfIPAddresses'))[copyIndex('ipConfigurations')], 1), true(), false())]"
-              }
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[parameters('subnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
             }
           }
         ]
-      },
-      "dependsOn": [
-        "publicIpAddresses"
-      ]
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
@@ -171,7 +133,7 @@
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
+          "vmSize": "[variables('vmSize')]"
         },
         "storageProfile": {
           "osDisk": {
@@ -255,7 +217,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {},
         "protectedSettings": {
-          "commandToExecute": "[format('bash installK3s.sh {0} {1} {2} {3} {4} {5} {6} {7} {8}', parameters('adminUsername'), subscription().subscriptionId, parameters('vmName'), parameters('azureLocation'), parameters('stagingStorageAccountName'), parameters('logAnalyticsWorkspace'), parameters('templateBaseUrl'), parameters('storageContainerName'), variables('k3sControlPlane'))]",
+          "commandToExecute": "[format('bash installK3s.sh {0} {1} {2} {3} {4} {5} {6} {7}', parameters('adminUsername'), subscription().subscriptionId, parameters('vmName'), parameters('azureLocation'), parameters('stagingStorageAccountName'), parameters('logAnalyticsWorkspace'), parameters('templateBaseUrl'), parameters('storageContainerName'))]",
           "fileUris": [
             "[format('{0}artifacts/installK3s.sh', parameters('templateBaseUrl'))]"
           ]
