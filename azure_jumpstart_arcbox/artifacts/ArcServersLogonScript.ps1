@@ -18,7 +18,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/prod/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
