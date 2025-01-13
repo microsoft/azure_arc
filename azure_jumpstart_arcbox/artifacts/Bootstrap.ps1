@@ -170,8 +170,6 @@ if ($null -ne $tags) {
 }
 
 $null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
-
 
 $KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
 
@@ -418,8 +416,6 @@ if ($null -ne $tags) {
 }
 
 $null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
-
 
 if ($flavor -eq "ITPro") {
     # Creating scheduled task for WinGet.ps1
