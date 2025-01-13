@@ -78,6 +78,7 @@
         'Kubernetes.kubectl',
         'Microsoft.Edge',
         #'Microsoft.Azure.AZCopy.10',
+        'Microsoft.VisualStudioCode',
         'Microsoft.AzureDataStudio',
         'Microsoft.VisualStudioCode',
         'Microsoft.SQLServerManagementStudio',
@@ -92,7 +93,8 @@
         'FireDaemon.OpenSSL',
         'thomasnordquist.MQTT-Explorer',
         'GitHub.cli',
-        'Python.Python.3.12'
+        'Python.Python.3.12',
+        'Derailed.k9s'
     )
 
     # Pip packages list
