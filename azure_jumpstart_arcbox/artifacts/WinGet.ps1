@@ -2,12 +2,16 @@ $ErrorActionPreference = $env:ErrorActionPreference
 
 $Env:ArcBoxDir = 'C:\ArcBox'
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
+$tenantId = $env:tenantId
+$subscriptionId = $env:subscriptionId
 
 $logFilePath = Join-Path -Path $Env:ArcBoxLogsDir -ChildPath ('WinGet-provisioning-' + (Get-Date -Format 'yyyyMMddHHmmss') + '.log')
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
 $DeploymentProgressString = "Installing WinGet packages..."
+
+Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
 
 $tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
 
