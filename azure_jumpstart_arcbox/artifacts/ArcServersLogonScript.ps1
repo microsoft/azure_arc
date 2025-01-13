@@ -141,6 +141,19 @@ if ($Env:flavor -ne "DevOps") {
     Write-Header "Az PowerShell Login"
     Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
 
+    $DeploymentProgressString = "Started ArcServersLogonScript"
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags["DeploymentProgress"] = $DeploymentProgressString
+    } else {
+        $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+
     $existingVMDisk = Get-AzDisk -ResourceGroupName $env:resourceGroup | Where-Object name -like *VMsDisk
 
     # Update disk IOPS and throughput before downloading nested VMs
@@ -160,6 +173,20 @@ if ($Env:flavor -ne "DevOps") {
     elseif ($Env:sqlServerEdition -eq "Enterprise"){
         $vhdImageToDownload = "ArcBox-SQL-ENT.vhdx"
     }
+
+
+    $DeploymentProgressString = "Downloading and configuring nested SQL VM"
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags["DeploymentProgress"] = $DeploymentProgressString
+    } else {
+        $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
     Write-Host "Fetching SQL VM"
     $SQLvmName = "$namingPrefix-SQL"
@@ -414,6 +441,19 @@ $payLoad = @"
 
         $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-02.vhdx"
+
+        $DeploymentProgressString = "Downloading and configuring nested VMs"
+
+        $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+    
+        if ($null -ne $tags) {
+            $tags["DeploymentProgress"] = $DeploymentProgressString
+        } else {
+            $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+        }
+    
+        $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+        $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
         # Verify if VHD files already downloaded especially when re-running this script
         if (!((Test-Path $Win2K25vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
