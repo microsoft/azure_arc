@@ -161,7 +161,7 @@ Connect-AzAccount -Identity
 
 $DeploymentProgressString = "Started bootstrap-script..."
 
-$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
 
 if ($null -ne $tags) {
     $tags["DeploymentProgress"] = $DeploymentProgressString
@@ -169,8 +169,8 @@ if ($null -ne $tags) {
     $tags = @{"DeploymentProgress" = $DeploymentProgressString}
 }
 
-$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
 
 $KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
@@ -409,7 +409,7 @@ $ScheduledTaskExecutable = "pwsh.exe"
 
 $DeploymentProgressString = "Restarting and installing WinGet packages..."
 
-$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
 
 if ($null -ne $tags) {
     $tags["DeploymentProgress"] = $DeploymentProgressString
@@ -417,8 +417,8 @@ if ($null -ne $tags) {
     $tags = @{"DeploymentProgress" = $DeploymentProgressString}
 }
 
-$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
 
 if ($flavor -eq "ITPro") {
