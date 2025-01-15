@@ -17,7 +17,7 @@ $rg = $env:resourceGroup
 $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
-$location = "eastus"
+$location = $env:azureLocation
 $customLocName = $HCIBoxConfig.rbCustomLocationName
 
 # Create logical networks

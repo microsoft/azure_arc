@@ -8,7 +8,7 @@ properties:
       settings:
         Name: namingPrefixStage-SQL
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-SQL.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-SQL.vhdx
         ProcessorCount: 2
         StartupMemory: '6GB'
         RestartIfNeeded: true
