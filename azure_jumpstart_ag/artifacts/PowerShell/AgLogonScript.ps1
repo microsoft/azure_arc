@@ -107,7 +107,7 @@ $global:Credentials = New-Object System.Management.Automation.PSCredential($AgCo
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI" -ForegroundColor Gray
-if($scenario -eq "contoso_hypermarket"){
+if($scenario -eq "contoso_hypermarket" -or $scenario -eq "contoso_motors"){
     az login --identity | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 }else{
     az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
