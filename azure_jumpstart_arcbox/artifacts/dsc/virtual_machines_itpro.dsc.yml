@@ -41,7 +41,7 @@ properties:
       settings:
         Name: namingPrefixStage-Ubuntu-01
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-01.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Ubuntu-01.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
@@ -57,7 +57,7 @@ properties:
       settings:
         Name: namingPrefixStage-Ubuntu-02
         SwitchName: 'InternalNATSwitch'
-        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-02.vhdx
+        VhdPath: F:\Virtual Machines\namingPrefixStage-Ubuntu-02.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
