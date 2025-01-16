@@ -98,7 +98,7 @@ if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
 
     # Create the task action to use pwsh.exe
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File $ActionScript"
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ActionScript"
 
     if ($env:flavor -eq "DataOps") {
         $UserName = "jumpstart\" + $Env:UserName
