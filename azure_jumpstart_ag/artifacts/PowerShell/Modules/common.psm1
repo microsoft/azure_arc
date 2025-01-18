@@ -983,6 +983,9 @@ function Deploy-Prometheus {
         $apiServerPort = ($apiServerAddress -split ":")[1]
 
         do {
+            Write-Host "apiServerFqdn=$apiServerFqdn"
+            Write-Host "apiServerPort=$apiServerPort"
+            Write-Host "apiServer=$apiServer"
             $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
             if ($result.TcpTestSucceeded) {
                 Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
