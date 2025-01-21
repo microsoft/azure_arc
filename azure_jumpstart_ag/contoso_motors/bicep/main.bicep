@@ -187,6 +187,7 @@ module keyVault 'data/keyVault.bicep' = {
     akvNameSite1: akvNameSite1
     akvNameSite2: akvNameSite2
     location: location
+    spnObjectId: spnObjectId
   }
 }
 
