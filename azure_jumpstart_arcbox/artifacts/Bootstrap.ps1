@@ -159,6 +159,18 @@ foreach ($module in $modules) {
 # Add Key Vault Secrets
 Connect-AzAccount -Identity
 
+$DeploymentProgressString = "Started bootstrap-script..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+
 $KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
 
 # Set Key Vault Name as an environment variable (used by DevOps flavor)
@@ -393,6 +405,17 @@ Write-Header "Configuring Logon Scripts"
 
 $ScheduledTaskExecutable = "pwsh.exe"
 
+$DeploymentProgressString = "Restarting and installing WinGet packages..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
 
 if ($flavor -eq "ITPro") {
     # Creating scheduled task for WinGet.ps1

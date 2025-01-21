@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "2738768575994422412"
+      "version": "0.32.4.45862",
+      "templateHash": "16300004813439680800"
     }
   },
   "parameters": {
@@ -67,6 +67,18 @@
       ],
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps', 'DataOps'"
+      }
+    },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Developer",
+      "allowedValues": [
+        "Developer",
+        "Standard",
+        "Enterprise"
+      ],
+      "metadata": {
+        "description": "SQL Server edition to deploy. Valid values are: 'Developer', 'Standard', 'Enterprise'"
       }
     },
     "githubAccount": {
@@ -163,7 +175,7 @@
     },
     "autoShutdownEnabled": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
     "autoShutdownTime": {
       "type": "string",
@@ -177,9 +189,24 @@
       "type": "string",
       "defaultValue": ""
     },
-    "sqlServerEdition": {
+    "enableAzureSpotPricing": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Option to enable spot pricing for the ArcBox Client VM"
+      }
+    },
+    "zones": {
       "type": "string",
-      "defaultValue": "Developer"
+      "defaultValue": "1",
+      "allowedValues": [
+        "1",
+        "2",
+        "3"
+      ],
+      "metadata": {
+        "description": "The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM"
+      }
     }
   },
   "variables": {
@@ -239,8 +266,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "16381001317417135477"
+              "version": "0.32.4.45862",
+              "templateHash": "2610071627031689606"
             }
           },
           "parameters": {
@@ -562,8 +589,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "9882362287265074744"
+              "version": "0.32.4.45862",
+              "templateHash": "439311248032936140"
             }
           },
           "parameters": {
@@ -844,8 +871,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "16381001317417135477"
+              "version": "0.32.4.45862",
+              "templateHash": "2610071627031689606"
             }
           },
           "parameters": {
@@ -1116,6 +1143,292 @@
       ]
     },
     {
+      "copy": {
+        "name": "ubuntuRancherK3sNodesDeployment",
+        "count": "[length(range(0, variables('k3sClusterNodesCount')))]"
+      },
+      "condition": "[equals(parameters('flavor'), 'DevOps')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('ubuntuRancherK3sNodesDeployment-{0}', range(0, variables('k3sClusterNodesCount'))[copyIndex()])]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "stagingStorageAccountName": {
+            "value": "[toLower(reference(resourceId('Microsoft.Resources/deployments', 'stagingStorageAccountDeployment'), '2022-09-01').outputs.storageAccountName.value)]"
+          },
+          "logAnalyticsWorkspace": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment'), '2022-09-01').outputs.subnetId.value]"
+          },
+          "azureLocation": {
+            "value": "[parameters('location')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "vmName": {
+            "value": "[format('{0}-Node-0{1}', variables('k3sArcClusterName'), range(0, variables('k3sClusterNodesCount'))[copyIndex()])]"
+          },
+          "storageContainerName": {
+            "value": "[toLower(variables('k3sArcClusterName'))]"
+          },
+          "namingPrefix": {
+            "value": "[parameters('namingPrefix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.32.4.45862",
+              "templateHash": "439311248032936140"
+            }
+          },
+          "parameters": {
+            "vmName": {
+              "type": "string",
+              "defaultValue": "[format('{0}-K3s-Node', parameters('namingPrefix'))]",
+              "metadata": {
+                "description": "The name of you Virtual Machine"
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "defaultValue": "arcdemo",
+              "metadata": {
+                "description": "Username for the Virtual Machine"
+              }
+            },
+            "sshRSAPublicKey": {
+              "type": "securestring",
+              "defaultValue": "",
+              "metadata": {
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
+              }
+            },
+            "ubuntuOSVersion": {
+              "type": "string",
+              "defaultValue": "22_04-lts-gen2",
+              "allowedValues": [
+                "22_04-lts-gen2"
+              ],
+              "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
+              }
+            },
+            "azureLocation": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource Id of the subnet in the virtual network"
+              }
+            },
+            "stagingStorageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
+              }
+            },
+            "logAnalyticsWorkspace": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Log Analytics workspace used with cluster extensions"
+              }
+            },
+            "templateBaseUrl": {
+              "type": "string",
+              "metadata": {
+                "description": "The base URL used for accessing artifacts and automation artifacts"
+              }
+            },
+            "flavor": {
+              "type": "string",
+              "allowedValues": [
+                "ITPro",
+                "DevOps",
+                "DataOps"
+              ],
+              "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+              }
+            },
+            "storageContainerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account container name for artifacts"
+              }
+            },
+            "namingPrefix": {
+              "type": "string",
+              "defaultValue": "ArcBox",
+              "maxLength": 7,
+              "metadata": {
+                "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
+              }
+            }
+          },
+          "variables": {
+            "networkInterfaceName": "[format('{0}-NIC', parameters('vmName'))]",
+            "osDiskType": "Premium_LRS",
+            "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B2ms', 'Standard_B8ms')]",
+            "diskSize": "[if(equals(parameters('flavor'), 'DataOps'), 512, 64)]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-01-01",
+              "name": "[variables('networkInterfaceName')]",
+              "location": "[parameters('azureLocation')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('azureLocation')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[variables('vmSize')]"
+                },
+                "storageProfile": {
+                  "osDisk": {
+                    "name": "[format('{0}-OSDisk', parameters('vmName'))]",
+                    "caching": "ReadWrite",
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "[variables('osDiskType')]"
+                    },
+                    "diskSizeGB": "[variables('diskSize')]"
+                  },
+                  "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-jammy",
+                    "sku": "[parameters('ubuntuOSVersion')]",
+                    "version": "latest"
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                    }
+                  ]
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                          "keyData": "[parameters('sshRSAPublicKey')]"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
+              "location": "[parameters('azureLocation')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {},
+                "protectedSettings": {
+                  "commandToExecute": "[format('bash installK3s.sh {0} {1} {2} {3} {4} {5} {6} {7}', parameters('adminUsername'), subscription().subscriptionId, parameters('vmName'), parameters('azureLocation'), parameters('stagingStorageAccountName'), parameters('logAnalyticsWorkspace'), parameters('templateBaseUrl'), parameters('storageContainerName'))]",
+                  "fileUris": [
+                    "[format('{0}artifacts/installK3s.sh', parameters('templateBaseUrl'))]"
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]",
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner'))]",
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'stagingStorageAccountDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ubuntuRancherK3sDeployment')]"
+      ]
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "clientVmDeployment",
@@ -1203,11 +1516,15 @@
           "autoShutdownTimezone": {
             "value": "[parameters('autoShutdownTimezone')]"
           },
-          "autoShutdownEmailRecipient": {
-            "value": "[parameters('autoShutdownEmailRecipient')]"
-          },
+          "autoShutdownEmailRecipient": "[if(empty(parameters('autoShutdownEmailRecipient')), createObject('value', null()), createObject('value', parameters('autoShutdownEmailRecipient')))]",
           "sqlServerEdition": {
             "value": "[parameters('sqlServerEdition')]"
+          },
+          "zones": {
+            "value": "[parameters('zones')]"
+          },
+          "enableAzureSpotPricing": {
+            "value": "[parameters('enableAzureSpotPricing')]"
           }
         },
         "template": {
@@ -1216,8 +1533,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "5450393794893126300"
+              "version": "0.32.4.45862",
+              "templateHash": "1720726630847060036"
             }
           },
           "parameters": {
@@ -1266,7 +1583,7 @@
             },
             "windowsOSVersion": {
               "type": "string",
-              "defaultValue": "2022-datacenter-g2",
+              "defaultValue": "2025-datacenter-g2",
               "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
               }
@@ -1393,7 +1710,19 @@
                 "DataOps"
               ],
               "metadata": {
-                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'ITPro', 'DevOps', 'DataOps'"
+              }
+            },
+            "sqlServerEdition": {
+              "type": "string",
+              "defaultValue": "Developer",
+              "allowedValues": [
+                "Developer",
+                "Standard",
+                "Enterprise"
+              ],
+              "metadata": {
+                "description": "SQL Server edition to deploy. Valid values are: 'Developer', 'Standard', 'Enterprise'"
               }
             },
             "deployBastion": {
@@ -1452,7 +1781,7 @@
             },
             "vmsDiskSku": {
               "type": "string",
-              "defaultValue": "Premium_LRS",
+              "defaultValue": "PremiumV2_LRS",
               "metadata": {
                 "description": "The SKU of the VMs disk"
               }
@@ -1466,7 +1795,7 @@
             },
             "autoShutdownEnabled": {
               "type": "bool",
-              "defaultValue": false
+              "defaultValue": true
             },
             "autoShutdownTime": {
               "type": "string",
@@ -1480,9 +1809,24 @@
               "type": "string",
               "defaultValue": ""
             },
-            "sqlServerEdition": {
-            "type": "string",
-            "defaultValue": "Developer"
+            "zones": {
+              "type": "string",
+              "defaultValue": "1",
+              "allowedValues": [
+                "1",
+                "2",
+                "3"
+              ],
+              "metadata": {
+                "description": "The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM"
+              }
+            },
+            "enableAzureSpotPricing": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Option to enable spot pricing for the ArcBox Client VM"
+              }
             }
           },
           "variables": {
@@ -1524,13 +1868,16 @@
               "apiVersion": "2022-01-01",
               "name": "[variables('publicIpAddressName')]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "properties": {
                 "publicIPAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
               },
               "sku": {
-                "name": "Basic"
+                "name": "Standard"
               }
             },
             {
@@ -1538,6 +1885,9 @@
               "apiVersion": "2023-04-02",
               "name": "[format('{0}-VMsDisk', parameters('vmName'))]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "sku": {
                 "name": "[parameters('vmsDiskSku')]"
               },
@@ -1545,8 +1895,10 @@
                 "creationData": {
                   "createOption": "Empty"
                 },
-                "diskSizeGB": 1024,
-                "burstingEnabled": true
+                "diskSizeGB": 256,
+                "burstingEnabled": false,
+                "diskMBpsReadWrite": 200,
+                "diskIOPSReadWrite": 5000
               }
             },
             {
@@ -1554,6 +1906,9 @@
               "apiVersion": "2022-03-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "identity": {
                 "type": "SystemAssigned"
               },
@@ -1569,7 +1924,7 @@
                     "managedDisk": {
                       "storageAccountType": "[variables('osDiskType')]"
                     },
-                    "diskSizeGB": 1024
+                    "diskSizeGB": 127
                   },
                   "imageReference": {
                     "publisher": "MicrosoftWindowsServer",
@@ -1600,9 +1955,12 @@
                   "adminPassword": "[parameters('windowsAdminPassword')]",
                   "windowsConfiguration": {
                     "provisionVMAgent": true,
-                    "enableAutomaticUpdates": false
+                    "enableAutomaticUpdates": true
                   }
-                }
+                },
+                "priority": "[if(parameters('enableAzureSpotPricing'), 'Spot', 'Regular')]",
+                "evictionPolicy": "[if(parameters('enableAzureSpotPricing'), 'Deallocate', null())]",
+                "billingProfile": "[if(parameters('enableAzureSpotPricing'), createObject('maxPrice', -1), null())]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
@@ -1626,7 +1984,7 @@
                   "fileUris": [
                     "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                   ],
-                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -githubBranch {27} -vmAutologon {28} -rdpPort {29} -addsDomainName {30} -customLocationRPOID {31} -resourceTags {32} -namingPrefix {33} -debugEnabled {34} -sqlServerEdition {35}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('githubBranch'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'), parameters('resourceTags'), parameters('namingPrefix'), parameters('debugEnabled'), parameters('sqlServerEdition'))]"
+                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -githubBranch {27} -vmAutologon {28} -rdpPort {29} -addsDomainName {30} -customLocationRPOID {31} -resourceTags {32} -namingPrefix {33} -debugEnabled {34} -sqlServerEdition {35} -autoShutdownEnabled {36}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('githubBranch'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'), parameters('resourceTags'), parameters('namingPrefix'), parameters('debugEnabled'), parameters('sqlServerEdition'), parameters('autoShutdownEnabled'))]"
                 }
               },
               "dependsOn": [
@@ -1686,7 +2044,7 @@
                 },
                 "timeZoneId": "[parameters('autoShutdownTimezone')]",
                 "notificationSettings": {
-                  "status": "Enabled",
+                  "status": "[if(empty(parameters('autoShutdownEmailRecipient')), 'Disabled', 'Enabled')]",
                   "timeInMinutes": 30,
                   "webhookUrl": "",
                   "emailRecipient": "[parameters('autoShutdownEmailRecipient')]",
@@ -1742,8 +2100,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "8653137040194732155"
+              "version": "0.32.4.45862",
+              "templateHash": "16555076902768051082"
             }
           },
           "parameters": {
@@ -1843,8 +2201,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1172818642563861188"
+              "version": "0.32.4.45862",
+              "templateHash": "14453387563250772967"
             }
           },
           "parameters": {
@@ -2473,8 +2831,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "9222970623693331004"
+                      "version": "0.32.4.45862",
+                      "templateHash": "1912011565831162458"
                     }
                   },
                   "parameters": {
@@ -2790,7 +3148,7 @@
                     "value": false
                   },
                   "enableSoftDelete": {
-                    "value": false
+                    "value": true
                   },
                   "location": {
                     "value": "[parameters('location')]"
@@ -5288,8 +5646,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "6158909554667476108"
+              "version": "0.32.4.45862",
+              "templateHash": "8144821245242671317"
             }
           },
           "parameters": {
@@ -5541,8 +5899,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1172818642563861188"
+              "version": "0.32.4.45862",
+              "templateHash": "14453387563250772967"
             }
           },
           "parameters": {
@@ -6171,8 +6529,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "9222970623693331004"
+                      "version": "0.32.4.45862",
+                      "templateHash": "1912011565831162458"
                     }
                   },
                   "parameters": {
@@ -6488,7 +6846,7 @@
                     "value": false
                   },
                   "enableSoftDelete": {
-                    "value": false
+                    "value": true
                   },
                   "location": {
                     "value": "[parameters('location')]"
@@ -8984,8 +9342,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1398021495301668101"
+              "version": "0.32.4.45862",
+              "templateHash": "15103003561479579430"
             }
           },
           "parameters": {
@@ -9109,7 +9467,7 @@
           "resources": [
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-02-02-preview",
+              "apiVersion": "2024-04-02-preview",
               "name": "[parameters('aksClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9144,6 +9502,10 @@
                   "serviceCidr": "[variables('serviceCidr_primary')]",
                   "dnsServiceIP": "[variables('dnsServiceIP_primary')]"
                 },
+                "autoUpgradeProfile": {
+                  "nodeOSUpgradeChannel": "NodeImage",
+                  "upgradeChannel": "stable"
+                },
                 "linuxProfile": {
                   "adminUsername": "[parameters('linuxAdminUsername')]",
                   "ssh": {
@@ -9153,16 +9515,12 @@
                       }
                     ]
                   }
-                },
-                "autoUpgradeProfile": {
-                  "upgradeChannel": "stable",
-                  "nodeOSUpgradeChannel": "NodeImage"
                 }
               }
             },
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-02-02-preview",
+              "apiVersion": "2024-04-02-preview",
               "name": "[parameters('drClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9208,8 +9566,8 @@
                   }
                 },
                 "autoUpgradeProfile": {
-                  "upgradeChannel": "stable",
-                  "nodeOSUpgradeChannel": "NodeImage"
+                  "nodeOSUpgradeChannel": "NodeImage",
+                  "upgradeChannel": "stable"
                 }
               }
             },
@@ -9218,7 +9576,7 @@
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
                 "principalType": "ServicePrincipal"
               },
@@ -9231,7 +9589,7 @@
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
                 "principalType": "ServicePrincipal"
               },

@@ -1,6 +1,13 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.32.4.45862",
+      "templateHash": "8144821245242671317"
+    }
+  },
   "parameters": {
     "addsDomainName": {
       "type": "string",
@@ -9,9 +16,9 @@
         "description": "The FQDN of the domain"
       }
     },
-    "vmName": {
+    "clientVMName": {
       "type": "string",
-      "defaultValue": "ArcBox-ADDS",
+      "defaultValue": "[format('{0}-ADDS', parameters('namingPrefix'))]",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
@@ -27,7 +34,6 @@
       "type": "securestring",
       "minLength": 12,
       "maxLength": 123,
-      "defaultValue": "ArcPassword123!!",
       "metadata": {
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
       }
@@ -55,10 +61,10 @@
     },
     "deployBastion": {
       "type": "bool",
+      "defaultValue": false,
       "metadata": {
         "description": "Choice to deploy Azure Bastion"
-      },
-      "defaultValue": false
+      }
     },
     "templateBaseUrl": {
       "type": "string",
@@ -66,23 +72,29 @@
       "metadata": {
         "description": "Base URL for ARM template"
       }
+    },
+    "namingPrefix": {
+      "type": "string",
+      "defaultValue": "ArcBox",
+      "maxLength": 7,
+      "metadata": {
+        "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
+      }
     }
   },
   "variables": {
-    "vmName": "[concat(parameters('vmName'))]",
-    "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "virtualNetworkName": "ArcBox-VNet",
-    "dcSubnetName": "ArcBox-DC-Subnet",
+    "networkInterfaceName": "[format('{0}-NIC', parameters('clientVMName'))]",
+    "virtualNetworkName": "[format('{0}-VNet', parameters('namingPrefix'))]",
+    "dcSubnetName": "[format('{0}-DC-Subnet', parameters('namingPrefix'))]",
     "addsPrivateIPAddress": "10.16.2.100",
-    "bastionName": "ArcBox-Bastion",
+    "bastionName": "[format('{0}-Bastion', parameters('namingPrefix'))]",
     "osDiskType": "Premium_LRS",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('dcSubnetName'))]",
-    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-    "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
+    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
+    "publicIpAddressName": "[if(not(parameters('deployBastion')), format('{0}-PIP', parameters('clientVMName')), format('{0}-PIP', variables('bastionName')))]",
     "PublicIPNoBastion": {
-      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
     }
-
   },
   "resources": [
     {
@@ -90,9 +102,6 @@
       "apiVersion": "2022-01-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
-      ],
       "properties": {
         "ipConfigurations": [
           {
@@ -103,43 +112,43 @@
               },
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[variables('addsPrivateIPAddress')]",
-              "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'), json('null'))]"
+              "publicIPAddress": "[if(not(parameters('deployBastion')), variables('PublicIPNoBastion'), null())]"
             }
           }
         ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      ]
+    },
+    {
+      "condition": "[not(parameters('deployBastion'))]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('publicIpAddressName')]",
+      "location": "[parameters('azureLocation')]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "idleTimeoutInMinutes": 4
+      },
+      "sku": {
+        "name": "Basic",
+        "tier": "Regional"
       }
     },
     {
-            "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2022-01-01",
-            "name": "[variables('publicIpAddressName')]",
-            "condition": "[not(parameters('deployBastion'))]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "publicIpAllocationMethod": "Static",
-                "publicIPAddressVersion": "IPv4",
-                "idleTimeoutInMinutes": 4
-            },
-            "sku": {
-                "name": "Basic",
-                "tier": "Regional"
-            }
-        },
-    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2022-03-01",
-      "name": "[variables('vmName')]",
+      "name": "[parameters('clientVMName')]",
       "location": "[parameters('azureLocation')]",
-      "dependsOn": [
-        "[variables('networkInterfaceRef')]"
-      ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
         },
         "storageProfile": {
           "osDisk": {
-            "name": "[concat(variables('vmName'),'-OSDisk')]",
+            "name": "[format('{0}-OSDisk', parameters('clientVMName'))]",
             "caching": "ReadWrite",
             "createOption": "fromImage",
             "managedDisk": {
@@ -162,7 +171,7 @@
           ]
         },
         "osProfile": {
-          "computerName": "[variables('vmName')]",
+          "computerName": "[parameters('clientVMName')]",
           "adminUsername": "[parameters('windowsAdminUsername')]",
           "adminPassword": "[parameters('windowsAdminPassword')]",
           "windowsConfiguration": {
@@ -170,28 +179,31 @@
             "enableAutomaticUpdates": false
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+      ]
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'/DeployADDS')]",
       "apiVersion": "2022-03-01",
+      "name": "[format('{0}/{1}', parameters('clientVMName'), 'DeployADDS')]",
       "location": "[parameters('azureLocation')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-      ],
       "properties": {
         "publisher": "Microsoft.Compute",
         "type": "CustomScriptExtension",
         "typeHandlerVersion": "1.10",
         "autoUpgradeMinorVersion": true,
-        "settings": {
+        "protectedSettings": {
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName {0} -domainAdminUsername {1} -domainAdminPassword {2} -templateBaseUrl {3}', parameters('addsDomainName'), parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('templateBaseUrl'))]"
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
+      ]
     }
   ],
   "outputs": {
