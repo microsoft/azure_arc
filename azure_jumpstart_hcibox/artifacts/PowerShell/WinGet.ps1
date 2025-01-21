@@ -26,9 +26,6 @@ $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\win
 # Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
 & $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
 
-# Temporary workaround for AzCopy installation due to CDN issues
-& "$($Env:HCIBoxDir)\azcopy_install.ps1"
-
 # Apply WinGet Configuration files
 & $winget configure --file "$($Env:HCIBoxDir)\DSC\packages.dsc.yml" --accept-configuration-agreements --disable-interactivity
 & $winget configure --file "$($Env:HCIBoxDir)\DSC\hyper-v.dsc.yml" --accept-configuration-agreements --disable-interactivity

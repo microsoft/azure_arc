@@ -81,7 +81,7 @@
         'Microsoft.Bicep',
         'Kubernetes.kubectl',
         'Microsoft.Edge',
-        #'Microsoft.Azure.AZCopy.10',
+        'Microsoft.Azure.AZCopy.10',
         'Microsoft.VisualStudioCode',
         'Microsoft.AzureDataStudio',
         'Microsoft.VisualStudioCode',
