@@ -3,7 +3,6 @@ $ErrorActionPreference = 'SilentlyContinue'
 $AgDir = 'C:\Ag'
 $AgLogsDir = "$AgDir\Logs"
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
 
 $logFilePath = Join-Path -Path $AgLogsDir -ChildPath ('WinGet-provisioning-' + (Get-Date -Format 'yyyyMMddHHmmss') + '.log')
 
@@ -20,9 +19,6 @@ $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\win
 
 # Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
 & $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget --silent --accept-package-agreements
-
-# Temporary workaround for AzCopy installation due to CDN issues
-& $AgPowerShellDir\azcopy_install.ps1
 
 ##############################################################
 # Install Winget packages

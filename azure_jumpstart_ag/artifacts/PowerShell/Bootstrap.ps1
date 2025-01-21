@@ -306,7 +306,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.p
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/k8s.tests.ps1") -OutFile "$AgDirectory\tests\k8s.tests.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$AgDirectory\tests\Invoke-Test.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/ag-bginfo.bgi") -OutFile "$AgDirectory\tests\ag-bginfo.bgi"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/azcopy_install.ps1") -OutFile "$AgPowerShellDir\azcopy_install.ps1"
 
 if($scenario -eq "contoso_supermarket"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"

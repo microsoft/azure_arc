@@ -44,13 +44,13 @@ properties:
       settings:
         id: Microsoft.Edge
         source: winget
-    # - resource: Microsoft.WinGet.DSC/WinGetPackage
-    #   id: azcopy
-    #   directives:
-    #     description: Install azcopy
-    #   settings:
-    #     id: Microsoft.Azure.AZCopy.10
-    #     source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: azcopy
+      directives:
+        description: Install azcopy
+      settings:
+        id: Microsoft.Azure.AZCopy.10
+        source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: DotNetSDK8
       directives:
