@@ -1,6 +1,13 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    "metadata": {
+      "_generator": {
+        "name": "bicep",
+        "version": "0.32.4.45862",
+        "templateHash": "1720726630847060036"
+      }
+    },
     "parameters": {
         "vmName": {
             "type": "string",
@@ -229,163 +236,276 @@
         "type": "string",
         "defaultValue": "Developer",
         "allowedValues": [
-            "Developer",
-            "Standard",
-            "Enterprise"
-            ]
+          "Developer",
+          "Standard",
+          "Enterprise"
+        ],
+        "metadata": {
+          "description": "SQL Server edition to deploy. Valid values are: 'Developer', 'Standard', 'Enterprise'"
         }
-
+      },
+      "deployBastion": {
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+          "description": "Choice to deploy Bastion to connect to the client VM"
+        }
+      },
+      "githubUser": {
+        "type": "string",
+        "metadata": {
+          "description": "User github account where they have forked https://github.com/Azure/jumpstart-apps"
+        }
+      },
+      "githubBranch": {
+        "type": "string",
+        "metadata": {
+          "description": "Git branch to use from the forked repo https://github.com/Azure/jumpstart-apps"
+        }
+      },
+      "k3sArcClusterName": {
+        "type": "string",
+        "defaultValue": "[format('{0}-K3s', parameters('namingPrefix'))]",
+        "metadata": {
+          "description": "The name of the K3s cluster"
+        }
     },
     "variables": {
-        "vmName": "[concat(parameters('vmName'))]",
-        "bastionName": "ArcBox-Bastion",
-        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
-        "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS",
-        "PublicIPNoBastion": {
-            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-        }
+      "bastionName": "[format('{0}-Bastion', parameters('namingPrefix'))]",
+      "publicIpAddressName": "[if(equals(parameters('deployBastion'), false()), format('{0}-PIP', parameters('vmName')), format('{0}-PIP', variables('bastionName')))]",
+      "networkInterfaceName": "[format('{0}-NIC', parameters('vmName'))]",
+      "osDiskType": "Premium_LRS",
+      "PublicIPNoBastion": {
+        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      }
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2022-01-01",
-            "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2022-01-01",
-            "name": "[variables('publicIpAddressName')]",
-            "condition": "[not(parameters('deployBastion'))]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "publicIpAllocationMethod": "Static",
-                "publicIPAddressVersion": "IPv4",
-                "idleTimeoutInMinutes": 4
-            },
-            "sku": {
-                "name": "Basic",
-                "tier": "Regional"
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2022-03-01",
-            "name": "[variables('vmName')]",
-            "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[if(equals(parameters('flavor'),'DevOps'),'Standard_B4ms',if(equals(parameters('flavor'),'DataOps'),'Standard_D8s_v4','Standard_D16s_v4'))]"
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2022-01-01",
+        "name": "[variables('networkInterfaceName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('subnetId')]"
                 },
-                "storageProfile": {
-                    "osDisk": {
-                        "name": "[concat(variables('vmName'),'-OSDisk')]",
-                        "caching": "ReadWrite",
-                        "createOption": "fromImage",
-                        "managedDisk": {
-                            "storageAccountType": "[variables('osDiskType')]"
-                        },
-                        "diskSizeGB": 1024
-                    },
-                    "imageReference": {
-                        "publisher": "MicrosoftWindowsServer",
-                        "offer": "WindowsServer",
-                        "sku": "[parameters('windowsOSVersion')]",
-                        "version": "latest"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
-                        }
-                    ]
-                },
-                "osProfile": {
-                    "computerName": "[variables('vmName')]",
-                    "adminUsername": "[parameters('windowsAdminUsername')]",
-                    "adminPassword": "[parameters('windowsAdminPassword')]",
-                    "windowsConfiguration": {
-                        "provisionVMAgent": true,
-                        "enableAutomaticUpdates": false
-                    }
-                }
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": "[if(equals(parameters('deployBastion'), false()), variables('PublicIPNoBastion'), null())]"
+              }
             }
+          ]
         },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/Bootstrap')]",
-            "apiVersion": "2022-03-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-            ],
-            "tags": {
-                "displayName": "config-bootstrap"
-            },
-            "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.10",
-                "autoUpgradeMinorVersion": true,
-                "protectedSettings": {
-                    "fileUris": [
-                        "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
-                    ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -tenantId ', parameters('tenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -registryUsername ', parameters('registryUsername'), ' -registryPassword ', parameters('registryPassword'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -mssqlmiName ', parameters('mssqlmiName'), ' -POSTGRES_NAME ', parameters('postgresName'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('postgresWorkerNodeCount'), ' -POSTGRES_DATASIZE ', parameters('postgresDatasize'), ' -POSTGRES_SERVICE_TYPE ', parameters('postgresServiceType'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -k3sArcDataClusterName ', parameters('k3sArcDataClusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -flavor ', parameters('flavor'), ' -k3sArcClusterName ', parameters('k3sArcClusterName'), ' -aksArcClusterName ', parameters('aksArcClusterName') , ' -aksdrArcClusterName ', parameters('aksdrArcClusterName') , ' -githubUser ', parameters('githubUser'), ' -rdpPort ', parameters('rdpPort'), ' -sshPort ', parameters('sshPort'), ' -addsDomainName ', parameters('addsDomainName'), ' -sqlServerEdition ', parameters('sqlServerEdition'))]"
-                }
-            }
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+        ]
+      },
+      {
+        "condition": "[equals(parameters('deployBastion'), false())]",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2022-01-01",
+        "name": "[variables('publicIpAddressName')]",
+        "location": "[parameters('location')]",
+        "zones": [
+          "[parameters('zones')]"
+        ],
+        "properties": {
+          "publicIPAllocationMethod": "Static",
+          "publicIPAddressVersion": "IPv4",
+          "idleTimeoutInMinutes": 4
         },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2022-04-01",
-            "name": "[guid(variables('vmName'), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
-            "properties": {
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2019-07-01', 'Full').identity.principalId]"            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
-            ],
-            "metadata": {
-                "description": "Assigns Client VM managed identity Owner Role at resource group level"
-            }
+        "sku": {
+          "name": "Standard"
         }
+      },
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-04-02",
+        "name": "[format('{0}-VMsDisk', parameters('vmName'))]",
+        "location": "[parameters('location')]",
+        "zones": [
+          "[parameters('zones')]"
+        ],
+        "sku": {
+          "name": "[parameters('vmsDiskSku')]"
+        },
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          },
+          "diskSizeGB": 256,
+          "burstingEnabled": false,
+          "diskMBpsReadWrite": 200,
+          "diskIOPSReadWrite": 5000
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2022-03-01",
+        "name": "[parameters('vmName')]",
+        "location": "[parameters('location')]",
+        "zones": [
+          "[parameters('zones')]"
+        ],
+        "identity": {
+          "type": "SystemAssigned"
+        },
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B4ms', if(equals(parameters('flavor'), 'DataOps'), 'Standard_D4s_v5', 'Standard_D8s_v5'))]"
+          },
+          "storageProfile": {
+            "osDisk": {
+              "name": "[format('{0}-OSDisk', parameters('vmName'))]",
+              "caching": "ReadWrite",
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "[variables('osDiskType')]"
+              },
+              "diskSizeGB": 127
+            },
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "dataDisks": [
+              {
+                "createOption": "Attach",
+                "lun": 0,
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', format('{0}-VMsDisk', parameters('vmName')))]"
+                }
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              }
+            ]
+          },
+          "osProfile": {
+            "computerName": "[parameters('vmName')]",
+            "adminUsername": "[parameters('windowsAdminUsername')]",
+            "adminPassword": "[parameters('windowsAdminPassword')]",
+            "windowsConfiguration": {
+              "provisionVMAgent": true,
+              "enableAutomaticUpdates": true
+            }
+          },
+          "priority": "[if(parameters('enableAzureSpotPricing'), 'Spot', 'Regular')]",
+          "evictionPolicy": "[if(parameters('enableAzureSpotPricing'), 'Deallocate', null())]",
+          "billingProfile": "[if(parameters('enableAzureSpotPricing'), createObject('maxPrice', -1), null())]"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
+          "[resourceId('Microsoft.Compute/disks', format('{0}-VMsDisk', parameters('vmName')))]"
+        ]
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2022-03-01",
+        "name": "[format('{0}/{1}', parameters('vmName'), 'Bootstrap')]",
+        "location": "[parameters('location')]",
+        "tags": {
+          "displayName": "config-bootstrap"
+        },
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "1.10",
+          "autoUpgradeMinorVersion": true,
+          "protectedSettings": {
+            "fileUris": [
+              "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
+            ],
+            "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -githubBranch {27} -vmAutologon {28} -rdpPort {29} -addsDomainName {30} -customLocationRPOID {31} -resourceTags {32} -namingPrefix {33} -debugEnabled {34} -sqlServerEdition {35} -autoShutdownEnabled {36}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('githubBranch'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'), parameters('resourceTags'), parameters('namingPrefix'), parameters('debugEnabled'), parameters('sqlServerEdition'), parameters('autoShutdownEnabled'))]"
+          }
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        ]
+      },
+      {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2022-04-01",
+        "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Administrator')]",
+        "properties": {
+          "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+          "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')]",
+          "principalType": "ServicePrincipal"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        ]
+      },
+      {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2022-04-01",
+        "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+        "properties": {
+          "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+          "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+          "principalType": "ServicePrincipal"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        ]
+      },
+      {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2022-04-01",
+        "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')]",
+        "properties": {
+          "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+          "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+          "principalType": "ServicePrincipal"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        ]
+      },
+      {
+        "condition": "[parameters('autoShutdownEnabled')]",
+        "type": "Microsoft.DevTestLab/schedules",
+        "apiVersion": "2018-09-15",
+        "name": "[format('shutdown-computevm-{0}', parameters('vmName'))]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "status": "Enabled",
+          "taskType": "ComputeVmShutdownTask",
+          "dailyRecurrence": {
+            "time": "[parameters('autoShutdownTime')]"
+          },
+          "timeZoneId": "[parameters('autoShutdownTimezone')]",
+          "notificationSettings": {
+            "status": "[if(empty(parameters('autoShutdownEmailRecipient')), 'Disabled', 'Enabled')]",
+            "timeInMinutes": 30,
+            "webhookUrl": "",
+            "emailRecipient": "[parameters('autoShutdownEmailRecipient')]",
+            "notificationLocale": "en"
+          },
+          "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+        ]
+      }
     ],
     "outputs": {
-        "adminUsername": {
-            "type": "string",
-            "value": "[parameters('windowsAdminUsername')]"
-        },
-        "publicIP": {
-            "condition": "[not(parameters('deployBastion'))]",
-            "type": "string",
-            "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
-        }
+      "adminUsername": {
+        "type": "string",
+        "value": "[parameters('windowsAdminUsername')]"
+      },
+      "publicIP": {
+        "type": "string",
+        "value": "[if(equals(parameters('deployBastion'), false()), concat(reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName')), '2022-01-01').ipAddress), '')]"
+      }
     }
-}
+  }

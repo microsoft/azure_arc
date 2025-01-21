@@ -1,233 +1,263 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "aksClusterName": {
-        "type": "string",
-        "defaultValue": "ArcBox-AKS-Data",
-        "metadata": {
-          "description": "The name of the Kubernetes cluster resource"
-        }
-      },
-      "drClusterName": {
-        "type": "string",
-        "defaultValue": "ArcBox-AKS-DR-Data",
-        "metadata": {
-          "description": "The name of the Kubernetes cluster resource"
-        }
-      },
-      "location": {
-        "type": "string",
-        "defaultValue": "[resourceGroup().location]",
-        "metadata": {
-          "description": "The location of the Managed Cluster resource"
-        }
-      },
-      "dnsPrefixPrimary": {
-        "type": "string",
-        "defaultValue": "arcdata",
-        "metadata": {
-          "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
-        }
-      },
-      "dnsPrefixSecondary": {
-        "type": "string",
-        "defaultValue": "arcdata",
-        "metadata": {
-          "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
-        }
-      },
-      "osDiskSizeGB": {
-        "type": "int",
-        "defaultValue": 0,
-        "metadata": {
-          "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize"
-        },
-        "minValue": 0,
-        "maxValue": 1023
-      },
-      "agentCount": {
-        "type": "int",
-        "defaultValue": 3,
-        "metadata": {
-          "description": "The number of nodes for the cluster"
-        },
-        "minValue": 1,
-        "maxValue": 50
-      },
-      "agentVMSize": {
-        "type": "string",
-        "defaultValue": "Standard_D8s_v4",
-        "metadata": {
-          "description": "The size of the Virtual Machine"
-        }
-      },
-      "linuxAdminUsername": {
-        "type": "string",
-        "defaultValue": "arcdemo",
-        "metadata": {
-          "description": "User name for the Linux Virtual Machines"
-        }
-      },
-      "sshRSAPublicKey": {
-        "type": "string",
-        "metadata": {
-          "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
-        }
-      },
-      "spnClientId": {
-        "metadata": {
-          "description": "Client ID (used by cloudprovider)"
-        },
-        "type": "securestring"
-      },
-      "spnClientSecret": {
-        "metadata": {
-          "description": "The Service Principal Client Secret"
-        },
-        "type": "securestring"
-      },
-      "enableRBAC": {
-        "defaultValue": true,
-        "type": "bool",
-        "metadata": {
-          "description": "boolean flag to turn on and off of RBAC"
-        }
-      },
-      "osType": {
-        "type": "string",
-        "defaultValue": "Linux",
-        "allowedValues": [ "Linux" ],
-        "metadata": {
-          "description": "The type of operating system"
-        }
-      },
-      "kubernetesVersion": {
-        "type": "string",
-        "metadata": {
-          "description": "The version of Kubernetes"
-        },
-        "defaultValue" : "1.28.9"
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.32.4.45862",
+      "templateHash": "15103003561479579430"
+    }
+  },
+  "parameters": {
+    "aksClusterName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-AKS-Data', parameters('namingPrefix'))]",
+      "metadata": {
+        "description": "The name of the Kubernetes cluster resource"
       }
     },
-    "variables": {
-      "serviceCidr-primary": "10.20.64.0/19",
-      "dnsServiceIP-primary": "10.20.64.10",
-      "dockerBridgeCidr-primary": "172.17.0.1/16",
-      "serviceCidr-secondary": "172.20.64.0/19",
-      "dnsServiceIP-secondary": "172.20.64.10",
-      "dockerBridgeCidr-secondary": "192.168.0.1/16",
-      "virtualNetworkName" : "ArcBox-VNet",
-      "aksSubnetName" : "ArcBox-AKS-Subnet",
-      "drVirtualNetworkName" : "ArcBox-DR-VNet",
-      "drSubnetName" : "ArcBox-DR-Subnet"
+    "drClusterName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-AKS-DR-Data', parameters('namingPrefix'))]",
+      "metadata": {
+        "description": "The name of the Kubernetes cluster resource"
+      }
     },
-    "resources": [
-      {
-        "apiVersion": "2024-02-02-preview",
-        "type": "Microsoft.ContainerService/managedClusters",
-        "location": "[parameters('location')]",
-        "name": "[parameters('aksClusterName')]",
-        "properties": {
-          "kubernetesVersion": "[parameters('kubernetesVersion')]",
-          "enableRBAC": "[parameters('enableRBAC')]",
-          "dnsPrefix": "[parameters('dnsPrefixPrimary')]",
-          "aadProfile": {
-            "managed": true
-          },
-          "agentPoolProfiles": [
-            {
-              "name": "agentpool",
-              "mode": "System",
-              "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
-              "count": "[parameters('agentCount')]",
-              "vmSize": "[parameters('agentVMSize')]",
-              "osType": "[parameters('osType')]",
-              "storageProfile": "ManagedDisks",
-              "type": "VirtualMachineScaleSets",
-              "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('aksSubnetName'))]"
-            }
-          ],
-          "networkProfile": {
-            "networkPlugin": "azure",
-            "serviceCidr": "[variables('serviceCidr-primary')]",
-            "dnsServiceIP": "[variables('dnsServiceIP-primary')]"
-          },
-          "linuxProfile": {
-            "adminUsername": "[parameters('linuxAdminUsername')]",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "keyData": "[parameters('sshRSAPublicKey')]"
-                }
-              ]
-            }
-          },
-          "autoUpgradeProfile": {
-            "upgradeChannel": "stable",
-            "nodeOSUpgradeChannel": "NodeImage"
-          },
-          "servicePrincipalProfile": {
-            "clientId": "[parameters('spnClientId')]",
-            "Secret": "[parameters('spnClientSecret')]"
-          },
-          "identity": {
-            "type": "SystemAssigned"
-          }
-        }
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location of the Managed Cluster resource"
+      }
+    },
+    "dnsPrefixPrimary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
+    "dnsPrefixSecondary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
+    "osDiskSizeGB": {
+      "type": "int",
+      "defaultValue": 0,
+      "minValue": 0,
+      "maxValue": 1023,
+      "metadata": {
+        "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize"
+      }
+    },
+    "agentCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "minValue": 1,
+      "maxValue": 50,
+      "metadata": {
+        "description": "The number of nodes for the cluster"
+      }
+    },
+    "agentVMSize": {
+      "type": "string",
+      "defaultValue": "Standard_D8s_v4",
+      "metadata": {
+        "description": "The size of the Virtual Machine"
+      }
+    },
+    "linuxAdminUsername": {
+      "type": "string",
+      "defaultValue": "arcdemo",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines"
+      }
+    },
+    "sshRSAPublicKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
+      }
+    },
+    "enableRBAC": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "boolean flag to turn on and off of RBAC"
+      }
+    },
+    "osType": {
+      "type": "string",
+      "defaultValue": "Linux",
+      "allowedValues": [
+        "Linux"
+      ],
+      "metadata": {
+        "description": "The type of operating system"
+      }
+    },
+    "kubernetesVersion": {
+      "type": "string",
+      "defaultValue": "1.28.9",
+      "metadata": {
+        "description": "The version of Kubernetes"
+      }
+    },
+    "namingPrefix": {
+      "type": "string",
+      "defaultValue": "ArcBox",
+      "maxLength": 7,
+      "metadata": {
+        "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
+      }
+    }
+  },
+  "variables": {
+    "serviceCidr_primary": "10.20.64.0/19",
+    "dnsServiceIP_primary": "10.20.64.10",
+    "serviceCidr_secondary": "172.20.64.0/19",
+    "dnsServiceIP_secondary": "172.20.64.10",
+    "virtualNetworkName": "[format('{0}-VNet', parameters('namingPrefix'))]",
+    "aksSubnetName": "[format('{0}-AKS-Subnet', parameters('namingPrefix'))]",
+    "drVirtualNetworkName": "[format('{0}-DR-VNet', parameters('namingPrefix'))]",
+    "drSubnetName": "[format('{0}-DR-Subnet', parameters('namingPrefix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-04-02-preview",
+      "name": "[parameters('aksClusterName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
       },
-      {
-        "apiVersion": "2024-02-02-preview",
-        "type": "Microsoft.ContainerService/managedClusters",
-        "location": "[parameters('location')]",
-        "name": "[parameters('drClusterName')]",
-        "properties": {
-          "kubernetesVersion": "[parameters('kubernetesVersion')]",
-          "enableRBAC": "[parameters('enableRBAC')]",
-          "dnsPrefix": "[parameters('dnsPrefixSecondary')]",
-          "aadProfile": {
-            "managed": true
-          },
-          "agentPoolProfiles": [
-            {
-              "name": "agentpool",
-              "mode": "System",
-              "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
-              "count": "[parameters('agentCount')]",
-              "vmSize": "[parameters('agentVMSize')]",
-              "osType": "[parameters('osType')]",
-              "storageProfile": "ManagedDisks",
-              "type": "VirtualMachineScaleSets",
-              "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('drVirtualNetworkName'),variables('drSubnetName'))]"
-            }
-          ],
-          "networkProfile": {
-            "networkPlugin": "azure",
-            "serviceCidr": "[variables('serviceCidr-secondary')]",
-            "dnsServiceIP": "[variables('dnsServiceIP-secondary')]"
-          },
-          "linuxProfile": {
-            "adminUsername": "[parameters('linuxAdminUsername')]",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "keyData": "[parameters('sshRSAPublicKey')]"
-                }
-              ]
-            }
-          },
-          "autoUpgradeProfile": {
-            "upgradeChannel": "stable",
-            "nodeOSUpgradeChannel": "NodeImage"
-          },
-          "servicePrincipalProfile": {
-            "clientId": "[parameters('spnClientId')]",
-            "Secret": "[parameters('spnClientSecret')]"
-          },
-          "identity": {
-            "type": "SystemAssigned"
+      "properties": {
+        "kubernetesVersion": "[parameters('kubernetesVersion')]",
+        "enableRBAC": "[parameters('enableRBAC')]",
+        "dnsPrefix": "[parameters('dnsPrefixPrimary')]",
+        "aadProfile": {
+          "managed": true
+        },
+        "agentPoolProfiles": [
+          {
+            "name": "agentpool",
+            "mode": "System",
+            "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+            "count": "[parameters('agentCount')]",
+            "vmSize": "[parameters('agentVMSize')]",
+            "osType": "[parameters('osType')]",
+            "type": "VirtualMachineScaleSets",
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('aksSubnetName'))]"
+          }
+        ],
+        "storageProfile": {
+          "diskCSIDriver": {
+            "enabled": true
+          }
+        },
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "serviceCidr": "[variables('serviceCidr_primary')]",
+          "dnsServiceIP": "[variables('dnsServiceIP_primary')]"
+        },
+        "autoUpgradeProfile": {
+          "nodeOSUpgradeChannel": "NodeImage",
+          "upgradeChannel": "stable"
+        },
+        "linuxProfile": {
+          "adminUsername": "[parameters('linuxAdminUsername')]",
+          "ssh": {
+            "publicKeys": [
+              {
+                "keyData": "[parameters('sshRSAPublicKey')]"
+              }
+            ]
           }
         }
       }
-    ]
-  }
+    },
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-04-02-preview",
+      "name": "[parameters('drClusterName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "kubernetesVersion": "[parameters('kubernetesVersion')]",
+        "enableRBAC": "[parameters('enableRBAC')]",
+        "dnsPrefix": "[parameters('dnsPrefixSecondary')]",
+        "aadProfile": {
+          "managed": true
+        },
+        "agentPoolProfiles": [
+          {
+            "name": "agentpool",
+            "mode": "System",
+            "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+            "count": "[parameters('agentCount')]",
+            "vmSize": "[parameters('agentVMSize')]",
+            "osType": "[parameters('osType')]",
+            "type": "VirtualMachineScaleSets",
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('drVirtualNetworkName'), variables('drSubnetName'))]"
+          }
+        ],
+        "storageProfile": {
+          "diskCSIDriver": {
+            "enabled": true
+          }
+        },
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "serviceCidr": "[variables('serviceCidr_secondary')]",
+          "dnsServiceIP": "[variables('dnsServiceIP_secondary')]"
+        },
+        "linuxProfile": {
+          "adminUsername": "[parameters('linuxAdminUsername')]",
+          "ssh": {
+            "publicKeys": [
+              {
+                "keyData": "[parameters('sshRSAPublicKey')]"
+              }
+            ]
+          }
+        },
+        "autoUpgradeProfile": {
+          "nodeOSUpgradeChannel": "NodeImage",
+          "upgradeChannel": "stable"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName'))]"
+      ]
+    }
+  ]
+}

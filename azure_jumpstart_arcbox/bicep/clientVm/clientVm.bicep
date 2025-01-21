@@ -20,7 +20,7 @@ param rdpPort string = '3389'
 param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
-param windowsOSVersion string = '2022-datacenter-g2'
+param windowsOSVersion string = '2025-datacenter-g2'
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -115,15 +115,26 @@ param addsDomainName string = 'jumpstart.local'
 param customLocationRPOID string = ''
 
 @description('The SKU of the VMs disk')
-param vmsDiskSku string = 'Premium_LRS'
+param vmsDiskSku string = 'PremiumV2_LRS'
 
 @description('Use this parameter to enable or disable debug mode for the automation scripts on the client VM, effectively configuring PowerShell ErrorActionPreference to Break. Default is false.')
 param debugEnabled bool = false
 
-param autoShutdownEnabled bool = false
+param autoShutdownEnabled bool = true
 param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm format (24-hour clock)
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
+
+@description('The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM')
+@allowed([
+  '1'
+  '2'
+  '3'
+])
+param zones string = '1'
+
+@description('Option to enable spot pricing for the ArcBox Client VM')
+param enableAzureSpotPricing bool = false
 
 var bastionName = '${namingPrefix}-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -154,19 +165,21 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
+  zones: [zones]
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
 }
 
 resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
   location: location
   name: '${vmName}-VMsDisk'
+  zones: [zones]
   sku: {
     name: vmsDiskSku
   }
@@ -174,14 +187,17 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
     creationData: {
       createOption: 'Empty'
     }
-    diskSizeGB: 1024
-    burstingEnabled: true
+    diskSizeGB: 256
+    burstingEnabled: false
+    diskMBpsReadWrite: 200
+    diskIOPSReadWrite: 5000
   }
 }
 
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
+  zones: [zones]
   identity: {
     type: 'SystemAssigned'
   }
@@ -197,7 +213,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         managedDisk: {
           storageAccountType: osDiskType
         }
-        diskSizeGB: 1024
+        diskSizeGB: 127
       }
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
@@ -228,9 +244,14 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       adminPassword: windowsAdminPassword
       windowsConfiguration: {
         provisionVMAgent: true
-        enableAutomaticUpdates: false
+        enableAutomaticUpdates: true
       }
     }
+    priority: enableAzureSpotPricing ? 'Spot' : 'Regular'
+    evictionPolicy: enableAzureSpotPricing ? 'Deallocate' : null
+    billingProfile: enableAzureSpotPricing ? {
+      maxPrice: -1
+    } : null
   }
 }
 
@@ -250,7 +271,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -tenantId ${tenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -k3sArcDataClusterName ${k3sArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -aksArcClusterName ${aksArcClusterName} -aksdrArcClusterName ${aksdrArcClusterName} -githubUser ${githubUser} -githubBranch ${githubBranch} -vmAutologon ${vmAutologon} -rdpPort ${rdpPort} -addsDomainName ${addsDomainName} -customLocationRPOID ${customLocationRPOID} -resourceTags ${resourceTags} -namingPrefix ${namingPrefix} -debugEnabled ${debugEnabled} -sqlServerEdition ${sqlServerEdition}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -tenantId ${tenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -k3sArcDataClusterName ${k3sArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -aksArcClusterName ${aksArcClusterName} -aksdrArcClusterName ${aksdrArcClusterName} -githubUser ${githubUser} -githubBranch ${githubBranch} -vmAutologon ${vmAutologon} -rdpPort ${rdpPort} -addsDomainName ${addsDomainName} -customLocationRPOID ${customLocationRPOID} -resourceTags ${resourceTags} -namingPrefix ${namingPrefix} -debugEnabled ${debugEnabled} -sqlServerEdition ${sqlServerEdition} -autoShutdownEnabled ${autoShutdownEnabled}'
     }
   }
 }
