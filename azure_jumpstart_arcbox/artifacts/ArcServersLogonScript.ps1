@@ -18,7 +18,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/prod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -447,13 +447,13 @@ $payLoad = @"
         $DeploymentProgressString = "Downloading and configuring nested VMs"
 
         $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
-    
+
         if ($null -ne $tags) {
             $tags["DeploymentProgress"] = $DeploymentProgressString
         } else {
             $tags = @{"DeploymentProgress" = $DeploymentProgressString}
         }
-    
+
         $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
         $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
