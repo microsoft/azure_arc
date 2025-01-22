@@ -1,4 +1,4 @@
-function Get-K3sConfigFile {
+function Get-K3sConfigFileContosoMotors {
     # Downloading k3s Kubernetes cluster kubeconfig file
     Write-Host "Downloading k3s Kubeconfigs"
     $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"

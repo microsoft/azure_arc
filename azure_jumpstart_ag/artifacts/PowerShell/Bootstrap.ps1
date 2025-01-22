@@ -33,7 +33,8 @@ param (
   [string]$openAIEndpoint,
   [string]$speachToTextEndpoint,
   [object]$azureOpenAIModel,
-  [string]$openAIDeploymentName
+  [string]$openAIDeploymentName,
+  [string]$AZCOPY_AUTO_LOGIN_TYPE
 )
 
 ##############################################################
