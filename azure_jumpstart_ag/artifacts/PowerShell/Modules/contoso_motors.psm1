@@ -1,13 +1,13 @@
-function Get-K3sConfigFile {
+function Get-K3sConfigFileContosoMotors {
     # Downloading k3s Kubernetes cluster kubeconfig file
     Write-Host "Downloading k3s Kubeconfigs"
-    $Env:AZCOPY_AUTO_LOGIN_TYPE = "PSCRED"
+    $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $containerName = $arcClusterName.toLower()
         $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
-        azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
+        azcopy cp $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
         $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
         azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "$AgLogsDir\" --include-pattern "*.log"
     }
@@ -129,13 +129,13 @@ function Set-K3sClusters {
 
 function Deploy-MotorsConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
-    $VMs = (Get-VM).Name
-    foreach ($VM in $VMs) {
-        Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
-            Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        if ($cluster.Value.Type -eq "k3s") {
+            Invoke-Expression "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+            kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+ 
         }
-        kubectx $VM.ToLower()
-        kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
     }
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-motors.psd

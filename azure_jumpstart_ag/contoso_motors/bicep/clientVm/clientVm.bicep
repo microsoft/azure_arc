@@ -130,6 +130,9 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2023-02-01' = if (
 resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: vmName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   tags: resourceTags
   properties: {
     hardwareProfile: {
@@ -208,6 +211,17 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       ]
       commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -vmAutologon ${vmAutologon}'
     }
+  }
+}
+
+// Add role assignment for the VM: Storage Blob Data Contributor
+resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
   }
 }
 
