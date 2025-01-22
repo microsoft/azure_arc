@@ -129,13 +129,13 @@ function Set-K3sClusters {
 
 function Deploy-MotorsConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
-    $VMs = (Get-VM).Name
-    foreach ($VM in $VMs) {
-        Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
-            Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        if ($cluster.Value.Type -eq "k3s") {
+            Invoke-Expression "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+            kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+ 
         }
-        kubectx $VM.ToLower()
-        kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
     }
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-motors.psd
