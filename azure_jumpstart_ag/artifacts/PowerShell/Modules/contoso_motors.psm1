@@ -1,13 +1,13 @@
 function Get-K3sConfigFile {
     # Downloading k3s Kubernetes cluster kubeconfig file
     Write-Host "Downloading k3s Kubeconfigs"
-    $Env:AZCOPY_AUTO_LOGIN_TYPE = "PSCRED"
+    $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $containerName = $arcClusterName.toLower()
         $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
-        azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
+        azcopy cp $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
         $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
         azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "$AgLogsDir\" --include-pattern "*.log"
     }

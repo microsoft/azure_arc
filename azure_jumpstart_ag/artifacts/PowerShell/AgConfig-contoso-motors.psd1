@@ -57,12 +57,12 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="latest"}
     )
 
     # PowerShell modules
     PowerShellModules       = @(
-        @{name='Az.ConnectedKubernetes'; version="0.10.3"},
+        @{name='Az.ConnectedKubernetes'; version="latest"},
         @{name='Az.KubernetesConfiguration'; version="latest"},
         @{name='Az.Kusto'; version="latest"},
         @{name='Az.EventGrid'; version="latest"},
