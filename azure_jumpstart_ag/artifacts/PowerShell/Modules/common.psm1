@@ -1269,37 +1269,14 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        Write-Host "Completed the az config set extension command"
         az connectedk8s enable-features --name $arcClusterName `
         --resource-group $resourceGroup `
         --features cluster-connect custom-locations `
         --custom-locations-oid $customLocationRPOID `
         --only-show-errors
-        Write-Host "az connectedk8s enable-features --name $arcClusterName command"
         Start-Sleep -Seconds 10
 
         do {
-            if($scenario -eq 'contoso_motors'){
-                az iot ops init --cluster $arcClusterName.toLower() `
-                --resource-group $resourceGroup `
-                --subscription $subscriptionId `
-                --only-show-errors
-            if ($? -eq $false) {
-                $aioStatus = "notDeployed"
-                Write-Host "`n"
-                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
-                Write-Host "`n"
-                az iot ops init --cluster $arcClusterName.toLower() `
-                    --resource-group $resourceGroup `
-                    --subscription $subscriptionId `
-                    --only-show-errors
-                $retryCount++
-            }
-            else {
-                $aioStatus = "deployed"
-            }
-        }
-        else {
             az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
@@ -1312,7 +1289,6 @@ function Deploy-AIO {
             else {
                 $aioStatus = "deployed"
             }            
-        }
         } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
         $kvIndex++
     }

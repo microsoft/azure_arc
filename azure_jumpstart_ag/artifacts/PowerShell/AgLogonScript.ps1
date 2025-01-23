@@ -234,7 +234,7 @@ if ($scenario -eq "contoso_supermarket") {
 
 if ($scenario -eq "contoso_motors") {
     Update-AzureIoTOpsExtension
-    Deploy-AIO
+    Deploy-AIO-M3
     Deploy-MotorsConfigs
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
