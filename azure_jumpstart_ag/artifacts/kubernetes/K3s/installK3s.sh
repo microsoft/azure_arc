@@ -320,7 +320,7 @@ storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
 
 # Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
-if [[ "$scenario" == "contoso-motors" ]]; then
+if [[ "$scenario" == "contoso_motors" ]]; then
     echo "Running curl command to install OpenVINO Toolkit Operator"
     curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
     sleep 10
