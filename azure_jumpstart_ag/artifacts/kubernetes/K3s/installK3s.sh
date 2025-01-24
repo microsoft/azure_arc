@@ -18,6 +18,7 @@ echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
 echo $resourceGroup:$10| awk '{print substr($1,2); }' >> vars.sh
 echo $deployGPUNodes:$11| awk '{print substr($1,2); }' >> vars.sh
+echo $scenario:$12| awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
@@ -317,5 +318,14 @@ exec 1>&3 2>&4 # Further commands will now output to the original stdout and std
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
+
+# Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
+if [[ "$scenario" == "contoso-motors" ]]; then
+    echo "Running curl command to install OpenVINO Toolkit Operator"
+    curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
+    sleep 10
+    echo "Installing operator via kubectl"
+    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+fi
 
 exit 0
