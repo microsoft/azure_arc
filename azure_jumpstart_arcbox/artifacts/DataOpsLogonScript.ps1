@@ -33,14 +33,6 @@ foreach ($key in $keys) {
     }
 }
 
-# Create Windows Terminal desktop shortcut
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
 $LogsPath = "C:\ArcBox\Logs"
@@ -402,7 +394,7 @@ Stop-Transcript
 wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-k3s-data" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
-$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
+$clusters | Foreach-Object {
     $cluster = $_
     $context = $cluster.context
     $clusterName = $cluster.clusterName
@@ -438,13 +430,21 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             Write-Host "Creating custom location on $clusterName"
-            #kubectx $cluster.context | Out-Null
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
-            Start-Sleep -Seconds 10
+            if ($context -ne 'k3s') {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            } else {
+
+              az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            }
+
+            Start-Sleep -Seconds 30
 
             try {
                 az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
@@ -453,7 +453,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
                 Exit 1
             }
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 30
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context
@@ -465,7 +465,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $dataController | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
@@ -548,24 +548,7 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Get-process WindowsTerminal | Stop-Process -Force
-
 # Changing to Jumpstart ArcBox wallpaper
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
-
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-
-            public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-            }
-        }
-    }
-'@
-
 
   Write-Header "Changing wallpaper"
 
@@ -573,8 +556,6 @@ namespace Win32{
   Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
 
   Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
-
-
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
@@ -587,15 +568,3 @@ Start-Sleep -Seconds 5
 Write-Header "Running tests to verify infrastructure"
 
 & "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
-
-Write-Header "Creating deployment logs bundle"
-
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
-$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
-
-#required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
-
-Stop-Transcript

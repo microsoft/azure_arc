@@ -123,7 +123,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$HCIPath\WinGet.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/azcopy_install.ps1") -OutFile "$HCIPath\azcopy_install.ps1"
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
