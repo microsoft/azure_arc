@@ -204,6 +204,7 @@ function Deploy-AIO-M3 {
                 --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
                 --query id -o tsv)
 
+        Write-Host "[$(Get-Date -Format t)] INFO: The aio storage account name is: $aioStorageAccountName" -ForegroundColor DarkGray
         Write-Host "[$(Get-Date -Format t)] INFO: the schemaId is '$schemaId' - verify this" -ForegroundColor DarkGray
 
         $customLocationName = $arcClusterName.toLower() + "-cl"
