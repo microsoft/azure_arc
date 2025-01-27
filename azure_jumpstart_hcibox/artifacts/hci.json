@@ -556,8 +556,9 @@
         },
         "kind": "StorageV2",
         "properties": {
+          "allowSharedKeyAccess": false,
           "supportsHttpsTrafficOnly": true,
-           "minimumTlsVersion": "TLS1_2"
+          "minimumTlsVersion": "TLS1_2"
         }
       },
       {
@@ -661,6 +662,7 @@
         "kind": "StorageV2",
         "properties": {
           "publicNetworkAccess": "Disabled",
+          "allowSharedKeyAccess": false,
           "supportsHttpsTrafficOnly": true,
            "minimumTlsVersion": "TLS1_2",
            "networkAcls": {
