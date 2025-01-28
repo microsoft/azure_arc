@@ -49,6 +49,9 @@ if ($scenario -eq "contoso_supermarket") {
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
+    $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
+    $global:k3sArcClusterName = $Env:k3sArcClusterName
+    $global:tenantId = $Env:tenantId
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:appUpstreamRepo = "https://github.com/Azure/jumpstart-apps"
     $global:tenantId = $Env:tenantId
@@ -234,9 +237,9 @@ if ($scenario -eq "contoso_supermarket") {
 
 if ($scenario -eq "contoso_motors") {
     Deploy-AIO-M3
-    Deploy-MotorsConfigs
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    Deploy-MotorsConfigs
 }elseif($scenario -eq "contoso_hypermarket"){
     Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
