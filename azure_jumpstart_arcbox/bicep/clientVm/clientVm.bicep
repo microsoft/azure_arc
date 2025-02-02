@@ -272,7 +272,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
   }
 }
 
-// Add role assignment for the VM: Azure Key Vault Secret Officer role
+// Add role assignment for the VM: Azure Key Vault Administrator role
 resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Administrator')
   scope: resourceGroup()
@@ -281,6 +281,16 @@ resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAss
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
     principalType: 'ServicePrincipal'
 
+  }
+}
+
+// Add role assignment for the deploy user: Azure Key Vault Administrator role
+resource deployerRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(deployer().objectId, 'Microsoft.Authorization/roleAssignments', 'Administrator')
+  scope: resourceGroup()
+  properties: {
+    principalId: deployer().objectId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
   }
 }
 
