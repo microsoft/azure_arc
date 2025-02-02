@@ -99,6 +99,9 @@ param enableAzureSpotPricing bool = false
 ])
 param zones string = '1'
 
+@secure()
+param registryPassword string = newGuid()
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
 var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
@@ -181,7 +184,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
-    azdataPassword: windowsAdminPassword
     tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
@@ -235,6 +237,8 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
     resourceTags: resourceTags
     namingPrefix: namingPrefix
+    windowsAdminPassword: windowsAdminPassword
+    registryPassword: registryPassword
   }
 }
 
