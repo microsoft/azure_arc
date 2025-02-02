@@ -182,10 +182,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-$adminPassword = Get-Secret -Name adminPassword -Secret $adminPassword -AsPlainText
-
-Write-Output "Added the following secrets to Azure Key Vault"
-Get-SecretInfo
+$adminPassword = Get-Secret -Name adminPassword -AsPlainText
 
 # Temporarily disabling Azure VM Auto-shutdown while automation is in progress
 if ($autoShutdownEnabled -eq "true") {
