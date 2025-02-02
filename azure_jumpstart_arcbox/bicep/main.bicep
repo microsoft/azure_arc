@@ -12,7 +12,7 @@ param windowsAdminUsername string
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string  = newGuid()
 
 @description('Enable automatic logon into ArcBox Virtual Machine')
 param vmAutologon bool = true
