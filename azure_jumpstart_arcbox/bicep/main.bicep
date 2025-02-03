@@ -21,7 +21,7 @@ param vmAutologon bool = true
 param rdpPort string = '3389'
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string
+param logAnalyticsWorkspaceName string = 'ArcBox-la'
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
