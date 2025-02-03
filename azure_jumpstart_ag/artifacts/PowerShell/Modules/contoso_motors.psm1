@@ -17,8 +17,8 @@ function Merge-K3sConfigFiles {
 
     $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
 
-    $kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
-    $kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    $kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-detroit"
+    $kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-monterrey"
 
     # Extract base file names (without extensions) to use as new names
     $suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig1Path)
@@ -84,8 +84,8 @@ function Merge-K3sConfigFiles {
     $mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
 
     Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
-    kubectx seattle="ag-k3s-seattle"
-    kubectx chicago="ag-k3s-chicago"
+    kubectx detroit="ag-k3s-detroit"
+    kubectx monterrey="ag-k3s-monterrey"
 
 }
 

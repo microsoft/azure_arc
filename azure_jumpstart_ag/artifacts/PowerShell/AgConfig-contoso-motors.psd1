@@ -147,10 +147,10 @@
 
     # Site Kubernetes cluster configurations
     SiteConfig              = @{
-        Seattle = @{
-            ArcClusterName         = "Ag-K3s-Seattle"
-            FriendlyName           = "Seattle"
-            GrafanaDataSource      = "seattle"
+        Detroit = @{
+            ArcClusterName         = "Ag-K3s-Detroit"
+            FriendlyName           = "Detroit"
+            GrafanaDataSource      = "detroit"
             Type                   = "k3s"
             Branch                 = "main"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
@@ -158,10 +158,10 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             IsProduction           = $true
         }
-        Chicago = @{
-            ArcClusterName         = "Ag-K3s-Chicago"
-            FriendlyName           = "Chicago"
-            GrafanaDataSource      = "chicago"
+        Monterrey = @{
+            ArcClusterName         = "Ag-K3s-Monterrey"
+            FriendlyName           = "Monterrey"
+            GrafanaDataSource      = "monterrey"
             Type                   = "k3s"
             Branch                 = "main"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
