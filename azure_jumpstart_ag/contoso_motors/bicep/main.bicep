@@ -34,10 +34,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
-param githubAccount string = 'nabeelmsft'
+param githubAccount string = 'mrhoads'
 
 @description('Target GitHub branch')
-param githubBranch string = 'contosomotorswork'
+param githubBranch string = 'mike-contoso-motors-20250203'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -82,10 +82,10 @@ param adxClusterName string = 'agadx${namingGuid}'
 param customLocationRPOID string
 
 @description('The name of the Azure Arc K3s cluster')
-param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
+param k3sArcDataClusterName string = 'Ag-K3s-Detroit-${namingGuid}'
 
 @description('The name of the Azure Arc K3s data cluster')
-param k3sArcClusterName string = 'Ag-K3s-Chicago-${namingGuid}'
+param k3sArcClusterName string = 'Ag-K3s-Monterrey-${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
