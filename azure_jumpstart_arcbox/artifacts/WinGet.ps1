@@ -4,6 +4,7 @@ $Env:ArcBoxDir = 'C:\ArcBox'
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
+$resourceGroup = $env:resourceGroup
 
 $logFilePath = Join-Path -Path $Env:ArcBoxLogsDir -ChildPath ('WinGet-provisioning-' + (Get-Date -Format 'yyyyMMddHHmmss') + '.log')
 

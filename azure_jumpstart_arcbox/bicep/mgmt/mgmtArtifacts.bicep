@@ -62,6 +62,15 @@ param resourceTags object = {
 @description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
 param namingPrefix string = 'ArcBox'
 
+@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
+@minLength(12)
+@maxLength(123)
+@secure()
+param windowsAdminPassword string?
+
+@secure()
+param registryPassword string?
+
 var keyVaultName = toLower('${namingPrefix}${uniqueString(resourceGroup().id)}')
 
 var security = {
@@ -547,6 +556,35 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
     enableSoftDelete: true
     location: location
   }
+}
+
+resource kv 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+  dependsOn: [
+    keyVault
+  ]
+}
+
+resource windowsAdminPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(windowsAdminPassword)) {
+  name: 'windowsAdminPassword'
+  parent: kv
+  properties: {
+    value: windowsAdminPassword
+  }
+  dependsOn: [
+    keyVault
+  ]
+}
+
+resource registryPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(registryPassword)) {
+  name: 'registryPassword'
+  parent: kv
+  properties: {
+    value: registryPassword
+  }
+  dependsOn: [
+    keyVault
+  ]
 }
 
 output vnetId string = arcVirtualNetwork.id

@@ -1,17 +1,13 @@
 param (
     [string]$adminUsername,
-    [string]$adminPassword,
     [string]$spnClientId,
-    [string]$spnClientSecret,
     [string]$tenantId,
     [string]$spnAuthority,
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$azdataUsername,
-    [string]$azdataPassword,
     [string]$acceptEula,
     [string]$registryUsername,
-    [string]$registryPassword,
     [string]$arcDcName,
     [string]$azureLocation,
     [string]$mssqlmiName,
@@ -186,12 +182,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-Set-Secret -Name adminPassword -Secret $adminPassword
-Set-Secret -Name AZDATAPASSWORD -Secret $azdataPassword
-Set-Secret -Name registryPassword -Secret $registryPassword
-
-Write-Output "Added the following secrets to Azure Key Vault"
-Get-SecretInfo
+$adminPassword = Get-Secret -Name windowsAdminPassword -AsPlainText
 
 # Temporarily disabling Azure VM Auto-shutdown while automation is in progress
 if ($autoShutdownEnabled -eq "true") {
