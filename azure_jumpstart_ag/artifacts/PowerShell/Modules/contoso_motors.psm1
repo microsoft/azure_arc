@@ -13,7 +13,7 @@ function Get-K3sConfigFileContosoMotors {
     }
 }
 
-function Merge-K3sConfigFiles {
+function Merge-K3sConfigFilesContosoMotors{
 
     $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
 

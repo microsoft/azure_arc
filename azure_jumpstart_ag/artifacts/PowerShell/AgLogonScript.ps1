@@ -168,7 +168,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 if($scenario -eq "contoso_hypermarket" -or $scenario -eq "contoso_motors"){
     Get-K3sConfigFileContosoMotors 
-    Merge-K3sConfigFiles
+    Merge-K3sConfigFilesContosoMotors
     Set-K3sClusters
 }
 
