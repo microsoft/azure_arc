@@ -6,35 +6,35 @@ trigger:
 variables:
   - group: hcibox-deployment  # Must contain all variables below
   - name: spnClientId
-    value: ${{ variables.spnClientId }}
+    value: $(spnClientId)
   - name: spnClientSecret
-    value: ${{ variables.spnClientSecret }}
+    value: $(spnClientSecret)
   - name: spnTenantId
-    value: ${{ variables.spnTenantId }}
+    value: $(spnTenantId)
   - name: spnProviderId
-    value: ${{ variables.spnProviderId }}
+    value: $(spnProviderId)
   - name: subscriptionId
-    value: ${{ variables.subscriptionId }}
+    value: $(subscriptionId)
   - name: resourceGroupName
-    value: ${{ variables.resourceGroupName }}
+    value: $(resourceGroupName)
   - name: location
     value: 'eastus'
   - name: windowsAdminUsername
-    value: ${{ variables.windowsAdminUsername }}
+    value: $(windowsAdminUsername)
   - name: windowsAdminPassword
-    value: ${{ variables.windowsAdminPassword }}
+    value: $(windowsAdminPassword)
   - name: logAnalyticsWorkspaceName
-    value: ${{ variables.logAnalyticsWorkspaceName }}
+    value: $(logAnalyticsWorkspaceName)
   - name: deployBastion
-    value: ${{ variables.deployBastion }}
+    value: $(deployBastion)
   - name: autoDeployClusterResource
-    value: ${{ variables.autoDeployClusterResource }}
+    value: $(autoDeployClusterResource)
   - name: autoUpgradeClusterResource
-    value: ${{ variables.autoUpgradeClusterResource }}
+    value: $(autoUpgradeClusterResource)
   - name: githubAccount
-    value: ${{ variables.githubAccount }}
+    value: $(githubAccount)
   - name: githubBranch
-    value: ${{ variables.githubBranch }}
+    value: $(githubBranch)
 
 pool:
   vmImage: 'windows-latest'
