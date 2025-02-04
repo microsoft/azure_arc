@@ -45,7 +45,24 @@ steps:
     azureSubscription: 'HCIBox-ServiceConnection'
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
     inlineScript: |
+      # Map pipeline variables to environment variables
+      $env:resourceGroupName = "$(resourceGroupName)"
+      $env:location = "$(location)"
+      $env:spnClientId = "$(spnClientId)"
+      $env:spnClientSecret = "$(spnClientSecret)"
+      $env:spnTenantId = "$(spnTenantId)"
+      $env:spnProviderId = "$(spnProviderId)"
+      $env:windowsAdminUsername = "$(windowsAdminUsername)"
+      $env:windowsAdminPassword = "$(windowsAdminPassword)"
+      $env:logAnalyticsWorkspaceName = "$(logAnalyticsWorkspaceName)"
+      $env:deployBastion = "$(deployBastion)"
+      $env:autoDeployClusterResource = "$(autoDeployClusterResource)"
+      $env:autoUpgradeClusterResource = "$(autoUpgradeClusterResource)"
+      $env:githubAccount = "$(githubAccount)"
+      $env:githubBranch = "$(githubBranch)"
+
       # Diagnostic check for required variables
       Write-Host "Checking required variables..."
       $requiredVars = @(
