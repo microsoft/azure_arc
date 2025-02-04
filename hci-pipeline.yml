@@ -43,46 +43,46 @@ steps:
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'HCIBox-ServiceConnection'
-    scriptType: 'ps'
+    scriptType: 'bash'
     scriptLocation: 'inlineScript'
     addSpnToEnvironment: true
     inlineScript: |
-      Write-Host "Checking required variables..."
-      Write-Host "resourceGroupName: $(resourceGroupName)"
-      Write-Host "location: $(location)"
-      Write-Host "spnClientId: $(spnClientId)"
-      Write-Host "spnClientSecret: ***" # Masked for security
-      Write-Host "spnTenantId: $(spnTenantId)"
-      Write-Host "spnProviderId: $(spnProviderId)"
-      Write-Host "windowsAdminUsername: $(windowsAdminUsername)"
-      Write-Host "windowsAdminPassword: ***" # Masked for security
-      Write-Host "logAnalyticsWorkspaceName: $(logAnalyticsWorkspaceName)"
-      Write-Host "deployBastion: $(deployBastion)"
-      Write-Host "autoDeployClusterResource: $(autoDeployClusterResource)"
-      Write-Host "autoUpgradeClusterResource: $(autoUpgradeClusterResource)"
-      Write-Host "githubAccount: $(githubAccount)"
-      Write-Host "githubBranch: $(githubBranch)"
+      echo "Checking required variables..."
+      echo "resourceGroupName: $(resourceGroupName)"
+      echo "location: $(location)"
+      echo "spnClientId: $(spnClientId)"
+      echo "spnClientSecret: ***"
+      echo "spnTenantId: $(spnTenantId)"
+      echo "spnProviderId: $(spnProviderId)"
+      echo "windowsAdminUsername: $(windowsAdminUsername)"
+      echo "windowsAdminPassword: ***"
+      echo "logAnalyticsWorkspaceName: $(logAnalyticsWorkspaceName)"
+      echo "deployBastion: $(deployBastion)"
+      echo "autoDeployClusterResource: $(autoDeployClusterResource)"
+      echo "autoUpgradeClusterResource: $(autoUpgradeClusterResource)"
+      echo "githubAccount: $(githubAccount)"
+      echo "githubBranch: $(githubBranch)"
       
       # Create resource group
-      Write-Host "Creating resource group: $(resourceGroupName) in $(location)"
+      echo "Creating resource group: $(resourceGroupName) in $(location)"
       az group create --name "$(resourceGroupName)" --location "$(location)"
       
       # Deploy main template
-      Write-Host "Starting deployment to resource group: $(resourceGroupName)"
-      az deployment group create `
-        --resource-group "$(resourceGroupName)" `
-        --template-file "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" `
-        --parameters `
-          spnClientId="$(spnClientId)" `
-          spnClientSecret="$(spnClientSecret)" `
-          spnTenantId="$(spnTenantId)" `
-          spnProviderId="$(spnProviderId)" `
-          windowsAdminUsername="$(windowsAdminUsername)" `
-          windowsAdminPassword="$(windowsAdminPassword)" `
-          logAnalyticsWorkspaceName="$(logAnalyticsWorkspaceName)" `
-          deployBastion="$(deployBastion)" `
-          autoDeployClusterResource="$(autoDeployClusterResource)" `
-          autoUpgradeClusterResource="$(autoUpgradeClusterResource)" `
-          githubAccount="$(githubAccount)" `
-          githubBranch="$(githubBranch)" `
+      echo "Starting deployment to resource group: $(resourceGroupName)"
+      az deployment group create \
+        --resource-group "$(resourceGroupName)" \
+        --template-file "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" \
+        --parameters \
+          spnClientId="$(spnClientId)" \
+          spnClientSecret="$(spnClientSecret)" \
+          spnTenantId="$(spnTenantId)" \
+          spnProviderId="$(spnProviderId)" \
+          windowsAdminUsername="$(windowsAdminUsername)" \
+          windowsAdminPassword="$(windowsAdminPassword)" \
+          logAnalyticsWorkspaceName="$(logAnalyticsWorkspaceName)" \
+          deployBastion="$(deployBastion)" \
+          autoDeployClusterResource="$(autoDeployClusterResource)" \
+          autoUpgradeClusterResource="$(autoUpgradeClusterResource)" \
+          githubAccount="$(githubAccount)" \
+          githubBranch="$(githubBranch)" \
           location="$(location)"
