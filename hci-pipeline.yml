@@ -67,9 +67,9 @@ steps:
       
       $missingVars = @()
       foreach ($var in $requiredVars) {
-        $value = Get-Item "env:$var" -ErrorAction SilentlyContinue
-        Write-Host "$var: $($value.Value)"
-        if (-not $value) {
+        $value = (Get-Item env:$var -ErrorAction SilentlyContinue).Value
+        Write-Host "${var}: $value"
+        if ([string]::IsNullOrEmpty($value)) {
           $missingVars += $var
         }
       }
@@ -82,25 +82,25 @@ steps:
       Write-Host "All required variables are present. Proceeding with deployment..."
       
       # Create resource group
-      Write-Host "Creating resource group: $(resourceGroupName) in $(location)"
-      az group create --name "$(resourceGroupName)" --location "$(location)"
+      Write-Host "Creating resource group: $env:resourceGroupName in $env:location"
+      az group create --name "$env:resourceGroupName" --location "$env:location"
       
       # Deploy main template
-      Write-Host "Starting deployment to resource group: $(resourceGroupName)"
+      Write-Host "Starting deployment to resource group: $env:resourceGroupName"
       az deployment group create `
-        --resource-group "$(resourceGroupName)" `
+        --resource-group "$env:resourceGroupName" `
         --template-file "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" `
         --parameters `
-          spnClientId="$(spnClientId)" `
-          spnClientSecret="$(spnClientSecret)" `
-          spnTenantId="$(spnTenantId)" `
-          spnProviderId="$(spnProviderId)" `
-          windowsAdminUsername="$(windowsAdminUsername)" `
-          windowsAdminPassword="$(windowsAdminPassword)" `
-          logAnalyticsWorkspaceName="$(logAnalyticsWorkspaceName)" `
-          deployBastion="$(deployBastion)" `
-          autoDeployClusterResource="$(autoDeployClusterResource)" `
-          autoUpgradeClusterResource="$(autoUpgradeClusterResource)" `
-          githubAccount="$(githubAccount)" `
-          githubBranch="$(githubBranch)" `
-          location="$(location)"
+          spnClientId="$env:spnClientId" `
+          spnClientSecret="$env:spnClientSecret" `
+          spnTenantId="$env:spnTenantId" `
+          spnProviderId="$env:spnProviderId" `
+          windowsAdminUsername="$env:windowsAdminUsername" `
+          windowsAdminPassword="$env:windowsAdminPassword" `
+          logAnalyticsWorkspaceName="$env:logAnalyticsWorkspaceName" `
+          deployBastion="$env:deployBastion" `
+          autoDeployClusterResource="$env:autoDeployClusterResource" `
+          autoUpgradeClusterResource="$env:autoUpgradeClusterResource" `
+          githubAccount="$env:githubAccount" `
+          githubBranch="$env:githubBranch" `
+          location="$env:location"
