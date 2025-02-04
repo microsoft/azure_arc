@@ -44,9 +44,9 @@ steps:
     ScriptType: 'InlineScript'
     azurePowerShellVersion: 'LatestVersion'
     Inline: |
-      Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
+      Write-Host "Running deployment from machine $env:COMPUTERNAME"
       $RGname = "$(ResourceGroupName)"
-      New-AzResourceGroup -Name $RGname -Location "eastus"
+      New-AzResourceGroup -Name $RGname -Location "eastus" -Force
 
 - task: AzurePowerShell@5
   displayName: 'Deploy Bicep template'
@@ -58,16 +58,30 @@ steps:
       Write-Host "Deploying to $(ResourceGroupName)"
       $githubAccount = "$(githubAccount)"
       $githubBranch = "$(githubBranch)"
+      
+      # Set the current location to the repository root
+      Set-Location $(Build.SourcesDirectory)
+      
       if ($githubAccount -ne "microsoft") {
         Write-Host "Checking out $githubAccount/$githubBranch"
         git remote add upstream https://github.com/$($githubAccount)/azure_jumpstart_hcibox.git
         git fetch upstream
         git checkout -b $githubBranch upstream/$githubBranch
       }
+
+      # Verify the bicep file exists
+      $bicepPath = "azure_jumpstart_hcibox/bicep/main.bicep"
+      if (-not (Test-Path $bicepPath)) {
+          Write-Error "Bicep file not found at: $bicepPath"
+          exit 1
+      }
+      
+      Write-Host "Using bicep file at: $bicepPath"
+      
       New-AzResourceGroupDeployment -Name HCIBox `
-      -ResourceGroupName $(ResourceGroupName) `
-      -TemplateFile azure_jumpstart_hcibox/bicep/main.bicep `
-      -TemplateParameterObject @{
+        -ResourceGroupName $(ResourceGroupName) `
+        -TemplateFile $bicepPath `
+        -TemplateParameterObject @{
           spnClientId = "$(spnClientId)"
           spnClientSecret = "$(spnClientSecret)"
           spnTenantId = "$(spnTenantId)"
@@ -81,4 +95,4 @@ steps:
           githubAccount = "$(githubAccount)"
           githubBranch = "$(githubBranch)"
           location = "eastus"
-      }
+        }
