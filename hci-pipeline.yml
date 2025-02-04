@@ -3,38 +3,20 @@ trigger:
     include:
     - main
 
+parameters:
+- name: resourceGroupName
+  type: string
+  default: 'hcibox-test'
+- name: location
+  type: string
+  default: 'eastus'
+
 variables:
-  - group: hcibox-deployment  # Must contain all variables below
-  - name: spnClientId
-    value: $(spnClientId)
-  - name: spnClientSecret
-    value: $(spnClientSecret)
-  - name: spnTenantId
-    value: $(spnTenantId)
-  - name: spnProviderId
-    value: $(spnProviderId)
-  - name: subscriptionId
-    value: $(subscriptionId)
+  - group: hcibox-deployment  # Variable group containing secrets
   - name: resourceGroupName
-    value: $(resourceGroupName)
+    value: ${{ parameters.resourceGroupName }}
   - name: location
-    value: 'eastus'
-  - name: windowsAdminUsername
-    value: $(windowsAdminUsername)
-  - name: windowsAdminPassword
-    value: $(windowsAdminPassword)
-  - name: logAnalyticsWorkspaceName
-    value: $(logAnalyticsWorkspaceName)
-  - name: deployBastion
-    value: $(deployBastion)
-  - name: autoDeployClusterResource
-    value: $(autoDeployClusterResource)
-  - name: autoUpgradeClusterResource
-    value: $(autoUpgradeClusterResource)
-  - name: githubAccount
-    value: $(githubAccount)
-  - name: githubBranch
-    value: $(githubBranch)
+    value: ${{ parameters.location }}
 
 pool:
   vmImage: 'windows-latest'
@@ -47,42 +29,59 @@ steps:
     azurePowerShellVersion: 'LatestVersion'
     Inline: |
       Write-Host "Checking required variables..."
-      Write-Host "resourceGroupName: $(resourceGroupName)"
-      Write-Host "location: $(location)"
-      Write-Host "spnClientId: $(spnClientId)"
+      
+      # Store variables in PowerShell variables to avoid expansion issues
+      $resourceGroupName = "$(resourceGroupName)"
+      $location = "$(location)"
+      $spnClientId = "$(spnClientId)"
+      $spnClientSecret = "$(spnClientSecret)"
+      $spnTenantId = "$(spnTenantId)"
+      $spnProviderId = "$(spnProviderId)"
+      $windowsAdminUsername = "$(windowsAdminUsername)"
+      $windowsAdminPassword = "$(windowsAdminPassword)"
+      $logAnalyticsWorkspaceName = "$(logAnalyticsWorkspaceName)"
+      $deployBastion = [System.Convert]::ToBoolean("$(deployBastion)")
+      $autoDeployClusterResource = [System.Convert]::ToBoolean("$(autoDeployClusterResource)")
+      $autoUpgradeClusterResource = [System.Convert]::ToBoolean("$(autoUpgradeClusterResource)")
+      $githubAccount = "$(githubAccount)"
+      $githubBranch = "$(githubBranch)"
+
+      Write-Host "resourceGroupName: $resourceGroupName"
+      Write-Host "location: $location"
+      Write-Host "spnClientId: $spnClientId"
       Write-Host "spnClientSecret: ***"
-      Write-Host "spnTenantId: $(spnTenantId)"
-      Write-Host "spnProviderId: $(spnProviderId)"
-      Write-Host "windowsAdminUsername: $(windowsAdminUsername)"
+      Write-Host "spnTenantId: $spnTenantId"
+      Write-Host "spnProviderId: $spnProviderId"
+      Write-Host "windowsAdminUsername: $windowsAdminUsername"
       Write-Host "windowsAdminPassword: ***"
-      Write-Host "logAnalyticsWorkspaceName: $(logAnalyticsWorkspaceName)"
-      Write-Host "deployBastion: $(deployBastion)"
-      Write-Host "autoDeployClusterResource: $(autoDeployClusterResource)"
-      Write-Host "autoUpgradeClusterResource: $(autoUpgradeClusterResource)"
-      Write-Host "githubAccount: $(githubAccount)"
-      Write-Host "githubBranch: $(githubBranch)"
+      Write-Host "logAnalyticsWorkspaceName: $logAnalyticsWorkspaceName"
+      Write-Host "deployBastion: $deployBastion"
+      Write-Host "autoDeployClusterResource: $autoDeployClusterResource"
+      Write-Host "autoUpgradeClusterResource: $autoUpgradeClusterResource"
+      Write-Host "githubAccount: $githubAccount"
+      Write-Host "githubBranch: $githubBranch"
       
       # Create resource group
-      Write-Host "Creating resource group: $(resourceGroupName) in $(location)"
-      New-AzResourceGroup -Name "$(resourceGroupName)" -Location "$(location)"
+      Write-Host "Creating resource group: $resourceGroupName in $location"
+      New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
       
       # Deploy main template
-      Write-Host "Starting deployment to resource group: $(resourceGroupName)"
+      Write-Host "Starting deployment to resource group: $resourceGroupName"
       New-AzResourceGroupDeployment -Name HCIBox `
-        -ResourceGroupName "$(resourceGroupName)" `
+        -ResourceGroupName $resourceGroupName `
         -TemplateFile "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" `
         -TemplateParameterObject @{
-          spnClientId = "$(spnClientId)"
-          spnClientSecret = "$(spnClientSecret)"
-          spnTenantId = "$(spnTenantId)"
-          spnProviderId = "$(spnProviderId)"
-          windowsAdminUsername = "$(windowsAdminUsername)"
-          windowsAdminPassword = "$(windowsAdminPassword)"
-          logAnalyticsWorkspaceName = "$(logAnalyticsWorkspaceName)"
-          deployBastion = [System.Convert]::ToBoolean("$(deployBastion)")
-          autoDeployClusterResource = [System.Convert]::ToBoolean("$(autoDeployClusterResource)")
-          autoUpgradeClusterResource = [System.Convert]::ToBoolean("$(autoUpgradeClusterResource)")
-          githubAccount = "$(githubAccount)"
-          githubBranch = "$(githubBranch)"
-          location = "$(location)"
+          spnClientId = $spnClientId
+          spnClientSecret = $spnClientSecret
+          spnTenantId = $spnTenantId
+          spnProviderId = $spnProviderId
+          windowsAdminUsername = $windowsAdminUsername
+          windowsAdminPassword = $windowsAdminPassword
+          logAnalyticsWorkspaceName = $logAnalyticsWorkspaceName
+          deployBastion = $deployBastion
+          autoDeployClusterResource = $autoDeployClusterResource
+          autoUpgradeClusterResource = $autoUpgradeClusterResource
+          githubAccount = $githubAccount
+          githubBranch = $githubBranch
+          location = $location
         }
