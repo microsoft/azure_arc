@@ -62,15 +62,28 @@ steps:
       # Set the current location to the repository root
       Set-Location $(Build.SourcesDirectory)
       
-      if ($githubAccount -ne "microsoft") {
-        Write-Host "Checking out $githubAccount/$githubBranch"
-        git remote add upstream https://github.com/$($githubAccount)/azure_jumpstart_hcibox.git
-        git fetch upstream
-        git checkout -b $githubBranch upstream/$githubBranch
+      # Check if we need to clone the repository
+      $bicepPath = "azure_jumpstart_hcibox/bicep/main.bicep"
+      if (-not (Test-Path $bicepPath)) {
+          Write-Host "Bicep file not found at default path, attempting to clone repository..."
+          if ($githubAccount -ne "microsoft") {
+              Write-Host "Checking out $githubAccount/$githubBranch"
+              # Use HTTPS with PAT
+              $pat = "$(GITHUB_PAT)"  # Add this to your pipeline variables
+              $repoUrl = "https://$($pat)@github.com/$($githubAccount)/azure_jumpstart_hcibox.git"
+              
+              git config --global user.email "pipeline@jumpstart.com"
+              git config --global user.name "HCIBox Pipeline"
+              
+              # Force the git operations
+              git remote remove upstream 2>$null
+              git remote add upstream $repoUrl
+              git fetch upstream --quiet
+              git checkout -f -B $githubBranch upstream/$githubBranch --quiet
+          }
       }
 
-      # Verify the bicep file exists
-      $bicepPath = "azure_jumpstart_hcibox/bicep/main.bicep"
+      # Verify the bicep file exists after potential clone
       if (-not (Test-Path $bicepPath)) {
           Write-Error "Bicep file not found at: $bicepPath"
           exit 1
