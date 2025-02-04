@@ -46,24 +46,26 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      # First create the resource group
-      az group create --name $(resourceGroupName) --location $(location)
+      # Create resource group - Fixed the variable reference
+      Write-Host "Creating resource group: $env:RESOURCEGROUPNAME in $env:LOCATION"
+      az group create --name "$env:RESOURCEGROUPNAME" --location "$env:LOCATION"
       
-      # Then deploy main template
+      # Deploy main template - Fixed variable references
+      Write-Host "Starting deployment to resource group: $env:RESOURCEGROUPNAME"
       az deployment group create `
-        --resource-group $(resourceGroupName) `
+        --resource-group "$env:RESOURCEGROUPNAME" `
         --template-file "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" `
         --parameters `
-          spnClientId=$(spnClientId) `
-          spnClientSecret=$(spnClientSecret) `
-          spnTenantId=$(spnTenantId) `
-          spnProviderId=$(spnProviderId) `
-          windowsAdminUsername=$(windowsAdminUsername) `
-          windowsAdminPassword=$(windowsAdminPassword) `
-          logAnalyticsWorkspaceName=$(logAnalyticsWorkspaceName) `
-          deployBastion=$(deployBastion) `
-          autoDeployClusterResource=$(autoDeployClusterResource) `
-          autoUpgradeClusterResource=$(autoUpgradeClusterResource) `
-          githubAccount=$(githubAccount) `
-          githubBranch=$(githubBranch) `
-          location=$(location)
+          spnClientId="$env:SPNCLIENTID" `
+          spnClientSecret="$env:SPNCLIENTSECRET" `
+          spnTenantId="$env:SPNTENANTID" `
+          spnProviderId="$env:SPNPROVIDERID" `
+          windowsAdminUsername="$env:WINDOWSADMINUSERNAME" `
+          windowsAdminPassword="$env:WINDOWSADMINPASSWORD" `
+          logAnalyticsWorkspaceName="$env:LOGANALYTICSWORKSPACENAME" `
+          deployBastion="$env:DEPLOYBASTION" `
+          autoDeployClusterResource="$env:AUTODEPLOYCLUSTERRESOURCE" `
+          autoUpgradeClusterResource="$env:AUTOUPGRADECLUSTERRESOURCE" `
+          githubAccount="$env:GITHUBACCOUNT" `
+          githubBranch="$env:GITHUBBRANCH" `
+          location="$env:LOCATION"
