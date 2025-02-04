@@ -46,19 +46,14 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      # Debug: Print environment variables
-      Write-Host "Debug: Printing environment variables..."
-      Write-Host "RESOURCEGROUPNAME: $env:RESOURCEGROUPNAME"
-      Write-Host "LOCATION: $env:LOCATION"
-      Write-Host "Pipeline variable syntax: $(resourceGroupName)"
+      # Debug: Print variables
+      Write-Host "Debug: Printing variables..."
+      Write-Host "resourceGroupName: $(resourceGroupName)"
+      Write-Host "location: $(location)"
       
       # Create resource group
-      Write-Host "Creating resource group: $env:RESOURCEGROUPNAME in $env:LOCATION"
-      az group create --name "$env:RESOURCEGROUPNAME" --location "$env:LOCATION"
-      
-      # Debug: Check if resource group was created
-      Write-Host "Checking resource group..."
-      az group show --name "$env:RESOURCEGROUPNAME"
+      Write-Host "Creating resource group: $(resourceGroupName) in $(location)"
+      az group create --name "$(resourceGroupName)" --location "$(location)"
       
       # Deploy main template
       Write-Host "Starting deployment to resource group: $(resourceGroupName)"
