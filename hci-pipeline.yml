@@ -46,10 +46,40 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      # Debug: Print variables
-      Write-Host "Debug: Printing variables..."
-      Write-Host "resourceGroupName: $(resourceGroupName)"
-      Write-Host "location: $(location)"
+      # Diagnostic check for required variables
+      Write-Host "Checking required variables..."
+      $requiredVars = @(
+        'resourceGroupName',
+        'location',
+        'spnClientId',
+        'spnClientSecret',
+        'spnTenantId',
+        'spnProviderId',
+        'windowsAdminUsername',
+        'windowsAdminPassword',
+        'logAnalyticsWorkspaceName',
+        'deployBastion',
+        'autoDeployClusterResource',
+        'autoUpgradeClusterResource',
+        'githubAccount',
+        'githubBranch'
+      )
+      
+      $missingVars = @()
+      foreach ($var in $requiredVars) {
+        $value = Get-Item "env:$var" -ErrorAction SilentlyContinue
+        Write-Host "$var: $($value.Value)"
+        if (-not $value) {
+          $missingVars += $var
+        }
+      }
+      
+      if ($missingVars.Count -gt 0) {
+        Write-Error "Missing required variables: $($missingVars -join ', ')"
+        exit 1
+      }
+      
+      Write-Host "All required variables are present. Proceeding with deployment..."
       
       # Create resource group
       Write-Host "Creating resource group: $(resourceGroupName) in $(location)"
