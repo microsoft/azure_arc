@@ -1,87 +1,84 @@
 trigger:
   branches:
     include:
-    - main
+      - main  # adjust this to your main branch name
+  paths:
+    include:
+      - azure_jumpstart_hcibox/*
 
 parameters:
-- name: resourceGroupName
+- name: ResourceGroupName
+  displayName: 'Resource Group Name'
   type: string
   default: 'hcibox-test'
-- name: location
+- name: AzureSubscription
+  displayName: 'Azure Subscription'
   type: string
-  default: 'eastus'
+  default: 'HCIBox-ServiceConnection'
+- name: githubAccount
+  displayName: 'githubAccount'
+  type: string
+  default: 'ldabas-msft'
+- name: githubBranch
+  displayName: 'githubBranch'
+  type: string
+  default: 'main'
 
 variables:
-  - group: hcibox-deployment  # Variable group containing secrets
-  - name: resourceGroupName
-    value: ${{ parameters.resourceGroupName }}
-  - name: location
-    value: ${{ parameters.location }}
+- group: hcibox-deployment
+- name: ResourceGroupName
+  value: ${{parameters.ResourceGroupName}}
+- name: githubAccount
+  value: ${{parameters.githubAccount}}
+- name: githubBranch
+  value: ${{parameters.githubBranch}}
 
 pool:
   vmImage: 'windows-latest'
 
 steps:
 - task: AzurePowerShell@5
+  displayName: 'Deploy resource group'
   inputs:
-    azureSubscription: 'HCIBox-ServiceConnection'
+    azureSubscription: ${{parameters.AzureSubscription}}
     ScriptType: 'InlineScript'
     azurePowerShellVersion: 'LatestVersion'
     Inline: |
-      Write-Host "Checking required variables..."
-      
-      # Store variables in PowerShell variables to avoid expansion issues
-      $resourceGroupName = "$(resourceGroupName)"
-      $location = "$(location)"
-      $spnClientId = "$(spnClientId)"
-      $spnClientSecret = "$(spnClientSecret)"
-      $spnTenantId = "$(spnTenantId)"
-      $spnProviderId = "$(spnProviderId)"
-      $windowsAdminUsername = "$(windowsAdminUsername)"
-      $windowsAdminPassword = "$(windowsAdminPassword)"
-      $logAnalyticsWorkspaceName = "$(logAnalyticsWorkspaceName)"
-      $deployBastion = [System.Convert]::ToBoolean("$(deployBastion)")
-      $autoDeployClusterResource = [System.Convert]::ToBoolean("$(autoDeployClusterResource)")
-      $autoUpgradeClusterResource = [System.Convert]::ToBoolean("$(autoUpgradeClusterResource)")
+      Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
+      $RGname = "$(ResourceGroupName)"
+      New-AzResourceGroup -Name $RGname -Location "eastus"
+
+- task: AzurePowerShell@5
+  displayName: 'Deploy Bicep template'
+  inputs:
+    azureSubscription: ${{parameters.AzureSubscription}}
+    ScriptType: 'InlineScript'
+    azurePowerShellVersion: 'LatestVersion'
+    Inline: |
+      Write-Host "Deploying to $(ResourceGroupName)"
       $githubAccount = "$(githubAccount)"
       $githubBranch = "$(githubBranch)"
-
-      Write-Host "resourceGroupName: $resourceGroupName"
-      Write-Host "location: $location"
-      Write-Host "spnClientId: $spnClientId"
-      Write-Host "spnClientSecret: ***"
-      Write-Host "spnTenantId: $spnTenantId"
-      Write-Host "spnProviderId: $spnProviderId"
-      Write-Host "windowsAdminUsername: $windowsAdminUsername"
-      Write-Host "windowsAdminPassword: ***"
-      Write-Host "logAnalyticsWorkspaceName: $logAnalyticsWorkspaceName"
-      Write-Host "deployBastion: $deployBastion"
-      Write-Host "autoDeployClusterResource: $autoDeployClusterResource"
-      Write-Host "autoUpgradeClusterResource: $autoUpgradeClusterResource"
-      Write-Host "githubAccount: $githubAccount"
-      Write-Host "githubBranch: $githubBranch"
-      
-      # Create resource group
-      Write-Host "Creating resource group: $resourceGroupName in $location"
-      New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
-      
-      # Deploy main template
-      Write-Host "Starting deployment to resource group: $resourceGroupName"
+      if ($githubAccount -ne "microsoft") {
+        Write-Host "Checking out $githubAccount/$githubBranch"
+        git remote add upstream https://github.com/$($githubAccount)/azure_jumpstart_hcibox.git
+        git fetch upstream
+        git checkout -b $githubBranch upstream/$githubBranch
+      }
       New-AzResourceGroupDeployment -Name HCIBox `
-        -ResourceGroupName $resourceGroupName `
-        -TemplateFile "$(System.DefaultWorkingDirectory)/azure_jumpstart_hcibox/artifacts/main.bicep" `
-        -TemplateParameterObject @{
-          spnClientId = $spnClientId
-          spnClientSecret = $spnClientSecret
-          spnTenantId = $spnTenantId
-          spnProviderId = $spnProviderId
-          windowsAdminUsername = $windowsAdminUsername
-          windowsAdminPassword = $windowsAdminPassword
-          logAnalyticsWorkspaceName = $logAnalyticsWorkspaceName
-          deployBastion = $deployBastion
-          autoDeployClusterResource = $autoDeployClusterResource
-          autoUpgradeClusterResource = $autoUpgradeClusterResource
-          githubAccount = $githubAccount
-          githubBranch = $githubBranch
-          location = $location
-        }
+      -ResourceGroupName $(ResourceGroupName) `
+      -TemplateFile azure_jumpstart_hcibox/bicep/main.bicep `
+      -TemplateParameterObject @{
+          spnClientId = "$(spnClientId)"
+          spnClientSecret = "$(spnClientSecret)"
+          spnTenantId = "$(spnTenantId)"
+          spnProviderId = "$(spnProviderId)"
+          windowsAdminUsername = "arcdemo"
+          windowsAdminPassword = "$(windowsAdminPassword)"
+          logAnalyticsWorkspaceName = "HCIBox-Workspace"
+          deployBastion = $false
+          autoDeployClusterResource = $true
+          autoUpgradeClusterResource = $false
+          githubAccount = "$(githubAccount)"
+          githubBranch = "$(githubBranch)"
+          location = "eastus"
+      }
