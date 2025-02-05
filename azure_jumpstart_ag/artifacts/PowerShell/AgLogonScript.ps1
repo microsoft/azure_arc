@@ -32,15 +32,17 @@ $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
 $global:appsRepo = "jumpstart-agora-apps"
+
 if ($scenario -eq "contoso_supermarket") {
-    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+    $global:appUpstreamRepo = "https://github.com/azure/jumpstart-apps"
+    $global:appsRepo = "jumpstart-apps"
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:cosmosDBName = $Env:cosmosDBName
     $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
-    $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+    $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-apps"
 }elseif ($scenario -eq "contoso_motors") {
     $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
     $global:aioNamespace = "azure-iot-operations"

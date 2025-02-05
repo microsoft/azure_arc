@@ -14,7 +14,7 @@ function SetupSupermarketRepo {
         }
         catch {
             if ($retryCount -lt $maxRetries) {
-                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
+                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/azure/jumpstart-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
                 $retryCount++
                 $forkExists = $false
                 start-sleep -Seconds 60
@@ -288,7 +288,7 @@ function Deploy-AzureIOTHub {
         Write-Host
     }
     else {
-        Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+        Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-apps repository!" -ForegroundColor Red
     }
 
     ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
@@ -754,8 +754,8 @@ function Deploy-supermarketBookmarks {
 
     # Replace matching value in the Bookmarks file
     $content = Get-Content -Path $bookmarksFileName
-    $newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
-    $newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+    $newContent = $content -replace "Jumpstart-Apps-Repo-Clone-URL", $output
+    $newContent = $newContent -replace "Jumpstart-Apps-Repo-Your-Fork", "Jumpstart Apps Repo - $githubUser"
     $newContent | Set-Content -Path $bookmarksFileName
 
     Start-Sleep -Seconds 2

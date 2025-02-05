@@ -46,7 +46,7 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
+@description('User github account where they have forked the repo https://github.com/azure/jumpstart-apps')
 @minLength(1)
 param githubUser string  = 'sampleUser'
 
