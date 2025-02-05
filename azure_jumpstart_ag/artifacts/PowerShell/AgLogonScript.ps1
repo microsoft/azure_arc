@@ -31,6 +31,7 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
+$global:acrName = $Env:acrName
 $global:appsRepo = "jumpstart-agora-apps"
 
 if ($scenario -eq "contoso_supermarket") {
