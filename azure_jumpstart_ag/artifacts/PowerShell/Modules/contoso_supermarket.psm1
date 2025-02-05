@@ -150,7 +150,7 @@ function SetupSupermarketRepo {
     $retryCount = 0
     $maxRetries = 5
     do {
-        $response = gh secret set "test" -b "test" 2>&1
+        $response = gh secret set "test" -b "test" --repo $githubUser/$appsRepo 2>&1
         if ($response -match "error") {
             if ($retryCount -eq $maxRetries) {
                 Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
@@ -163,7 +163,7 @@ function SetupSupermarketRepo {
             }
         }
     } while ($response -match "error" -or $retryCount -ge $maxRetries)
-    gh secret delete test
+    gh secret delete test --repo $githubUser/$appsRepo
     Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
 
     Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
