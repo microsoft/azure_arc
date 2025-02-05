@@ -190,12 +190,12 @@ function SetupSupermarketRepo {
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
     gh repo set-default "$githubUser/$appsRepo"
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-    gh secret set "ACR_NAME" -b $acrName
-    gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-    gh secret set "SPN_TENANT_ID" -b $spnTenantId
+    gh secret set "SPN_CLIENT_ID" --body $spnClientID --repo $githubUser/$appsRepo
+    gh secret set "SPN_CLIENT_SECRET" --body $spnClientSecret --repo $githubUser/$appsRepo
+    gh secret set "ACR_NAME" --body $acrName --repo $githubUser/$appsRepo
+    gh secret set "PAT_GITHUB" --body $githubPat --repo $githubUser/$appsRepo
+    gh secret set "COSMOS_DB_ENDPOINT" --body $cosmosDBEndpoint --repo $githubUser/$appsRepo
+    gh secret set "SPN_TENANT_ID" --body $spnTenantId --repo $githubUser/$appsRepo
 
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
