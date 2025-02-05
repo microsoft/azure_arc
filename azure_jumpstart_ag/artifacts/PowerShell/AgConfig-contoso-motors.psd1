@@ -201,7 +201,7 @@
         inferencing_deployment = @{
             GitOpsConfigName = "contoso-motors"
             KustomizationName = "contoso-motors"
-            KustomizationPath="./contoso_manufacturing/operations"
+            KustomizationPath="./agora/contoso_motors"
             Namespace = "contoso-motors"
             Order = 1
         }
