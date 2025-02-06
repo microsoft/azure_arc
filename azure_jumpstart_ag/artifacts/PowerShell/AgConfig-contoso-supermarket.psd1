@@ -305,11 +305,11 @@
             ConfigMaps = @{
                 "mqtt-broker-config" = @{
                     ContainerName = "mqtt-broker"
-                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt_broker/mosquitto.conf"
                 }
                 "mqtt-simulator-config" = @{
                     ContainerName = "mqtt-simulator"
-                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt_simulator/config/settings.json"
                 }
                 "mqtt2prom-config" = @{
                     ContainerName = "mqtt2prom"
