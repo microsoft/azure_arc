@@ -495,6 +495,7 @@ function Deploy-supermarketConfigs {
             }
 
             $AgConfig = $using:AgConfig
+            $configMapDir = $using:configMapDir
             $cluster = $using:cluster
             $site = $cluster.Value
             $siteName = $site.FriendlyName.ToLower()
