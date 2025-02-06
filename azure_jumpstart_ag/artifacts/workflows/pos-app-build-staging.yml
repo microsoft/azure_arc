@@ -7,7 +7,7 @@ on:
         types:
             - closed
         paths:
-        - 'contoso_supermarket/developer/pos/**'
+        - 'agora/point_of_sale/src/**'
 
   workflow_dispatch: {}
 
