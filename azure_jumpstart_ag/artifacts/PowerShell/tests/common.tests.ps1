@@ -19,8 +19,14 @@ Describe "ArcBox resource group" {
     BeforeAll {
         $ResourceGroupName = $env:resourceGroup
     }
-    It "should have 79 resources or more" {
-        (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 79
+    if($scenario -ne "contoso_supermarket"){
+        It "should have 79 resources or more" {
+            (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 79
+        }
+    }else{
+        It "should have 24 resources or more" {
+            (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 24
+        }
     }
 }
 
