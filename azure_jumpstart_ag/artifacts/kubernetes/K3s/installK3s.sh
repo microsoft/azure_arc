@@ -325,8 +325,4 @@ azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storag
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
-    # this needs to run on each k3s cluster
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    helm repo update
-    helm install observability prometheus-community/kube-prometheus-stack --namespace observability
 exit 0
