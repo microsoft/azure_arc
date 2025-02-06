@@ -79,8 +79,7 @@ sudo chmod +x /usr/local/bin/azcopy
 
 # Authorize azcopy by using a system-wide managed identity
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
-
-# Run the lock check before attempting the installation
+d devthe lock check before attempting the installation
 check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
@@ -326,4 +325,8 @@ azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storag
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
+    # this needs to run on each k3s cluster
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo update
+    helm install observability prometheus-community/kube-prometheus-stack
 exit 0
