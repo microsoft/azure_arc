@@ -286,7 +286,7 @@ resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAss
 
 // Add role assignment for the deploy user: Azure Key Vault Administrator role
 resource deployerRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(deployer().objectId, 'Microsoft.Authorization/roleAssignments', 'Key Vault Administrator')
+  name: guid(resourceGroup().id,deployer().objectId, resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483'))
   scope: resourceGroup()
   properties: {
     principalId: deployer().objectId
