@@ -6,7 +6,6 @@
 param (
     [string]$domainName,
     [string]$domainAdminUsername,
-    [string]$domainAdminPassword,
     [string]$templateBaseUrl
 )
 
@@ -17,8 +16,17 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 
 Start-Transcript -Path "$Env:ArcBoxLogsDir\SetupADDS.log"
 
-# Convert plain text password to secure string
-$secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+
+Install-PSResource -Name Az.KeyVault -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+
+Connect-AzAccount -Identity
+
+# Fetch windowsAdminPassword from Key Vault (assumes $env:KeyVaultName is defined)
+$windowsAdminPasswordSecret = Get-Secret -Name windowsAdminPassword -AsPlainText
+$secureDomainAdminPassword = $windowsAdminPasswordSecret | ConvertTo-SecureString -AsPlainText -Force
 
 # Enable ADDS windows feature to setup domain forest
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
