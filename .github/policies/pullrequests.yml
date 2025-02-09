@@ -1,4 +1,4 @@
-name:  Housekeeping - PRs management
+name: Housekeeping - PRs management
 description: Arc Jumpstart management of PRs using GitHub Policies
 owner: 
 resource: repository
@@ -7,7 +7,7 @@ where:
 configuration:
   resourceManagementConfiguration:
     scheduledSearches:
-    - description: 
+    - description: "Mark PRs as stale after 7 days of inactivity when needs author feedback"
       frequencies:
       - hourly:
           hour: 3
@@ -25,7 +25,7 @@ configuration:
           label: no recent activity
       - addReply:
           reply: This pull request has been automatically marked as stale because it was marked as requiring author feedback but has not had any activity for **7 days**. It will be closed if no further activity occurs **within 7 days of this comment**. Thank you ${issueAuthor} for your contributions to this project!
-    - description: 
+    - description: "Close stale PRs after 14 days of no activity"
       frequencies:
       - hourly:
           hour: 3
@@ -39,7 +39,7 @@ configuration:
       actions:
       - addReply:
           reply: Because of no activity for over **14 days**, we're closing this pull request. Please open a new issue report if more support is required. Thank you for your support ${issueAuthor}!
-    - description: 
+    - description: "Notify assignees for PRs marked as investigate after 3 days"
       frequencies:
       - hourly:
           hour: 12
@@ -53,16 +53,45 @@ configuration:
       actions:
       - addReply:
           reply: "${assignees}\nGentle ping that this issue needs attention. "
+    - description: "Warning for PRs open for more than 30 days"
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isOpen
+      - isPullRequest
+      - noActivitySince:
+          days: 30
+      actions:
+      - addLabel:
+          label: long-running
+      - addReply:
+          reply: "This pull request has been open for 30 days. @${assignees} please review if this PR should be continued or closed."
+    - description: "Notify reviewers for PRs waiting for review"
+      frequencies:
+      - hourly:
+          hour: 6
+      filters:
+      - isOpen
+      - isPullRequest
+      - hasLabel:
+          label: review
+      - noActivitySince:
+          days: 5
+      actions:
+      - addReply:
+          reply: "This PR has been waiting for review for 5 days. @${assignees} please review when possible."
     eventResponderTasks:
-    - if:
+    - description: "Welcome message for new PRs"
+      if:
       - payloadType: Pull_Request
       - isAction:
           action: Opened
       then:
       - addReply:
           reply: 'Hi ${issueAuthor}! Thank you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Arc Jumpstart better.'
-      description: 
-    - if:
+    - description: "Add needs author feedback label when changes requested"
+      if:
       - payloadType: Pull_Request_Review
       - isAction:
           action: Submitted
@@ -71,8 +100,8 @@ configuration:
       then:
       - addLabel:
           label: needs author feedback
-      description: 
-    - if:
+    - description: "Remove stale labels when author responds"
+      if:
       - payloadType: Pull_Request
       - isActivitySender:
           issueAuthor: True
@@ -91,8 +120,8 @@ configuration:
           label: no recent activity
       - addLabel:
           label: review
-      description: 
-    - if:
+    - description: "Add review label to new PRs"
+      if:
       - payloadType: Pull_Request
       - isAction:
           action: Null
@@ -100,8 +129,8 @@ configuration:
       then:
       - addLabel:
           label: review
-      description: 
-    - if:
+    - description: "Remove review label after review"
+      if:
       - payloadType: Pull_Request_Review
       - isAction:
           action: Submitted
@@ -111,8 +140,8 @@ configuration:
           label: review
       - removeLabel:
           label: no recent activity
-      description: 
-    - if:
+    - description: "Update labels when author responds to review"
+      if:
       - payloadType: Pull_Request_Review
       - isActivitySender:
           issueAuthor: True 
@@ -128,6 +157,5 @@ configuration:
           label: no recent activity
       - addLabel:
           label: review
-      description: 
 onFailure: 
-onSuccess: 
+onSuccess:
