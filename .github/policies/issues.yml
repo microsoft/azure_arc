@@ -1,13 +1,13 @@
-name:  Housekeeping - Issues management
-description: Arc Jumpstart management of issues using GitHub Policies
-owner: 
+name: Housekeeping - Issues management
+description: Automated issue management policy for Arc Jumpstart repository
+owner: azure-arc-admin
 resource: repository
 disabled: false
 where: 
 configuration:
   resourceManagementConfiguration:
     scheduledSearches:
-    - description: 
+    - description: Mark issues as stale when needing author feedback
       frequencies:
       - hourly:
           hour: 3
@@ -17,15 +17,15 @@ configuration:
       - hasLabel:
           label: needs author feedback
       - noActivitySince:
-          days: 7 
+          days: 10
       - isNotLabeledWith:
           label: no recent activity
       actions:
       - addLabel:
           label: no recent activity
       - addReply:
-          reply: This issue has been automatically marked as stale because it has been marked as requiring author feedback but has not had any activity for **7 days**. It will be closed if no further activity occurs **within 7 days of this comment**. Thank you ${issueAuthor} for your contributions to the repository!
-    - description: 
+          reply: This issue has been automatically marked as stale because it has been marked as requiring author feedback but has not had any activity for **10 days**. It will be closed if no further activity occurs **within 7 days of this comment**. Thank you ${issueAuthor} for your contributions!
+    - description: Close stale issues after warning period
       frequencies:
       - hourly:
           hour: 3
@@ -40,7 +40,7 @@ configuration:
       - addReply:
           reply: Because of no activity for over **14 days**, we're closing this issue. Please open a new issue report if more support is required. Thank you for your support ${issueAuthor}!
       - closeIssue
-    - description: 
+    - description: Notify assignees of issues needing investigation
       frequencies:
       - hourly:
           hour: 12
@@ -61,8 +61,14 @@ configuration:
           action: Opened
       then:
       - addReply:
-          reply: 'Hi ${issueAuthor}! Thank you for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Arc Jumpstart.'
-      description: 
+          reply: 'Hi ${issueAuthor}! Thank you for opening this issue in the Arc Jumpstart repository. Our team actively monitors these issues and we will review it soon. Please make sure to:
+
+          1. Check our documentation and existing issues first
+          2. Provide as much detail as possible
+          3. Include any relevant logs or error messages
+          
+          We appreciate your contribution to making Arc Jumpstart better!'
+      description: Send welcome message to new issue authors
     - if:
       - payloadType: Issue_Comment
       - hasLabel:
@@ -113,4 +119,4 @@ configuration:
           label: review
       description: 
 onFailure: 
-onSuccess: 
+onSuccess:
