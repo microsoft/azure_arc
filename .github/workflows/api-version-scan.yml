@@ -1,0 +1,45 @@
+name: Scan Azure API Versions
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.bicep'
+      - '**/*.json'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**/*.bicep'
+      - '**/*.json'
+  workflow_dispatch:
+
+jobs:
+  scan-api-versions:
+    name: Scan for outdated API versions
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install PSRule for Azure
+        shell: pwsh
+        run: |
+          Install-Module -Name 'PSRule.Rules.Azure' -Scope CurrentUser -Force
+      
+      - name: Scan templates
+        shell: pwsh
+        run: |
+          $results = Get-ChildItem -Recurse -Filter "*.bicep" | Assert-PSRule -Module PSRule.Rules.Azure -Outcome Fail -OutputFormat Sarif -OutputPath reports/results.sarif
+          $results += Get-ChildItem -Recurse -Filter "*.json" | Assert-PSRule -Module PSRule.Rules.Azure -Outcome Fail -OutputFormat Sarif -OutputPath reports/results.sarif
+          
+          if ($results) {
+            Write-Host "::warning::Found outdated API versions in templates"
+            $results | Format-Table -AutoSize
+            exit 1
+          }
+        
+      - name: Upload scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: reports/results.sarif

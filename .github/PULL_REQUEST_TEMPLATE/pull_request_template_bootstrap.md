@@ -3,6 +3,10 @@
 ## Description
 <!--- Describe your changes in detail -->
 
+## Related Issue
+<!--- If fixing a bug or implementing a feature, please link to the issue here: -->
+Fixes # (issue)
+
 ## How Has This Been Tested?
 
 - Please describe in detail how you tested your changes
@@ -14,9 +18,12 @@
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] Documentation update
 
-## Checklist
-- [ ] My code follows the code style of this project.
-- [ ] My change requires a change to the documentation.
-- [ ] I have updated the documentation and/or images accordingly.
-- [ ] I've read the Jumpstart [contribution guidelines](https://aka.ms/JumpstartContribution).
+## Validation Checklist
+- [ ] My code follows the code style of this project
+- [ ] My change requires a documentation update
+- [ ] I have updated the documentation accordingly
+- [ ] I've read the [Jumpstart contribution guidelines](https://aka.ms/JumpstartContribution)
+- [ ] All new scripts include proper error handling
+- [ ] All deployment parameters are properly documented
