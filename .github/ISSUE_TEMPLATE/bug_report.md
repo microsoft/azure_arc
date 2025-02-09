@@ -30,16 +30,24 @@ assignees: ''
 <!--- A clear and concise description of what you expected to happen. --->
 
 **Environment summary**
-<!--- Relevant versions to the issue / CLI version (`_az --version_`) / Terraform CLI version (`terraform version`) / Other  --->
+<!--- Please provide:
+- Azure CLI version (`az --version`)
+- Operating system and version
+- Deployed region
+- Any other relevant version information
+--->
 
 **Have you looked at the Troubleshooting and Logs section?**
 <!---Relevant logs retrieval instructions can be found in the Troubleshooting section.
-- [Jumpstart ArcBox for IT Pros troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/ITPro#basic-troubleshooting)
-- [Jumpstart ArcBox for DevOps troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/DevOps#basic-troubleshooting)
-- [Jumpstart ArcBox for DataOps troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/DataOps#basic-troubleshooting)
-- [HCIBox troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_hcibox/getting_started#basic-troubleshooting)
-- [Agora - Contoso Supermarket troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_ag/retail/contoso_supermarket/troubleshooting)
-- [Agora - Contoso Motors troubleshooting](https://arcjumpstart.com/azure_jumpstart_ag/manufacturing/contoso_motors/troubleshooting)
+- [Jumpstart ArcBox for IT Pros troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro/#basic-troubleshooting)
+- [Jumpstart ArcBox for DevOps troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/DevOps/#basic-troubleshooting)
+- [Jumpstart ArcBox for DataOps troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/DataOps/#basic-troubleshooting)
+- [HCIBox troubleshooting](https://jumpstart.azure.com/azure_jumpstart_hcibox/troubleshooting)
+- [Agora - Contoso Supermarket troubleshooting](https://jumpstart.azure.com/azure_jumpstart_ag/contoso_supermarket/troubleshooting)
+- [Agora - Contoso Motors troubleshooting](https://jumpstart.azure.com/azure_jumpstart_ag/contoso_motors/troubleshooting)
+- [Agora - Contoso Hypermarket troubleshooting](https://jumpstart.azure.com/azure_jumpstart_ag/contoso_hypermarket/troubleshooting/)
+
+Please include relevant log files as specified in the troubleshooting guides.
 --->
 
 **Screenshots**
