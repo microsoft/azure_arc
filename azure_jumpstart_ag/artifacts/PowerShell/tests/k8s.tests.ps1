@@ -22,7 +22,9 @@ BeforeDiscovery {
 
     # Loop through each SiteConfig and extract the ArcClusterName
     foreach ($site in $AgConfig.SiteConfig.Values) {
-        $ArcClusterNames += $site.ArcClusterName
+        if($site.Type -ne 'AKS'){
+            $ArcClusterNames += $site.ArcClusterName
+        }
     }
 
 }
