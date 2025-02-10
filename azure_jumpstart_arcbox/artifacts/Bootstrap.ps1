@@ -1,17 +1,13 @@
 param (
     [string]$adminUsername,
-    [string]$adminPassword,
     [string]$spnClientId,
-    [string]$spnClientSecret,
     [string]$tenantId,
     [string]$spnAuthority,
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$azdataUsername,
-    [string]$azdataPassword,
     [string]$acceptEula,
     [string]$registryUsername,
-    [string]$registryPassword,
     [string]$arcDcName,
     [string]$azureLocation,
     [string]$mssqlmiName,
@@ -119,22 +115,6 @@ New-Item -Path $Env:ArcBoxTestsDir -ItemType directory -Force
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
-if ($vmAutologon -eq "true") {
-
-    Write-Host "Configuring VM Autologon"
-
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
-    if($flavor -eq "DataOps"){
-        Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
-    }
-} else {
-
-    Write-Host "Not configuring VM Autologon"
-
-}
-
 # Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "SyncForegroundPolicy" 1
 
@@ -186,12 +166,23 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-Set-Secret -Name adminPassword -Secret $adminPassword
-Set-Secret -Name AZDATAPASSWORD -Secret $azdataPassword
-Set-Secret -Name registryPassword -Secret $registryPassword
+$adminPassword = Get-Secret -Name windowsAdminPassword -AsPlainText
 
-Write-Output "Added the following secrets to Azure Key Vault"
-Get-SecretInfo
+if ($vmAutologon -eq "true") {
+
+    Write-Host "Configuring VM Autologon"
+
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+    if($flavor -eq "DataOps"){
+        Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
+    }
+} else {
+
+    Write-Host "Not configuring VM Autologon"
+
+}
 
 # Temporarily disabling Azure VM Auto-shutdown while automation is in progress
 if ($autoShutdownEnabled -eq "true") {

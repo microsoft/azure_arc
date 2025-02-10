@@ -6,7 +6,6 @@
 param (
     [string]$domainName,
     [string]$domainAdminUsername,
-    [string]$domainAdminPassword,
     [string]$templateBaseUrl
 )
 
@@ -17,8 +16,67 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 
 Start-Transcript -Path "$Env:ArcBoxLogsDir\SetupADDS.log"
 
-# Convert plain text password to secure string
-$secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+
+$modules = @("Az.KeyVault", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
+
+foreach ($module in $modules) {
+    Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+}
+
+# Connect to Azure using Managed Identity
+Connect-AzAccount -Identity
+
+# Get the resource group name from the Azure Instance Metadata Service
+$metadataUrl = "http://169.254.169.254/metadata/instance/compute?api-version=2021-02-01"
+$headers = @{ "Metadata" = "true" }
+$response = Invoke-RestMethod -Uri $metadataUrl -Method Get -Headers $headers
+$resourceGroup = $response.resourceGroupName
+
+$KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
+
+# Set Key Vault Name as an environment variable
+[System.Environment]::SetEnvironmentVariable('keyVaultName', $KeyVault.VaultName, [System.EnvironmentVariableTarget]::Machine)
+
+# Import required module
+Import-Module Microsoft.PowerShell.SecretManagement
+
+# Register the Azure Key Vault as a secret vault if not already registered
+# Ensure you have installed the SecretManagement and SecretStore modules along with the Key Vault extension
+
+if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
+    Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
+}
+
+# Fetch windowsAdminPassword from Key Vault (assumes $env:KeyVaultName is defined)
+$windowsAdminPasswordSecret = Get-Secret -Name windowsAdminPassword -AsPlainText
+$secureDomainAdminPassword = $windowsAdminPasswordSecret | ConvertTo-SecureString -AsPlainText -Force
+
+# Set Diagnostic Data settings
+
+$telemetryPath = "HKLM:\Software\Policies\Microsoft\Windows\DataCollection"
+$telemetryProperty = "AllowTelemetry"
+$telemetryValue = 3
+
+$oobePath = "HKLM:\Software\Policies\Microsoft\Windows\OOBE"
+$oobeProperty = "DisablePrivacyExperience"
+$oobeValue = 1
+
+# Create the registry key and set the value for AllowTelemetry
+if (-not (Test-Path $telemetryPath)) {
+    New-Item -Path $telemetryPath -Force | Out-Null
+}
+Set-ItemProperty -Path $telemetryPath -Name $telemetryProperty -Value $telemetryValue
+
+# Create the registry key and set the value for DisablePrivacyExperience
+if (-not (Test-Path $oobePath)) {
+    New-Item -Path $oobePath -Force | Out-Null
+}
+Set-ItemProperty -Path $oobePath -Name $oobeProperty -Value $oobeValue
+
+Write-Host "Registry keys and values for Diagnostic Data settings have been set successfully."
 
 # Enable ADDS windows feature to setup domain forest
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools

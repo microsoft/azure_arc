@@ -17,7 +17,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-$adminPassword = Get-Secret -Name 'adminPassword' -AsPlainText
+$adminPassword = Get-Secret -Name 'windowsAdminPassword' -AsPlainText
 
 # Get Active Directory Information
 $netbiosname = $Env:addsDomainName.Split('.')[0].ToUpper()
