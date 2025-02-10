@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   replace-text:
-    if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }}
+    if: ${{ github.repository != 'azure/jumpstart-apps' }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
