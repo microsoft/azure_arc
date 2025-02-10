@@ -231,7 +231,7 @@ function Deploy-MotorsConfigs {
                                     --scope cluster `
                                     --url $appClonedRepo `
                                     --branch $branch `
-                                    --sync-interval 3s `
+                                    --sync-interval 5m `
                                     --kustomization name=$appName path=$appPath prune=true `
                                     --timeout 30m `
                                     --namespace $namespace `
