@@ -1,11 +1,10 @@
-# .github/workflows/stale-branches.yml
-
 name: Stale Branches
 
 on:
   schedule:
-    - cron: '0 6 * * 1-5'
-    
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
 permissions:
   issues: write
   contents: write
