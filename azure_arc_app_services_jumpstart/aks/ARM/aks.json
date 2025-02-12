@@ -123,7 +123,6 @@
             "count": "[parameters('agentCount')]",
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
-            "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets"
           }
         ],
