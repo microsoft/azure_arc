@@ -73,7 +73,7 @@
     "githubUser": {
       "type": "string",
       "metadata": {
-        "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
+        "description": "User's github account where they have forked https://github.com/microsoft/jumpstart-apps"
       },
       "defaultValue": "microsoft"
     }
