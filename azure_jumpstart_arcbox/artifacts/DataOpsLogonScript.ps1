@@ -412,7 +412,7 @@ $clusters | Foreach-Object {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.34.0 `
+            --version 1.35.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"
