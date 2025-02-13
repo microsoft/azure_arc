@@ -1,3 +1,5 @@
+[![Stale Issues and PRs](https://github.com/microsoft/azure_arc/actions/workflows/stale-issues-pr.yml/badge.svg?branch=main)](https://github.com/microsoft/azure_arc/actions/workflows/stale-issues-pr.yml) [![Stale Branches](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml/badge.svg)](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml)
+
 # Arc Jumpstart source code
 
 Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.

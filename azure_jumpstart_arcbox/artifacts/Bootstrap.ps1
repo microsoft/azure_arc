@@ -1,17 +1,13 @@
 param (
     [string]$adminUsername,
-    [string]$adminPassword,
     [string]$spnClientId,
-    [string]$spnClientSecret,
     [string]$tenantId,
     [string]$spnAuthority,
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$azdataUsername,
-    [string]$azdataPassword,
     [string]$acceptEula,
     [string]$registryUsername,
-    [string]$registryPassword,
     [string]$arcDcName,
     [string]$azureLocation,
     [string]$mssqlmiName,
@@ -37,7 +33,8 @@ param (
     [object]$resourceTags,
     [string]$namingPrefix,
     [string]$debugEnabled,
-    [string]$sqlServerEdition
+    [string]$sqlServerEdition,
+    [string]$autoShutdownEnabled
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -72,6 +69,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('namingPrefix', $namingPrefix, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ArcBoxDir', "C:\ArcBox", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('sqlServerEdition', $sqlServerEdition, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoShutdownEnabled', $autoShutdownEnabled, [System.EnvironmentVariableTarget]::Machine)
 
 if ($debugEnabled -eq "true") {
     [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
@@ -117,22 +115,6 @@ New-Item -Path $Env:ArcBoxTestsDir -ItemType directory -Force
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
-if ($vmAutologon -eq "true") {
-
-    Write-Host "Configuring VM Autologon"
-
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
-    if($flavor -eq "DataOps"){
-        Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
-    }
-} else {
-
-    Write-Host "Not configuring VM Autologon"
-
-}
-
 # Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "SyncForegroundPolicy" 1
 
@@ -157,6 +139,18 @@ foreach ($module in $modules) {
 # Add Key Vault Secrets
 Connect-AzAccount -Identity
 
+$DeploymentProgressString = "Started bootstrap-script..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+
 $KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
 
 # Set Key Vault Name as an environment variable (used by DevOps flavor)
@@ -172,12 +166,38 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-Set-Secret -Name adminPassword -Secret $adminPassword
-Set-Secret -Name AZDATAPASSWORD -Secret $azdataPassword
-Set-Secret -Name registryPassword -Secret $registryPassword
+$adminPassword = Get-Secret -Name windowsAdminPassword -AsPlainText
 
-Write-Output "Added the following secrets to Azure Key Vault"
-Get-SecretInfo
+if ($vmAutologon -eq "true") {
+
+    Write-Host "Configuring VM Autologon"
+
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+    if($flavor -eq "DataOps"){
+        Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
+    }
+} else {
+
+    Write-Host "Not configuring VM Autologon"
+
+}
+
+# Temporarily disabling Azure VM Auto-shutdown while automation is in progress
+if ($autoShutdownEnabled -eq "true") {
+
+    $ScheduleResource = Get-AzResource -ResourceGroup $resourceGroup -ResourceType Microsoft.DevTestLab/schedules
+    $Uri = "https://management.azure.com$($ScheduleResource.ResourceId)?api-version=2018-09-15"
+
+    $Schedule = Invoke-AzRestMethod -Uri $Uri
+
+    $ScheduleSettings = $Schedule.Content | ConvertFrom-Json
+    $ScheduleSettings.properties.status = "Disabled"
+
+    Invoke-AzRestMethod -Uri $Uri -Method PUT -Payload ($ScheduleSettings | ConvertTo-Json)
+
+}
 
 # Installing DHCP service
 Write-Output "Installing DHCP service"
@@ -319,6 +339,30 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
+# Set Diagnostic Data settings
+
+$telemetryPath = "HKLM:\Software\Policies\Microsoft\Windows\DataCollection"
+$telemetryProperty = "AllowTelemetry"
+$telemetryValue = 3
+
+$oobePath = "HKLM:\Software\Policies\Microsoft\Windows\OOBE"
+$oobeProperty = "DisablePrivacyExperience"
+$oobeValue = 1
+
+# Create the registry key and set the value for AllowTelemetry
+if (-not (Test-Path $telemetryPath)) {
+    New-Item -Path $telemetryPath -Force | Out-Null
+}
+Set-ItemProperty -Path $telemetryPath -Name $telemetryProperty -Value $telemetryValue
+
+# Create the registry key and set the value for DisablePrivacyExperience
+if (-not (Test-Path $oobePath)) {
+    New-Item -Path $oobePath -Force | Out-Null
+}
+Set-ItemProperty -Path $oobePath -Name $oobeProperty -Value $oobeValue
+
+Write-Host "Registry keys and values for Diagnostic Data settings have been set successfully."
+
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
 if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
@@ -352,6 +396,17 @@ Write-Header "Configuring Logon Scripts"
 
 $ScheduledTaskExecutable = "pwsh.exe"
 
+$DeploymentProgressString = "Restarting and installing WinGet packages..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
 
 if ($flavor -eq "ITPro") {
     # Creating scheduled task for WinGet.ps1

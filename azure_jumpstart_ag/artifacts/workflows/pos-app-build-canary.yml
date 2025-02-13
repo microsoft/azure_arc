@@ -64,7 +64,7 @@ jobs:
       if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
       run: |
         if [ "$latest_tag" != "v1.0" ]; then
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
+          docker build ./agora/point_of_sale/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
         fi
 

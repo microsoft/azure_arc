@@ -33,7 +33,8 @@ param (
   [string]$openAIEndpoint,
   [string]$speachToTextEndpoint,
   [object]$azureOpenAIModel,
-  [string]$openAIDeploymentName
+  [string]$openAIDeploymentName,
+  [string]$acrName
 )
 
 ##############################################################
@@ -77,6 +78,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "2738768575994422412"
+      "version": "0.32.4.45862",
+      "templateHash": "11114503493889055176"
     }
   },
   "parameters": {
@@ -31,6 +31,7 @@
     },
     "windowsAdminPassword": {
       "type": "securestring",
+      "defaultValue": "[newGuid()]",
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
@@ -53,6 +54,7 @@
     },
     "logAnalyticsWorkspaceName": {
       "type": "string",
+      "defaultValue": "ArcBox-la",
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
@@ -67,6 +69,18 @@
       ],
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps', 'DataOps'"
+      }
+    },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Developer",
+      "allowedValues": [
+        "Developer",
+        "Standard",
+        "Enterprise"
+      ],
+      "metadata": {
+        "description": "SQL Server edition to deploy. Valid values are: 'Developer', 'Standard', 'Enterprise'"
       }
     },
     "githubAccount": {
@@ -163,7 +177,7 @@
     },
     "autoShutdownEnabled": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
     "autoShutdownTime": {
       "type": "string",
@@ -177,9 +191,28 @@
       "type": "string",
       "defaultValue": ""
     },
-    "sqlServerEdition": {
+    "enableAzureSpotPricing": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Option to enable spot pricing for the ArcBox Client VM"
+      }
+    },
+    "zones": {
       "type": "string",
-      "defaultValue": "Developer"
+      "defaultValue": "1",
+      "allowedValues": [
+        "1",
+        "2",
+        "3"
+      ],
+      "metadata": {
+        "description": "The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM"
+      }
+    },
+    "registryPassword": {
+      "type": "securestring",
+      "defaultValue": "[newGuid()]"
     }
   },
   "variables": {
@@ -239,8 +272,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "16381001317417135477"
+              "version": "0.32.4.45862",
+              "templateHash": "2610071627031689606"
             }
           },
           "parameters": {
@@ -562,8 +595,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "9882362287265074744"
+              "version": "0.32.4.45862",
+              "templateHash": "439311248032936140"
             }
           },
           "parameters": {
@@ -844,8 +877,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "16381001317417135477"
+              "version": "0.32.4.45862",
+              "templateHash": "2610071627031689606"
             }
           },
           "parameters": {
@@ -1116,6 +1149,292 @@
       ]
     },
     {
+      "copy": {
+        "name": "ubuntuRancherK3sNodesDeployment",
+        "count": "[length(range(0, variables('k3sClusterNodesCount')))]"
+      },
+      "condition": "[equals(parameters('flavor'), 'DevOps')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('ubuntuRancherK3sNodesDeployment-{0}', range(0, variables('k3sClusterNodesCount'))[copyIndex()])]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "stagingStorageAccountName": {
+            "value": "[toLower(reference(resourceId('Microsoft.Resources/deployments', 'stagingStorageAccountDeployment'), '2022-09-01').outputs.storageAccountName.value)]"
+          },
+          "logAnalyticsWorkspace": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment'), '2022-09-01').outputs.subnetId.value]"
+          },
+          "azureLocation": {
+            "value": "[parameters('location')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "vmName": {
+            "value": "[format('{0}-Node-0{1}', variables('k3sArcClusterName'), range(0, variables('k3sClusterNodesCount'))[copyIndex()])]"
+          },
+          "storageContainerName": {
+            "value": "[toLower(variables('k3sArcClusterName'))]"
+          },
+          "namingPrefix": {
+            "value": "[parameters('namingPrefix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.32.4.45862",
+              "templateHash": "439311248032936140"
+            }
+          },
+          "parameters": {
+            "vmName": {
+              "type": "string",
+              "defaultValue": "[format('{0}-K3s-Node', parameters('namingPrefix'))]",
+              "metadata": {
+                "description": "The name of you Virtual Machine"
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "defaultValue": "arcdemo",
+              "metadata": {
+                "description": "Username for the Virtual Machine"
+              }
+            },
+            "sshRSAPublicKey": {
+              "type": "securestring",
+              "defaultValue": "",
+              "metadata": {
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
+              }
+            },
+            "ubuntuOSVersion": {
+              "type": "string",
+              "defaultValue": "22_04-lts-gen2",
+              "allowedValues": [
+                "22_04-lts-gen2"
+              ],
+              "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
+              }
+            },
+            "azureLocation": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource Id of the subnet in the virtual network"
+              }
+            },
+            "stagingStorageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
+              }
+            },
+            "logAnalyticsWorkspace": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Log Analytics workspace used with cluster extensions"
+              }
+            },
+            "templateBaseUrl": {
+              "type": "string",
+              "metadata": {
+                "description": "The base URL used for accessing artifacts and automation artifacts"
+              }
+            },
+            "flavor": {
+              "type": "string",
+              "allowedValues": [
+                "ITPro",
+                "DevOps",
+                "DataOps"
+              ],
+              "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+              }
+            },
+            "storageContainerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account container name for artifacts"
+              }
+            },
+            "namingPrefix": {
+              "type": "string",
+              "defaultValue": "ArcBox",
+              "maxLength": 7,
+              "metadata": {
+                "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
+              }
+            }
+          },
+          "variables": {
+            "networkInterfaceName": "[format('{0}-NIC', parameters('vmName'))]",
+            "osDiskType": "Premium_LRS",
+            "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B2ms', 'Standard_B8ms')]",
+            "diskSize": "[if(equals(parameters('flavor'), 'DataOps'), 512, 64)]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-01-01",
+              "name": "[variables('networkInterfaceName')]",
+              "location": "[parameters('azureLocation')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('azureLocation')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[variables('vmSize')]"
+                },
+                "storageProfile": {
+                  "osDisk": {
+                    "name": "[format('{0}-OSDisk', parameters('vmName'))]",
+                    "caching": "ReadWrite",
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "[variables('osDiskType')]"
+                    },
+                    "diskSizeGB": "[variables('diskSize')]"
+                  },
+                  "imageReference": {
+                    "publisher": "canonical",
+                    "offer": "0001-com-ubuntu-server-jammy",
+                    "sku": "[parameters('ubuntuOSVersion')]",
+                    "version": "latest"
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                    }
+                  ]
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                          "keyData": "[parameters('sshRSAPublicKey')]"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
+              "location": "[parameters('azureLocation')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {},
+                "protectedSettings": {
+                  "commandToExecute": "[format('bash installK3s.sh {0} {1} {2} {3} {4} {5} {6} {7}', parameters('adminUsername'), subscription().subscriptionId, parameters('vmName'), parameters('azureLocation'), parameters('stagingStorageAccountName'), parameters('logAnalyticsWorkspace'), parameters('templateBaseUrl'), parameters('storageContainerName'))]",
+                  "fileUris": [
+                    "[format('{0}artifacts/installK3s.sh', parameters('templateBaseUrl'))]"
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]",
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner'))]",
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'stagingStorageAccountDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ubuntuRancherK3sDeployment')]"
+      ]
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "clientVmDeployment",
@@ -1129,9 +1448,6 @@
             "value": "[parameters('windowsAdminUsername')]"
           },
           "windowsAdminPassword": {
-            "value": "[parameters('windowsAdminPassword')]"
-          },
-          "azdataPassword": {
             "value": "[parameters('windowsAdminPassword')]"
           },
           "tenantId": {
@@ -1203,11 +1519,15 @@
           "autoShutdownTimezone": {
             "value": "[parameters('autoShutdownTimezone')]"
           },
-          "autoShutdownEmailRecipient": {
-            "value": "[parameters('autoShutdownEmailRecipient')]"
-          },
+          "autoShutdownEmailRecipient": "[if(empty(parameters('autoShutdownEmailRecipient')), createObject('value', null()), createObject('value', parameters('autoShutdownEmailRecipient')))]",
           "sqlServerEdition": {
             "value": "[parameters('sqlServerEdition')]"
+          },
+          "zones": {
+            "value": "[parameters('zones')]"
+          },
+          "enableAzureSpotPricing": {
+            "value": "[parameters('enableAzureSpotPricing')]"
           }
         },
         "template": {
@@ -1216,8 +1536,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "5450393794893126300"
+              "version": "0.32.4.45862",
+              "templateHash": "16893232953418081903"
             }
           },
           "parameters": {
@@ -1266,7 +1586,7 @@
             },
             "windowsOSVersion": {
               "type": "string",
-              "defaultValue": "2022-datacenter-g2",
+              "defaultValue": "2025-datacenter-g2",
               "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
               }
@@ -1298,9 +1618,6 @@
               "type": "string",
               "defaultValue": "arcdemo"
             },
-            "azdataPassword": {
-              "type": "securestring"
-            },
             "acceptEula": {
               "type": "string",
               "defaultValue": "yes"
@@ -1308,10 +1625,6 @@
             "registryUsername": {
               "type": "string",
               "defaultValue": "registryUser"
-            },
-            "registryPassword": {
-              "type": "securestring",
-              "defaultValue": "[newGuid()]"
             },
             "arcDcName": {
               "type": "string",
@@ -1393,7 +1706,19 @@
                 "DataOps"
               ],
               "metadata": {
-                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'ITPro', 'DevOps', 'DataOps'"
+              }
+            },
+            "sqlServerEdition": {
+              "type": "string",
+              "defaultValue": "Developer",
+              "allowedValues": [
+                "Developer",
+                "Standard",
+                "Enterprise"
+              ],
+              "metadata": {
+                "description": "SQL Server edition to deploy. Valid values are: 'Developer', 'Standard', 'Enterprise'"
               }
             },
             "deployBastion": {
@@ -1452,7 +1777,7 @@
             },
             "vmsDiskSku": {
               "type": "string",
-              "defaultValue": "Premium_LRS",
+              "defaultValue": "PremiumV2_LRS",
               "metadata": {
                 "description": "The SKU of the VMs disk"
               }
@@ -1466,7 +1791,7 @@
             },
             "autoShutdownEnabled": {
               "type": "bool",
-              "defaultValue": false
+              "defaultValue": true
             },
             "autoShutdownTime": {
               "type": "string",
@@ -1480,9 +1805,24 @@
               "type": "string",
               "defaultValue": ""
             },
-            "sqlServerEdition": {
-            "type": "string",
-            "defaultValue": "Developer"
+            "zones": {
+              "type": "string",
+              "defaultValue": "1",
+              "allowedValues": [
+                "1",
+                "2",
+                "3"
+              ],
+              "metadata": {
+                "description": "The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM"
+              }
+            },
+            "enableAzureSpotPricing": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Option to enable spot pricing for the ArcBox Client VM"
+              }
             }
           },
           "variables": {
@@ -1524,13 +1864,16 @@
               "apiVersion": "2022-01-01",
               "name": "[variables('publicIpAddressName')]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "properties": {
                 "publicIPAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
               },
               "sku": {
-                "name": "Basic"
+                "name": "Standard"
               }
             },
             {
@@ -1538,6 +1881,9 @@
               "apiVersion": "2023-04-02",
               "name": "[format('{0}-VMsDisk', parameters('vmName'))]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "sku": {
                 "name": "[parameters('vmsDiskSku')]"
               },
@@ -1545,8 +1891,10 @@
                 "creationData": {
                   "createOption": "Empty"
                 },
-                "diskSizeGB": 1024,
-                "burstingEnabled": true
+                "diskSizeGB": 256,
+                "burstingEnabled": false,
+                "diskMBpsReadWrite": 200,
+                "diskIOPSReadWrite": 5000
               }
             },
             {
@@ -1554,6 +1902,9 @@
               "apiVersion": "2022-03-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('location')]",
+              "zones": [
+                "[parameters('zones')]"
+              ],
               "identity": {
                 "type": "SystemAssigned"
               },
@@ -1569,7 +1920,7 @@
                     "managedDisk": {
                       "storageAccountType": "[variables('osDiskType')]"
                     },
-                    "diskSizeGB": 1024
+                    "diskSizeGB": 127
                   },
                   "imageReference": {
                     "publisher": "MicrosoftWindowsServer",
@@ -1600,9 +1951,12 @@
                   "adminPassword": "[parameters('windowsAdminPassword')]",
                   "windowsConfiguration": {
                     "provisionVMAgent": true,
-                    "enableAutomaticUpdates": false
+                    "enableAutomaticUpdates": true
                   }
-                }
+                },
+                "priority": "[if(parameters('enableAzureSpotPricing'), 'Spot', 'Regular')]",
+                "evictionPolicy": "[if(parameters('enableAzureSpotPricing'), 'Deallocate', null())]",
+                "billingProfile": "[if(parameters('enableAzureSpotPricing'), createObject('maxPrice', -1), null())]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
@@ -1626,7 +1980,7 @@
                   "fileUris": [
                     "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                   ],
-                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -githubBranch {27} -vmAutologon {28} -rdpPort {29} -addsDomainName {30} -customLocationRPOID {31} -resourceTags {32} -namingPrefix {33} -debugEnabled {34} -sqlServerEdition {35}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('githubBranch'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'), parameters('resourceTags'), parameters('namingPrefix'), parameters('debugEnabled'), parameters('sqlServerEdition'))]"
+                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -tenantId {1} -spnAuthority {2} -subscriptionId {3} -resourceGroup {4} -azdataUsername {5} -acceptEula {6} -registryUsername {7} -arcDcName {8} -azureLocation {9} -mssqlmiName {10} -POSTGRES_NAME {11} -POSTGRES_WORKER_NODE_COUNT {12} -POSTGRES_DATASIZE {13} -POSTGRES_SERVICE_TYPE {14} -stagingStorageAccountName {15} -workspaceName {16} -templateBaseUrl {17} -flavor {18} -k3sArcDataClusterName {19} -k3sArcClusterName {20} -aksArcClusterName {21} -aksdrArcClusterName {22} -githubUser {23} -githubBranch {24} -vmAutologon {25} -rdpPort {26} -addsDomainName {27} -customLocationRPOID {28} -resourceTags {29} -namingPrefix {30} -debugEnabled {31} -sqlServerEdition {32} -autoShutdownEnabled {33}', parameters('windowsAdminUsername'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('acceptEula'), parameters('registryUsername'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('githubBranch'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'), parameters('resourceTags'), parameters('namingPrefix'), parameters('debugEnabled'), parameters('sqlServerEdition'), parameters('autoShutdownEnabled'))]"
                 }
               },
               "dependsOn": [
@@ -1645,6 +1999,15 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
               ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(deployer().objectId, 'Microsoft.Authorization/roleAssignments', 'Key Vault Administrator')]",
+              "properties": {
+                "principalId": "[deployer().objectId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')]"
+              }
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
@@ -1686,7 +2049,7 @@
                 },
                 "timeZoneId": "[parameters('autoShutdownTimezone')]",
                 "notificationSettings": {
-                  "status": "Enabled",
+                  "status": "[if(empty(parameters('autoShutdownEmailRecipient')), 'Disabled', 'Enabled')]",
                   "timeInMinutes": 30,
                   "webhookUrl": "",
                   "emailRecipient": "[parameters('autoShutdownEmailRecipient')]",
@@ -1742,8 +2105,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "8653137040194732155"
+              "version": "0.32.4.45862",
+              "templateHash": "16555076902768051082"
             }
           },
           "parameters": {
@@ -1835,16 +2198,23 @@
           },
           "namingPrefix": {
             "value": "[parameters('namingPrefix')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "registryPassword": {
+            "value": "[parameters('registryPassword')]"
           }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1172818642563861188"
+              "version": "0.32.4.45862",
+              "templateHash": "12707130817207447691"
             }
           },
           "parameters": {
@@ -1977,6 +2347,19 @@
               "metadata": {
                 "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
               }
+            },
+            "windowsAdminPassword": {
+              "type": "securestring",
+              "nullable": true,
+              "minLength": 12,
+              "maxLength": 123,
+              "metadata": {
+                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+              }
+            },
+            "registryPassword": {
+              "type": "securestring",
+              "nullable": true
             }
           },
           "variables": {
@@ -2035,8 +2418,8 @@
               }
             ]
           },
-          "resources": [
-            {
+          "resources": {
+            "arcVirtualNetwork": {
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2022-01-01",
               "name": "[parameters('virtualNetworkName')]",
@@ -2053,12 +2436,12 @@
                 "subnets": "[if(and(equals(parameters('deployBastion'), false()), not(equals(parameters('flavor'), 'DataOps'))), variables('primarySubnet'), if(and(equals(parameters('deployBastion'), false()), equals(parameters('flavor'), 'DataOps')), union(variables('primarySubnet'), variables('dataOpsSubnets')), if(and(equals(parameters('deployBastion'), true()), not(equals(parameters('flavor'), 'DataOps'))), union(variables('primarySubnet'), variables('bastionSubnet')), if(and(equals(parameters('deployBastion'), true()), equals(parameters('flavor'), 'DataOps')), union(variables('primarySubnet'), variables('bastionSubnet'), variables('dataOpsSubnets')), variables('primarySubnet')))))]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "bastionNetworkSecurityGroup",
+                "networkSecurityGroup",
+                "policyDeployment"
               ]
             },
-            {
+            "drVirtualNetwork": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2022-01-01",
@@ -2086,11 +2469,11 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "networkSecurityGroup",
+                "policyDeployment"
               ]
             },
-            {
+            "virtualNetworkName_peering_to_DR_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
               "apiVersion": "2022-01-01",
@@ -2105,12 +2488,12 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "arcVirtualNetwork",
+                "drVirtualNetwork",
+                "policyDeployment"
               ]
             },
-            {
+            "drVirtualNetworkName_peering_to_primary_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
               "apiVersion": "2022-01-01",
@@ -2125,12 +2508,12 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "arcVirtualNetwork",
+                "drVirtualNetwork",
+                "policyDeployment"
               ]
             },
-            {
+            "networkSecurityGroup": {
               "type": "Microsoft.Network/networkSecurityGroups",
               "apiVersion": "2022-01-01",
               "name": "[parameters('networkSecurityGroupName')]",
@@ -2244,10 +2627,10 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "bastionNetworkSecurityGroup": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/networkSecurityGroups",
               "apiVersion": "2022-01-01",
@@ -2374,10 +2757,10 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "workspace": {
               "type": "Microsoft.OperationalInsights/workspaces",
               "apiVersion": "2021-06-01",
               "name": "[parameters('workspaceName')]",
@@ -2389,7 +2772,7 @@
                 }
               }
             },
-            {
+            "securityGallery": {
               "type": "Microsoft.OperationsManagement/solutions",
               "apiVersion": "2015-11-01-preview",
               "name": "[variables('security').name]",
@@ -2404,10 +2787,10 @@
                 "publisher": "Microsoft"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                "workspace"
               ]
             },
-            {
+            "publicIpAddress": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/publicIPAddresses",
               "apiVersion": "2022-01-01",
@@ -2422,10 +2805,10 @@
                 "name": "Standard"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "bastionHost": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/bastionHosts",
               "apiVersion": "2023-11-01",
@@ -2439,12 +2822,45 @@
                 "ipConfigurations": "[if(not(equals(parameters('bastionSku'), 'Developer')), createArray(createObject('name', 'IpConf', 'properties', createObject('publicIPAddress', createObject('id', resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))), 'subnet', createObject('id', variables('bastionSubnetRef'))))), null())]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
+                "arcVirtualNetwork",
+                "policyDeployment",
+                "publicIpAddress"
               ]
             },
-            {
+            "kv": {
+              "existing": true,
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('keyVaultName')]",
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "windowsAdminPassword_kv_secret": {
+              "condition": "[not(empty(parameters('windowsAdminPassword')))]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'windowsAdminPassword')]",
+              "properties": {
+                "value": "[parameters('windowsAdminPassword')]"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "registryPassword_kv_secret": {
+              "condition": "[not(empty(parameters('registryPassword')))]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'registryPassword')]",
+              "properties": {
+                "value": "[parameters('registryPassword')]"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "policyDeployment": {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "policyDeployment",
@@ -2473,8 +2889,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "9222970623693331004"
+                      "version": "0.32.4.45862",
+                      "templateHash": "1912011565831162458"
                     }
                   },
                   "parameters": {
@@ -2770,10 +3186,10 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                "workspace"
               ]
             },
-            {
+            "keyVault": {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "keyVaultDeployment",
@@ -2790,7 +3206,7 @@
                     "value": false
                   },
                   "enableSoftDelete": {
-                    "value": false
+                    "value": true
                   },
                   "location": {
                     "value": "[parameters('location')]"
@@ -5232,10 +5648,10 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             }
-          ],
+          },
           "outputs": {
             "vnetId": {
               "type": "string",
@@ -5243,7 +5659,7 @@
             },
             "subnetId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '2022-01-01').subnets[0].id]"
+              "value": "[reference('arcVirtualNetwork').subnets[0].id]"
             }
           }
         }
@@ -5288,8 +5704,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "6158909554667476108"
+              "version": "0.32.4.45862",
+              "templateHash": "8144821245242671317"
             }
           },
           "parameters": {
@@ -5537,12 +5953,13 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1172818642563861188"
+              "version": "0.32.4.45862",
+              "templateHash": "12707130817207447691"
             }
           },
           "parameters": {
@@ -5675,6 +6092,19 @@
               "metadata": {
                 "description": "The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19"
               }
+            },
+            "windowsAdminPassword": {
+              "type": "securestring",
+              "nullable": true,
+              "minLength": 12,
+              "maxLength": 123,
+              "metadata": {
+                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+              }
+            },
+            "registryPassword": {
+              "type": "securestring",
+              "nullable": true
             }
           },
           "variables": {
@@ -5733,8 +6163,8 @@
               }
             ]
           },
-          "resources": [
-            {
+          "resources": {
+            "arcVirtualNetwork": {
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2022-01-01",
               "name": "[parameters('virtualNetworkName')]",
@@ -5751,12 +6181,12 @@
                 "subnets": "[if(and(equals(parameters('deployBastion'), false()), not(equals(parameters('flavor'), 'DataOps'))), variables('primarySubnet'), if(and(equals(parameters('deployBastion'), false()), equals(parameters('flavor'), 'DataOps')), union(variables('primarySubnet'), variables('dataOpsSubnets')), if(and(equals(parameters('deployBastion'), true()), not(equals(parameters('flavor'), 'DataOps'))), union(variables('primarySubnet'), variables('bastionSubnet')), if(and(equals(parameters('deployBastion'), true()), equals(parameters('flavor'), 'DataOps')), union(variables('primarySubnet'), variables('bastionSubnet'), variables('dataOpsSubnets')), variables('primarySubnet')))))]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "bastionNetworkSecurityGroup",
+                "networkSecurityGroup",
+                "policyDeployment"
               ]
             },
-            {
+            "drVirtualNetwork": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2022-01-01",
@@ -5784,11 +6214,11 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "networkSecurityGroup",
+                "policyDeployment"
               ]
             },
-            {
+            "virtualNetworkName_peering_to_DR_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
               "apiVersion": "2022-01-01",
@@ -5803,12 +6233,12 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "arcVirtualNetwork",
+                "drVirtualNetwork",
+                "policyDeployment"
               ]
             },
-            {
+            "drVirtualNetworkName_peering_to_primary_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
               "apiVersion": "2022-01-01",
@@ -5823,12 +6253,12 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "arcVirtualNetwork",
+                "drVirtualNetwork",
+                "policyDeployment"
               ]
             },
-            {
+            "networkSecurityGroup": {
               "type": "Microsoft.Network/networkSecurityGroups",
               "apiVersion": "2022-01-01",
               "name": "[parameters('networkSecurityGroupName')]",
@@ -5942,10 +6372,10 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "bastionNetworkSecurityGroup": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/networkSecurityGroups",
               "apiVersion": "2022-01-01",
@@ -6072,10 +6502,10 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "workspace": {
               "type": "Microsoft.OperationalInsights/workspaces",
               "apiVersion": "2021-06-01",
               "name": "[parameters('workspaceName')]",
@@ -6087,7 +6517,7 @@
                 }
               }
             },
-            {
+            "securityGallery": {
               "type": "Microsoft.OperationsManagement/solutions",
               "apiVersion": "2015-11-01-preview",
               "name": "[variables('security').name]",
@@ -6102,10 +6532,10 @@
                 "publisher": "Microsoft"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                "workspace"
               ]
             },
-            {
+            "publicIpAddress": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/publicIPAddresses",
               "apiVersion": "2022-01-01",
@@ -6120,10 +6550,10 @@
                 "name": "Standard"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             },
-            {
+            "bastionHost": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/bastionHosts",
               "apiVersion": "2023-11-01",
@@ -6137,12 +6567,45 @@
                 "ipConfigurations": "[if(not(equals(parameters('bastionSku'), 'Developer')), createArray(createObject('name', 'IpConf', 'properties', createObject('publicIPAddress', createObject('id', resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))), 'subnet', createObject('id', variables('bastionSubnetRef'))))), null())]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
+                "arcVirtualNetwork",
+                "policyDeployment",
+                "publicIpAddress"
               ]
             },
-            {
+            "kv": {
+              "existing": true,
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('keyVaultName')]",
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "windowsAdminPassword_kv_secret": {
+              "condition": "[not(empty(parameters('windowsAdminPassword')))]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'windowsAdminPassword')]",
+              "properties": {
+                "value": "[parameters('windowsAdminPassword')]"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "registryPassword_kv_secret": {
+              "condition": "[not(empty(parameters('registryPassword')))]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'registryPassword')]",
+              "properties": {
+                "value": "[parameters('registryPassword')]"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "policyDeployment": {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "policyDeployment",
@@ -6171,8 +6634,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "9222970623693331004"
+                      "version": "0.32.4.45862",
+                      "templateHash": "1912011565831162458"
                     }
                   },
                   "parameters": {
@@ -6468,10 +6931,10 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                "workspace"
               ]
             },
-            {
+            "keyVault": {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "keyVaultDeployment",
@@ -6488,7 +6951,7 @@
                     "value": false
                   },
                   "enableSoftDelete": {
-                    "value": false
+                    "value": true
                   },
                   "location": {
                     "value": "[parameters('location')]"
@@ -8930,10 +9393,10 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'policyDeployment')]"
+                "policyDeployment"
               ]
             }
-          ],
+          },
           "outputs": {
             "vnetId": {
               "type": "string",
@@ -8941,7 +9404,7 @@
             },
             "subnetId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '2022-01-01').subnets[0].id]"
+              "value": "[reference('arcVirtualNetwork').subnets[0].id]"
             }
           }
         }
@@ -8984,8 +9447,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "1398021495301668101"
+              "version": "0.32.4.45862",
+              "templateHash": "15103003561479579430"
             }
           },
           "parameters": {
@@ -9109,7 +9572,7 @@
           "resources": [
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-02-02-preview",
+              "apiVersion": "2024-04-02-preview",
               "name": "[parameters('aksClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9144,6 +9607,10 @@
                   "serviceCidr": "[variables('serviceCidr_primary')]",
                   "dnsServiceIP": "[variables('dnsServiceIP_primary')]"
                 },
+                "autoUpgradeProfile": {
+                  "nodeOSUpgradeChannel": "NodeImage",
+                  "upgradeChannel": "stable"
+                },
                 "linuxProfile": {
                   "adminUsername": "[parameters('linuxAdminUsername')]",
                   "ssh": {
@@ -9153,16 +9620,12 @@
                       }
                     ]
                   }
-                },
-                "autoUpgradeProfile": {
-                  "upgradeChannel": "stable",
-                  "nodeOSUpgradeChannel": "NodeImage"
                 }
               }
             },
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-02-02-preview",
+              "apiVersion": "2024-04-02-preview",
               "name": "[parameters('drClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9208,8 +9671,8 @@
                   }
                 },
                 "autoUpgradeProfile": {
-                  "upgradeChannel": "stable",
-                  "nodeOSUpgradeChannel": "NodeImage"
+                  "nodeOSUpgradeChannel": "NodeImage",
+                  "upgradeChannel": "stable"
                 }
               }
             },
@@ -9218,7 +9681,7 @@
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
                 "principalType": "ServicePrincipal"
               },
@@ -9231,7 +9694,7 @@
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2024-04-02-preview', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
                 "principalType": "ServicePrincipal"
               },

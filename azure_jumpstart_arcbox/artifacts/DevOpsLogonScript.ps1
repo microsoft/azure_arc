@@ -38,14 +38,6 @@ foreach ($key in $keys) {
     }
 }
 
-# Create Windows Terminal desktop shortcut
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
 # Create desktop shortcut for Logs-folder
 $WshShell = New-Object -comObject WScript.Shell
 $LogsPath = "C:\ArcBox\Logs"
@@ -321,7 +313,7 @@ az k8s-configuration flux create `
     --scope cluster `
     --url $appClonedRepo `
     --branch $env:githubBranch --sync-interval 3s `
-    --kustomization name=nginx path=./nginx/release
+    --kustomization name=nginx path=./arcbox/nginx/release
 
 # Create GitOps config for Bookstore application
 Write-Host "Creating GitOps config for Bookstore application"
@@ -332,7 +324,7 @@ az k8s-configuration flux create `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
     --branch $env:githubBranch --sync-interval 3s `
-    --kustomization name=bookstore path=./bookstore/yaml
+    --kustomization name=bookstore path=./arcbox/bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
 Write-Host "Creating GitOps config for Bookstore RBAC"
@@ -345,7 +337,7 @@ az k8s-configuration flux create `
     --namespace bookstore `
     --url $appClonedRepo `
     --branch $env:githubBranch --sync-interval 3s `
-    --kustomization name=bookstore path=./bookstore/rbac-sample
+    --kustomization name=bookstore path=./arcbox/bookstore/rbac-sample
 
 # Create GitOps config for Hello-Arc application
 Write-Host "Creating GitOps config for Hello-Arc application"
@@ -358,7 +350,7 @@ az k8s-configuration flux create `
     --scope namespace `
     --url $appClonedRepo `
     --branch $env:githubBranch --sync-interval 3s `
-    --kustomization name=helloarc path=./hello-arc/yaml
+    --kustomization name=helloarc path=./arcbox/hello_arc/yaml
 
 $configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcDataClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)
 
@@ -475,15 +467,3 @@ Start-Sleep -Seconds 5
 Write-Header "Running tests to verify infrastructure"
 
 & "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
-
-Write-Header "Creating deployment logs bundle"
-
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
-$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
-
-#required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
-
-Stop-Transcript

@@ -79,11 +79,4 @@ properties:
       settings:
         id: FireDaemon.OpenSSL
         source: winget
-    - resource: DSCR_Font/cFont
-      id: CascadiaMono
-      directives:
-        description: Install font CascadiaMono
-      settings:
-        FontName: Cascadia Mono
-        FontFile: C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.18.3181.0_x64__8wekyb3d8bbwe\CascadiaMono.ttf
   configurationVersion: 0.2.0

@@ -27,7 +27,7 @@
       "value": "<Azure Bastion Host name>"
     },
     "servicePrincipalClient": {
-      "value": "<Your Azure service principal name>"
+      "value": "<Your Azure service principal application ID>"
     },
     "servicePrincipalClientSecret": {
       "value": "<Your Azure service principal password>"

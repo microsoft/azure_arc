@@ -63,7 +63,7 @@ jobs:
         prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
       if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       run: |
-        docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
+        docker build ./agora/point_of_sale/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
 
     - name: 'Checkout production branch'

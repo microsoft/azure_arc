@@ -12,7 +12,7 @@ param windowsAdminUsername string
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string  = newGuid()
 
 @description('Enable automatic logon into ArcBox Virtual Machine')
 param vmAutologon bool = true
@@ -21,7 +21,7 @@ param vmAutologon bool = true
 param rdpPort string = '3389'
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string
+param logAnalyticsWorkspaceName string = 'ArcBox-la'
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
@@ -83,10 +83,24 @@ param resourceTags object = {
 @description('The naming prefix for the nested virtual machines and all Azure resources deployed. The maximum length for the naming prefix is 7 characters,example: `ArcBox-Win2k19`')
 param namingPrefix string = 'ArcBox'
 
-param autoShutdownEnabled bool = false
+param autoShutdownEnabled bool = true
 param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm format (24-hour clock)
 param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
 param autoShutdownEmailRecipient string = ''
+
+@description('Option to enable spot pricing for the ArcBox Client VM')
+param enableAzureSpotPricing bool = false
+
+@description('The availability zone for the Virtual Machine, public IP, and data disk for the ArcBox client VM')
+@allowed([
+  '1'
+  '2'
+  '3'
+])
+param zones string = '1'
+
+@secure()
+param registryPassword string = newGuid()
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
@@ -170,7 +184,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
-    azdataPassword: windowsAdminPassword
     tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
@@ -196,6 +209,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownTimezone: autoShutdownTimezone
     autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
     sqlServerEdition: sqlServerEdition
+    zones: zones
+    enableAzureSpotPricing: enableAzureSpotPricing
   }
   dependsOn: [
     updateVNetDNSServers
@@ -222,6 +237,8 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
     resourceTags: resourceTags
     namingPrefix: namingPrefix
+    windowsAdminPassword: windowsAdminPassword
+    registryPassword: registryPassword
   }
 }
 
