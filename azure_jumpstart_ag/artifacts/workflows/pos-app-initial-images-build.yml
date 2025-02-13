@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build-and-deploy-v1-image:
-      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && github.event.pull_request.merged == true
+      if: ${{ github.repository != 'azure/jumpstart-apps' }} && github.event.pull_request.merged == true
       runs-on: ubuntu-latest
       steps:
       # checkout the repo
@@ -38,7 +38,7 @@ jobs:
               if [ $branch == "main" ]; then
                 branch="dev"
               fi
-              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag"
+              docker build ./agora/point_of_sale/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag
             done
 
@@ -57,7 +57,7 @@ jobs:
               if [ $branch == "main" ]; then
                 branch="dev"
               fi
-              docker build ./contoso_supermarket/developer/pos/src/cloud_sync -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+              docker build ./agora/pos_cloud_sync/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0
             done
 
@@ -76,7 +76,7 @@ jobs:
               if [ $branch == "main" ]; then
                 branch="dev"
               fi
-              docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+              docker build ./agora/store_ai_backend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0
             done
 
@@ -95,7 +95,7 @@ jobs:
               if [ $branch == "main" ]; then
                 branch="dev"
               fi
-              docker build ./contoso_supermarket/developer/queue_monitoring_backend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+              docker build ./agora/store_queue_monitoring_backend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0
             done
 
@@ -114,6 +114,6 @@ jobs:
               if [ $branch == "main" ]; then
                 branch="dev"
               fi
-              docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+              docker build ./agora/store_queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0
             done

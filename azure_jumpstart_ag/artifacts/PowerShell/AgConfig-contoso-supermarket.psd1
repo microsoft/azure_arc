@@ -8,7 +8,7 @@
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgIconDir         = "C:\Ag\Icons"
-        AgTestsDir        = "C:\Ag\Tests"        
+        AgTestsDir        = "C:\Ag\Tests"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"
@@ -257,63 +257,63 @@
         ContosoSupermarket_contosodb = @{
             GitOpsConfigName = "config-supermarket-db"
             KustomizationName = "contosodb"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosodb"
+            KustomizationPath="./agora/store_db/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 1
         }
         ContosoSupermarket_cloudsync = @{
             GitOpsConfigName = "config-supermarket-cloudsync"
             KustomizationName = "cloudsync"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/cloudsync"
+            KustomizationPath="./agora/pos_cloud_sync/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 2
         }
         ContosoSupermarket_contosopos = @{
             GitOpsConfigName = "config-supermarket-pos"
             KustomizationName = "contosopos"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosopos"
+            KustomizationPath="./agora/point_of_sale/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 3
         }
         ContosoSupermarket_queue_monitoring_backend = @{
             GitOpsConfigName = "config-supermarket-queue-backend"
             KustomizationName = "queuebackend"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-backend"
+            KustomizationPath="./agora/store_queue_monitoring_backend/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 4
         }
         ContosoSupermarket_contosoai = @{
             GitOpsConfigName = "config-supermarket-ai"
             KustomizationName = "contosoai"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosoai"
+            KustomizationPath="./agora/store_ai_backend/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 5
         }
         ContosoSupermarket_queue_monitoring_frontend = @{
             GitOpsConfigName = "config-supermarket-queue-frontend"
             KustomizationName = "queuefrontend"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend"
+            KustomizationPath="./agora/store_queue_monitoring_frontend/operations/releases"
             Namespace = "contoso-supermarket"
             Order = 6
         }
         SensorMonitor = @{
             GitOpsConfigName  = "config-sensormonitor"
             KustomizationName = "sensor-monitor"
-            KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
+            KustomizationPath = "./agora/freezer_monitoring/operations/releases"
             Namespace         = "sensor-monitor"
             AppPath           = "freezer_monitoring"
             ConfigMaps = @{
                 "mqtt-broker-config" = @{
                     ContainerName = "mqtt-broker"
-                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt_broker/mosquitto.conf"
                 }
                 "mqtt-simulator-config" = @{
                     ContainerName = "mqtt-simulator"
-                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt_simulator/config/settings.json"
                 }
                 "mqtt2prom-config" = @{
                     ContainerName = "mqtt2prom"
-                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
+                    RepoPath      = "contents/agora/freezer_monitoring/src/mqtt2prom/config.yaml"
                 }
             }
             Order = 7

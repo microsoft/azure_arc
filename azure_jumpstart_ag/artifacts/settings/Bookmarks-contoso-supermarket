@@ -156,14 +156,14 @@
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "https://github.com/microsoft/jumpstart-agora-apps"
+               "url": "https://github.com/microsoft/jumpstart-apps"
             }, {
                "id": "21",
-               "name": "Agora-Apps-Repo-Your-Fork",
+               "name": "Jumpstart-Apps-Repo-Your-Fork",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Agora-Apps-Repo-Clone-URL"
+               "url": "Jumpstart-Apps-Repo-Clone-URL"
             } ],
             "id": "19",
             "name": "GitHub",

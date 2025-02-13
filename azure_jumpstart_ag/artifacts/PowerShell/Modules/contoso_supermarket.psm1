@@ -14,7 +14,7 @@ function SetupSupermarketRepo {
         }
         catch {
             if ($retryCount -lt $maxRetries) {
-                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
+                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/azure/jumpstart-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
                 $retryCount++
                 $forkExists = $false
                 start-sleep -Seconds 60
@@ -150,7 +150,7 @@ function SetupSupermarketRepo {
     $retryCount = 0
     $maxRetries = 5
     do {
-        $response = gh secret set "test" -b "test" 2>&1
+        $response = gh secret set "test" -b "test" --repo $githubUser/$appsRepo 2>&1
         if ($response -match "error") {
             if ($retryCount -eq $maxRetries) {
                 Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
@@ -163,7 +163,7 @@ function SetupSupermarketRepo {
             }
         }
     } while ($response -match "error" -or $retryCount -ge $maxRetries)
-    gh secret delete test
+    gh secret delete test --repo $githubUser/$appsRepo
     Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
 
     Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
@@ -190,12 +190,12 @@ function SetupSupermarketRepo {
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
     gh repo set-default "$githubUser/$appsRepo"
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-    gh secret set "ACR_NAME" -b $acrName
-    gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-    gh secret set "SPN_TENANT_ID" -b $spnTenantId
+    gh secret set "SPN_CLIENT_ID" --body $spnClientID --repo $githubUser/$appsRepo
+    gh secret set "SPN_CLIENT_SECRET" --body $spnClientSecret --repo $githubUser/$appsRepo
+    gh secret set "ACR_NAME" --body $acrName --repo $githubUser/$appsRepo
+    gh secret set "PAT_GITHUB" --body $githubPat --repo $githubUser/$appsRepo
+    gh secret set "COSMOS_DB_ENDPOINT" --body $cosmosDBEndpoint --repo $githubUser/$appsRepo
+    gh secret set "SPN_TENANT_ID" --body $spnTenantId --repo $githubUser/$appsRepo
 
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
@@ -288,7 +288,7 @@ function Deploy-AzureIOTHub {
         Write-Host
     }
     else {
-        Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+        Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-apps repository!" -ForegroundColor Red
     }
 
     ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
@@ -495,6 +495,7 @@ function Deploy-supermarketConfigs {
             }
 
             $AgConfig = $using:AgConfig
+            $configMapDir = $using:configMapDir
             $cluster = $using:cluster
             $site = $cluster.Value
             $siteName = $site.FriendlyName.ToLower()
@@ -754,8 +755,8 @@ function Deploy-supermarketBookmarks {
 
     # Replace matching value in the Bookmarks file
     $content = Get-Content -Path $bookmarksFileName
-    $newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
-    $newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+    $newContent = $content -replace "Jumpstart-Apps-Repo-Clone-URL", $output
+    $newContent = $newContent -replace "Jumpstart-Apps-Repo-Your-Fork", "Jumpstart Apps Repo - $githubUser"
     $newContent | Set-Content -Path $bookmarksFileName
 
     Start-Sleep -Seconds 2

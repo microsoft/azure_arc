@@ -1,0 +1,31 @@
+name: Stale Branches
+
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  stale_branches:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Stale Branches
+      uses: crs-k/stale-branches@v5.0.0
+      with:
+        repo-token: '${{ secrets.GITHUB_TOKEN }}'
+        days-before-stale: 45
+        days-before-delete: 60
+        comment-updates: false
+        tag-committer: false
+        stale-branch-label: 'stale branch 🗑️'
+        compare-branches: 'info'
+        branches-filter-regex: '^((?!dependabot))'
+        rate-limit: false
+        pr-check: false
+        dry-run: false
+        ignore-issue-interaction: false
+        

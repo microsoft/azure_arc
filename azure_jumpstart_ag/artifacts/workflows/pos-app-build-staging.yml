@@ -7,7 +7,7 @@ on:
         types:
             - closed
         paths:
-        - 'contoso_supermarket/developer/pos/**'
+        - 'agora/point_of_sale/src/**'
 
   workflow_dispatch: {}
 
@@ -56,9 +56,9 @@ jobs:
         env:
           latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         run: |
-              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
+              docker build ./agora/point_of_sale/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
-              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
+              docker build ./agora/point_of_sale/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
 
       - name: 'Update Image tag on main branch'
