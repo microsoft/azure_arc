@@ -325,4 +325,9 @@ azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storag
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
+    echo "Installing OVMS and InfluxDB Helm charts"
+    helm install ovms -n contoso-motors oci://jumpstartprod.azurecr.io/helm/ovms --version 0.1.0
+    helm install influxdb -n contoso-motors oci://jumpstartprod.azurecr.io/helm/influxdb --version 0.1.1
+
+
 exit 0
