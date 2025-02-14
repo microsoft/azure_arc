@@ -66,10 +66,10 @@ param adxClusterName string
 param rdpPort string = '3389'
 
 @description('Target GitHub account')
-param githubAccount string = 'nabeelmsft'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'contosomotorswork'
+param githubBranch string = 'main'
 
 //@description('GitHub Personal access token for the user account')
 //@secure()
@@ -136,7 +136,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D32s_v5'
+      vmSize: 'Standard_D8s_v5'
     }
     storageProfile: {
       osDisk: {
