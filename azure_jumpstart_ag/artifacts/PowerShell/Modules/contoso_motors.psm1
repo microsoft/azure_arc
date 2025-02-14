@@ -128,15 +128,9 @@ function Set-K3sClusters {
 }
 
 function Deploy-MotorsConfigs {
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS and InfluxDB" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Beginning Contoso Motors GitOps Deployment" -ForegroundColor Gray
 
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-
-        helm install ovms --create-namespace -n contoso-motors oci://jumpstartprod.azurecr.io/helm/ovms --version 0.1.0
-        helm install influxdb -n contoso-motors oci://jumpstartprod.azurecr.io/helm/influxdb --version 0.1.1
-
-    
-    }
+  
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-motors.psd
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
