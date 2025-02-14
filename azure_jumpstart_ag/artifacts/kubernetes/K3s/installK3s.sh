@@ -313,6 +313,7 @@ fi
 
 # Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
     echo "Running curl command to install OpenVINO Toolkit Operator"
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
     sleep 10
     echo "Installing operator via kubectl"
@@ -320,6 +321,7 @@ fi
 
     echo "Installing OVMS and InfluxDB Helm charts"
     helm install ovms --create-namespace -n contoso-motors oci://jumpstartprod.azurecr.io/helm/ovms --version 0.1.0
+    sleep 10
     helm install influxdb -n contoso-motors oci://jumpstartprod.azurecr.io/helm/influxdb --version 0.1.1
 
 
