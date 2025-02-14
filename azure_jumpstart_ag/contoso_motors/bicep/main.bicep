@@ -87,11 +87,6 @@ param k3sArcDataClusterName string = 'Ag-K3s-Detroit-${namingGuid}'
 @description('The name of the Azure Arc K3s data cluster')
 param k3sArcClusterName string = 'Ag-K3s-Monterrey-${namingGuid}'
 
-@minLength(5)
-@maxLength(50)
-@description('Name of the Azure Container Registry')
-param acrName string = 'agacr${namingGuid}'
-
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
@@ -231,7 +226,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     //githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    acrName: acrName
     rdpPort: rdpPort
     namingGuid: namingGuid
     adxClusterName: adxClusterName
@@ -281,14 +275,6 @@ module keyVault 'data/keyVault.bicep' = {
     akvNameSite2: akvNameSite2
     location: location
     spnObjectId: spnObjectId
-  }
-}
-
-module acr 'kubernetes/acr.bicep' = {
-  name: 'acrDeployment'
-  params: {
-    acrName: acrName
-    location: location
   }
 }
 
