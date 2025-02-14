@@ -42,9 +42,9 @@ if ($scenario -eq "contoso_supermarket") {
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 }elseif ($scenario -eq "contoso_motors") {
-    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+    $global:appUpstreamRepo = "https://github.com/mrhoads/jumpstart-apps"
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
@@ -168,7 +168,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 if($scenario -eq "contoso_hypermarket" -or $scenario -eq "contoso_motors"){
     Get-K3sConfigFileContosoMotors 
-    Merge-K3sConfigFiles
+    Merge-K3sConfigFilesContosoMotors
     Set-K3sClusters
 }
 

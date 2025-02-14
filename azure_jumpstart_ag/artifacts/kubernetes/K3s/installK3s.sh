@@ -79,8 +79,7 @@ sudo chmod +x /usr/local/bin/azcopy
 
 # Authorize azcopy by using a system-wide managed identity
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
-
-# Run the lock check before attempting the installation
+d devthe lock check before attempting the installation
 check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
@@ -310,6 +309,22 @@ fi
 
     # Installing NVIDIA container toolkit
 
+
+
+# Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
+    echo "Running curl command to install OpenVINO Toolkit Operator"
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
+    sleep 10
+    echo "Installing operator via kubectl"
+    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+
+    echo "Installing OVMS and InfluxDB Helm charts"
+    helm install ovms --create-namespace -n contoso-motors oci://jumpstartprod.azurecr.io/helm/ovms --version 0.1.0
+    sleep 10
+    helm install influxdb -n contoso-motors oci://jumpstartprod.azurecr.io/helm/influxdb --version 0.1.1
+
+
 # Uploading this script log to staging storage for ease of troubleshooting
 echo ""
 echo "Uploading the script logs to staging storage"
@@ -319,11 +334,5 @@ log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
 
-# Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
-    echo "Running curl command to install OpenVINO Toolkit Operator"
-    curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
-    sleep 10
-    echo "Installing operator via kubectl"
-    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
 exit 0

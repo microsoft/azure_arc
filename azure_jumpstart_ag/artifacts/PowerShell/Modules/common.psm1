@@ -998,33 +998,32 @@ function Deploy-Prometheus {
         } while ($true)
 
         # Install Prometheus Operator
-        # Lines 1002 to 1027 needs to be uncommented after the debug session.
-        # $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
-        # helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-        # Do {
-        #     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
-        #     Start-Sleep -Seconds 45
-        #     $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-        # } while ($monitorIP -eq "Nope" )
-        # # Get Load Balancer IP
-        # $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        Do {
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($monitorIP -eq "Nope" )
+        # Get Load Balancer IP
+        $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-        # if ($_.Value.IsProduction) {
-        #     Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
-        #     # Request body with information about the data source to add
-        #     $grafanaDSBody = @{
-        #         name      = $_.Value.FriendlyName.ToLower()
-        #         type      = 'prometheus'
-        #         url       = ("http://" + $monitorLBIP + ":9090")
-        #         access    = 'proxy'
-        #         basicAuth = $false
-        #         isDefault = $true
-        #     } | ConvertTo-Json
+        if ($_.Value.IsProduction) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
+            # Request body with information about the data source to add
+            $grafanaDSBody = @{
+                name      = $_.Value.FriendlyName.ToLower()
+                type      = 'prometheus'
+                url       = ("http://" + $monitorLBIP + ":9090")
+                access    = 'proxy'
+                basicAuth = $false
+                isDefault = $true
+            } | ConvertTo-Json
 
-        #     # Make HTTP request to the API
-        #     Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        # }
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
 
         # Add Contoso Operator User
         if (!$_.Value.IsProduction) {
@@ -1146,20 +1145,6 @@ function Deploy-Prometheus {
     Write-Host
 }
 
-function Update-AzureIoTOpsExtension {
-    try {
-        Write-Host "Starting patching of azure-iot-ops extension..." -ForegroundColor Green
-        & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "C:\Program Files\Microsoft SDKs\Azure\CLI2\Lib\site-packages\azure-cli-extensions\azure-iot-ops" azure-identity==1.17.1
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "Installation of azure-iot-ops extension completed successfully." -ForegroundColor Green
-        } else {
-            Write-Host "Installation of azure-iot-ops extension failed with exit code $LASTEXITCODE." -ForegroundColor Red
-        }
-    } catch {
-        Write-Host "An error occurred during the patching of the azure-iot-ops extension." -ForegroundColor Red
-        Write-Host $_.Exception.Message -ForegroundColor Red
-    }
-}
 
 # Deploys Azure IoT Operations on all k8s clusters in the config file
 function Deploy-AIO {

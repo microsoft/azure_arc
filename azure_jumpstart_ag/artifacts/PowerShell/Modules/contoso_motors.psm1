@@ -13,12 +13,12 @@ function Get-K3sConfigFileContosoMotors {
     }
 }
 
-function Merge-K3sConfigFiles {
+function Merge-K3sConfigFilesContosoMotors{
 
     $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
 
-    $kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
-    $kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    $kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-detroit"
+    $kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-monterrey"
 
     # Extract base file names (without extensions) to use as new names
     $suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig1Path)
@@ -84,8 +84,8 @@ function Merge-K3sConfigFiles {
     $mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
 
     Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
-    kubectx seattle="ag-k3s-seattle"
-    kubectx chicago="ag-k3s-chicago"
+    kubectx detroit="ag-k3s-detroit"
+    kubectx monterrey="ag-k3s-monterrey"
 
 }
 
@@ -128,15 +128,9 @@ function Set-K3sClusters {
 }
 
 function Deploy-MotorsConfigs {
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Beginning Contoso Motors GitOps Deployment" -ForegroundColor Gray
 
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        if ($cluster.Value.Type -eq "k3s") {
-            Invoke-Expression "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
-            kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
- 
-        }
-    }
+  
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-motors.psd
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -231,7 +225,7 @@ function Deploy-MotorsConfigs {
                                     --scope cluster `
                                     --url $appClonedRepo `
                                     --branch $branch `
-                                    --sync-interval 3s `
+                                    --sync-interval 5m `
                                     --kustomization name=$appName path=$appPath prune=true `
                                     --timeout 30m `
                                     --namespace $namespace `

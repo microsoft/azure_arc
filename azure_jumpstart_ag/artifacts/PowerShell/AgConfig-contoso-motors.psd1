@@ -147,23 +147,23 @@
 
     # Site Kubernetes cluster configurations
     SiteConfig              = @{
-        Seattle = @{
-            ArcClusterName         = "Ag-K3s-Seattle"
-            FriendlyName           = "Seattle"
-            GrafanaDataSource      = "seattle"
+        Detroit = @{
+            ArcClusterName         = "Ag-K3s-Detroit"
+            FriendlyName           = "Detroit"
+            GrafanaDataSource      = "detroit"
             Type                   = "k3s"
-            Branch                 = "main"
+            Branch                 = "contoso-motors-helm"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             IsProduction           = $true
         }
-        Chicago = @{
-            ArcClusterName         = "Ag-K3s-Chicago"
-            FriendlyName           = "Chicago"
-            GrafanaDataSource      = "chicago"
+        Monterrey = @{
+            ArcClusterName         = "Ag-K3s-Monterrey"
+            FriendlyName           = "Monterrey"
+            GrafanaDataSource      = "monterrey"
             Type                   = "k3s"
-            Branch                 = "main"
+            Branch                 = "contoso-motors-helm"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -201,7 +201,7 @@
         inferencing_deployment = @{
             GitOpsConfigName = "contoso-motors"
             KustomizationName = "contoso-motors"
-            KustomizationPath="./contoso_manufacturing/operations"
+            KustomizationPath="./agora/contoso_motors"
             Namespace = "contoso-motors"
             Order = 1
         }

@@ -243,8 +243,8 @@ function Deploy-AIO-M3 {
                 --cluster $arcClusterName.toLower() `
                 --resource-group $Env:resourceGroup `
                 --subscription $Env:subscriptionId `
-                --custom-location customLocationName `
-                --sr-resource-id schemaId `
+                --custom-location $customLocationName `
+                --sr-resource-id $schemaId `
                 --enable-rsync true `
                 --add-insecure-listener true `
                 --only-show-errors
