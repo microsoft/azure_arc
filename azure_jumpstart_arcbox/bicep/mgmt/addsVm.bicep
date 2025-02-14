@@ -14,7 +14,7 @@ param windowsAdminUsername string = 'arcdemo'
 param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
-param windowsOSVersion string = '2022-datacenter-g2'
+param windowsOSVersion string = '2025-datacenter-g2'
 
 @description('Location for all resources')
 param azureLocation string = resourceGroup().location
@@ -120,6 +120,9 @@ resource clientVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       }
     }
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
 
 resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
@@ -135,8 +138,28 @@ resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03
       fileUris: [
         uri(templateBaseUrl, 'artifacts/SetupADDS.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName ${addsDomainName} -domainAdminUsername ${windowsAdminUsername} -domainAdminPassword ${windowsAdminPassword} -templateBaseUrl ${templateBaseUrl}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName ${addsDomainName} -domainAdminUsername ${windowsAdminUsername} -templateBaseUrl ${templateBaseUrl}'
     }
+  }
+}
+
+// Role assignment for Reader
+resource vmReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(clientVM.id, 'reader')
+  scope: resourceGroup()
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
+    principalId: clientVM.identity.principalId
+  }
+}
+
+// Role assignment for Key Vault Secret Reader
+resource vmKeyVaultSecretReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(clientVM.id, 'keyVaultSecretReader')
+  scope: resourceGroup()
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: clientVM.identity.principalId
   }
 }
 

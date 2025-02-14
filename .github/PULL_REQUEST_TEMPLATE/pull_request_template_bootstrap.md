@@ -3,6 +3,12 @@
 ## Description
 <!--- Describe your changes in detail -->
 
+## Related Issue
+<!--- If fixing a bug or implementing a feature, please link to the issue here: -->
+Fixes # (issue)
+
+> **Note:** If your pull request is related to documentation, we kindly ask you to open both an issue and a PR in our [documentation repository](https://github.com/Azure/arc_jumpstart_docs).
+
 ## How Has This Been Tested?
 
 - Please describe in detail how you tested your changes
@@ -15,8 +21,10 @@
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 
-## Checklist
-- [ ] My code follows the code style of this project.
-- [ ] My change requires a change to the documentation.
-- [ ] I have updated the documentation and/or images accordingly.
-- [ ] I've read the Jumpstart [contribution guidelines](https://aka.ms/JumpstartContribution).
+## Validation Checklist
+- [ ] My code follows the code style of this project
+- [ ] My change requires a documentation update
+- [ ] I have updated the documentation accordingly
+- [ ] I've read the [Jumpstart contribution guidelines](https://aka.ms/JumpstartContribution)
+- [ ] All new scripts include proper error handling
+- [ ] All deployment parameters are properly documented

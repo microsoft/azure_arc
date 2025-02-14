@@ -34,6 +34,7 @@ param (
   [string]$speachToTextEndpoint,
   [object]$azureOpenAIModel,
   [string]$openAIDeploymentName,
+  [string]$acrName,
   [string]$AZCOPY_AUTO_LOGIN_TYPE
 )
 
@@ -79,6 +80,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZCOPY_AUTO_LOGIN_TYPE', 'MSI', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 Write-Host "Scenario from the configuration is $scenario"

@@ -12,7 +12,7 @@ param windowsAdminUsername string
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string  = newGuid()
 
 @description('Enable automatic logon into ArcBox Virtual Machine')
 param vmAutologon bool = true
@@ -21,7 +21,7 @@ param vmAutologon bool = true
 param rdpPort string = '3389'
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string
+param logAnalyticsWorkspaceName string = 'ArcBox-la'
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
@@ -98,6 +98,9 @@ param enableAzureSpotPricing bool = false
   '3'
 ])
 param zones string = '1'
+
+@secure()
+param registryPassword string = newGuid()
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
@@ -181,7 +184,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
-    azdataPassword: windowsAdminPassword
     tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
@@ -235,6 +237,8 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
     resourceTags: resourceTags
     namingPrefix: namingPrefix
+    windowsAdminPassword: windowsAdminPassword
+    registryPassword: registryPassword
   }
 }
 

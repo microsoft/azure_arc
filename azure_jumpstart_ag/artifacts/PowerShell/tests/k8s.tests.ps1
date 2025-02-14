@@ -1,7 +1,18 @@
 BeforeDiscovery {
 
     # Login to Azure PowerShell with Managed Identity
-    Connect-AzAccount -Identity -Subscription $env:subscriptionId
+    if($scenario -ne "contoso_supermarket"){
+        Connect-AzAccount -Identity -Subscription $env:subscriptionId
+    }else {
+        $secret = $Env:spnClientSecret
+        $clientId = $Env:spnClientId
+        $tenantId = $Env:spnTenantId
+        $subscriptionId = $Env:subscriptionId
+
+        $azurePassword = ConvertTo-SecureString $secret -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential($clientId, $azurePassword)
+        Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal -Subscription $subscriptionId
+    }
 
     # Import the configuration data
     $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
@@ -11,7 +22,9 @@ BeforeDiscovery {
 
     # Loop through each SiteConfig and extract the ArcClusterName
     foreach ($site in $AgConfig.SiteConfig.Values) {
-        $ArcClusterNames += $site.ArcClusterName
+        if($site.Type -ne 'AKS'){
+            $ArcClusterNames += $site.ArcClusterName
+        }
     }
 
 }
@@ -53,14 +66,16 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
             }
         }
     }
-    It "Azure IoT Operations - aio-operator service should be online with a valid ClusterIP" {
-        # Find the aio-operator service in the list
-        $aioOperatorService = $aioServices.items | Where-Object { $_.metadata.name -eq "aio-operator" }
+    if($scenario -ne "contoso_supermarket"){
+        It "Azure IoT Operations - aio-operator service should be online with a valid ClusterIP" {
+            # Find the aio-operator service in the list
+            $aioOperatorService = $aioServices.items | Where-Object { $_.metadata.name -eq "aio-operator" }
 
-        # Verify that the aio-operator service exists
-        $aioOperatorService | Should -Not -BeNullOrEmpty -Because "The aio-operator service should exist in the azure-iot-operations namespace"
+            # Verify that the aio-operator service exists
+            $aioOperatorService | Should -Not -BeNullOrEmpty -Because "The aio-operator service should exist in the azure-iot-operations namespace"
 
-        # Verify that the aio-operator service has a ClusterIP assigned
-        $aioOperatorService.spec.clusterIP | Should -Not -BeNullOrEmpty -Because "The aio-operator service should have a valid ClusterIP assigned"
+            # Verify that the aio-operator service has a ClusterIP assigned
+            $aioOperatorService.spec.clusterIP | Should -Not -BeNullOrEmpty -Because "The aio-operator service should have a valid ClusterIP assigned"
+        }
     }
 }

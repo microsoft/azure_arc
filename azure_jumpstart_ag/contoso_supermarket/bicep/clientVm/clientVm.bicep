@@ -47,7 +47,7 @@ param templateBaseUrl string
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+@description('User github account where they have forked https://github.com/azure/jumpstart-apps')
 param githubUser string
 
 @description('Storage account used for staging file artifacts')
