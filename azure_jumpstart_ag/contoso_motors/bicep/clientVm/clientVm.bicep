@@ -66,7 +66,7 @@ param adxClusterName string
 param rdpPort string = '3389'
 
 @description('Target GitHub account')
-param githubAccount string = 'mrhods'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
 param githubBranch string = 'main'
