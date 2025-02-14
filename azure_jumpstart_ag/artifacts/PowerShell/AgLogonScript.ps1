@@ -45,7 +45,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-apps"
 }elseif ($scenario -eq "contoso_motors") {
-    $global:appUpstreamRepo = "https://github.com/mrhoads/jumpstart-apps"
+    $global:appUpstreamRepo = "https://github.com/azure/jumpstart-apps"
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
