@@ -14,7 +14,7 @@ function ConvertFrom-SecureStringToPlainText {
         [Parameter(Mandatory = $true)]
         [System.Security.SecureString]$SecureString
     )
-    
+
     $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
     try {
         return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
@@ -1451,7 +1451,7 @@ function Set-HCIDeployPrereqs {
                     [Parameter(Mandatory = $true)]
                     [System.Security.SecureString]$SecureString
                 )
-                
+
                 $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
                 try {
                     return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
@@ -1460,7 +1460,7 @@ function Set-HCIDeployPrereqs {
                     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)
                 }
             }
-            
+
             # Prep nodes for Azure Arc onboarding
             winrm quickconfig -quiet
             netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
@@ -1761,6 +1761,11 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 # Prepare the cluster for deployment
 #######################################################################################
 # New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+
+# Stop for manual testing
+Stop-Transcript
+exit
+
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
