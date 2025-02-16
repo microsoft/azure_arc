@@ -321,9 +321,11 @@ function Restart-VMs {
     )
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
         Write-Host "Restarting VM: $($VM.Hostname)"
-        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
-            Restart-Computer -Force
-        }
+        # Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
+        #     Restart-Computer -Force
+        # }
+        # Restart via host to avoid "Failed to restart the computer with the following error message: Class not registered"
+        Restart-VM -Name $VM.Hostname -Force
     }
     Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
