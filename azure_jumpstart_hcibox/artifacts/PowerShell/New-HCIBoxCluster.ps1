@@ -629,11 +629,11 @@ function Set-NICs {
             }
 
             # Enable WinRM
-            Write-Host "Enabling Windows Remoting in $env:COMPUTERNAME"
+            Write-Host "Configuring Windows Remoting in $env:COMPUTERNAME"
             Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
-            Enable-PSRemoting | Out-Null
+            #Enable-PSRemoting | Out-Null
 
-            Start-Sleep -Seconds 60
+            #Start-Sleep -Seconds 60
 
             # Rename non-storage adapters
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
@@ -1462,8 +1462,8 @@ function Set-HCIDeployPrereqs {
             }
 
             # Prep nodes for Azure Arc onboarding
-            winrm quickconfig -quiet
-            netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
+            #winrm quickconfig -quiet
+            #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
 
             # Register PSGallery as a trusted repo
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -1474,22 +1474,22 @@ function Set-HCIDeployPrereqs {
             Install-Module AzsHCI.ARCinstaller -Force
 
             #Install required PowerShell modules in your node for registration
-            Install-Module Az.Accounts -Force
-            Install-Module Az.ConnectedMachine -Force
-            Install-Module Az.Resources -Force
+            #Install-Module Az.Accounts -Force
+            #Install-Module Az.ConnectedMachine -Force
+            #Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
 
             # Workaround for BITS transfer issue
-            Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
 
-            Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
     }
 
@@ -1624,11 +1624,12 @@ Write-Host "[Build cluster - Step 1/11] Downloading HCIBox VHDs" -ForegroundColo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.vhdx "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.sha256 "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jsvhdtemp.blob.core.windows.net/vhdx/azurelocal2411.vhdx?sp=r&st=2025-02-16T21:23:23Z&se=2025-02-24T05:23:23Z&spr=https&sv=2022-11-02&sr=b&sig=z5HViDqf2%2BXC3MosKa7Y4talrOZUSL786dPCdhNXArw%3D' "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.vhdx "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.sha256 "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
 
 
-$checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
+<# $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
@@ -1636,7 +1637,7 @@ if ($checksum.Hash -eq $hash) {
 else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw
-}
+} #>
 
 #BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
 #BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
@@ -1762,9 +1763,11 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 #######################################################################################
 # New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
+<#
 # Stop for manual testing
 Stop-Transcript
 exit
+#>
 
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
