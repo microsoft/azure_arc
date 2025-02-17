@@ -15,16 +15,14 @@ Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustR
 Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
 Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
-# Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers -Force -Latest
+# Update WinGet package manager to the latest version (running twice due to a known issue regarding WinAppSDK)
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
+Repair-WinGetPackageManager -AllUsers -Force -Latest -Verbose
 
 Get-WinGetVersion
 
 Write-Output 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
-
-# Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
-& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
 
 # Apply WinGet Configuration files
 & $winget configure --file "$($Env:HCIBoxDir)\DSC\packages.dsc.yml" --accept-configuration-agreements --disable-interactivity
