@@ -328,10 +328,10 @@ function Restart-VMs {
         Restart-VM -Name $VM.Hostname -Force
     }
     Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
-    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
-        Restart-Computer -Force
-    }
+
+    Restart-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname -Force
     Start-Sleep -Seconds 30
+
 }
 
 function New-ManagementVM {
@@ -646,12 +646,12 @@ function Set-NICs {
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue -PassThru
+                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue -PassThru | Select-Object Name,PSComputerName
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
 
             # Rename non-storage adapters
-            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC -PassThru
+            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC -PassThru | Select-Object Name,PSComputerName
 
              # Configue WinRM
             Write-Host "Configuring Windows Remote Management in $env:COMPUTERNAME"
@@ -1790,6 +1790,8 @@ exit
 #>
 
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
+
+Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 & "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
