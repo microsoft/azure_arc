@@ -1488,7 +1488,7 @@ function Set-HCIDeployPrereqs {
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId -ErrorAction Continue
 
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
