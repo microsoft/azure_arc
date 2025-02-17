@@ -636,43 +636,27 @@ function Set-NICs {
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
-        # Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
 
-    $int = 9
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
-        $int++
-
-        Invoke-CommandWithRetry -VMName $VM.Hostname -Credential $Credential -ScriptBlock {hostname} -MaxRetries 12 -RetryDelay 10
 
         Write-Host "Setting NICs on VM $($VM.Hostname)"
-        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ArgumentList $HCIBoxConfig, $VM -ScriptBlock {
-            $HCIBoxConfig = $args[0]
-            $VM = $args[1]
-            # Create IP Address of Storage Adapters
-            $storageAIP = $VM.StorageAIP
-            $storageBIP = $VM.StorageBIP
+        Invoke-CommandWithRetry -VMName $VM.Hostname -Credential $Credential -MaxRetries 12 -RetryDelay 10 -ScriptBlock {
 
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue
+                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue -PassThru
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
-            foreach ($storageNIC in $storageNICs) {
-                #If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }
-                #If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }
-            }
-
-            # Enable WinRM
-            Write-Host "Configuring Windows Remoting in $env:COMPUTERNAME"
-            Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
-            #Enable-PSRemoting | Out-Null
-
-            #Start-Sleep -Seconds 60
 
             # Rename non-storage adapters
-            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
+            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC -PassThru
+
+             # Configue WinRM
+            Write-Host "Configuring Windows Remote Management in $env:COMPUTERNAME"
+            Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
+
         }
     }
 }
