@@ -1494,9 +1494,9 @@ function Set-HCIDeployPrereqs {
             Install-Module AzsHCI.ARCinstaller -Force
 
             #Install required PowerShell modules in your node for registration
-            #Install-Module Az.Accounts -Force
-            #Install-Module Az.ConnectedMachine -Force
-            #Install-Module Az.Resources -Force
+            Install-Module Az.Accounts -Force
+            Install-Module Az.ConnectedMachine -Force
+            Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
