@@ -91,7 +91,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") 
 workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
-            $kubectlVersion = '1.28.5'
+            $kubectlVersion = '1.31.5'
             #Run commands in parallel.
             Parallel
                 {
