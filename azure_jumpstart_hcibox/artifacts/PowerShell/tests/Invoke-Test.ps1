@@ -15,9 +15,61 @@ $tests_failed = $tests_failed + $tests_hci.Failed.Count
 Write-Output "Tests succeeded: $tests_passed"
 Write-Output "Tests failed: $tests_failed"
 
+Write-Output "Exporting deployment test results to resource group tag DeploymentStatus"
+
+$DeploymentStatusString = "Tests succeeded: $tests_passed Tests failed: $tests_failed"
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($tests_failed -gt 0) {
+    $DeploymentProgressString = 'Failed'
+} else {
+    $DeploymentProgressString = 'Completed'
+}
+
+if ($null -ne $tags) {
+    $tags['DeploymentStatus'] = $DeploymentStatusString
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{
+        'DeploymentStatus'   = $DeploymentStatusString
+        'DeploymentProgress' = $DeploymentProgressString
+    }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+
 Write-Header "Adding deployment test results to wallpaper using BGInfo"
 
 Set-Content "$Env:windir\TEMP\hcibox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\hcibox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:HCIBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
+
+# Setup scheduled task for running tests on each logon
+$TaskName = "Pester tests"
+$ActionScript = "C:\HCIBox\Tests\Invoke-Test.ps1"
+
+# Check if the scheduled task exists
+if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
+    Write-Host "Scheduled task '$TaskName' already exists."
+} else {
+    # Create the task trigger
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+
+    # Create the task action to use pwsh.exe
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ActionScript"
+
+    $UserName = $Env:UserName
+
+    # Register the scheduled task for the current user
+    Register-ScheduledTask -TaskName $TaskName -Trigger $Trigger -Action $Action -User $UserName
+
+    Write-Header "Scheduled task $TaskName created successfully for the currently logged-on user, using pwsh.exe."
+
+    Stop-Transcript
+
+    # logoff the user to apply the wallpaper in proper scaling and refresh tests results at first logon
+    logoff.exe
+}

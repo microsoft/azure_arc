@@ -14,7 +14,7 @@ function ConvertFrom-SecureStringToPlainText {
         [Parameter(Mandatory = $true)]
         [System.Security.SecureString]$SecureString
     )
-    
+
     $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
     try {
         return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
@@ -321,15 +321,17 @@ function Restart-VMs {
     )
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
         Write-Host "Restarting VM: $($VM.Hostname)"
-        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
-            Restart-Computer -Force
-        }
+        # Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
+        #     Restart-Computer -Force
+        # }
+        # Restart via host to avoid "Failed to restart the computer with the following error message: Class not registered"
+        Restart-VM -Name $VM.Hostname -Force
     }
     Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
-    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
-        Restart-Computer -Force
-    }
+
+    Restart-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname -Force
     Start-Sleep -Seconds 30
+
 }
 
 function New-ManagementVM {
@@ -595,6 +597,37 @@ function New-NATSwitch {
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.simInternetVLAN | Out-Null
 }
 
+function Invoke-CommandWithRetry {
+    param (
+        [string]$VMName,
+        [pscredential]$Credential,
+        [scriptblock]$ScriptBlock,
+        [int]$MaxRetries = 5,
+        [int]$RetryDelay = 10
+    )
+
+    $retryCount = 0
+    $success = $false
+
+    do {
+        try {
+            Write-Host "Attempt $($retryCount + 1) to execute command on $VMName..."
+            Invoke-Command -VMName $VMName -Credential $Credential -ScriptBlock $ScriptBlock -ErrorAction Stop
+            $success = $true
+            Write-Host "Command executed successfully on $VMName."
+        } catch {
+            Write-Warning "Failed to execute command on $VMName. Error: $_"
+            $retryCount++
+            if ($retryCount -lt $MaxRetries) {
+                Write-Host "Retrying in $RetryDelay seconds..."
+                Start-Sleep -Seconds $RetryDelay
+            } else {
+                Write-Error "Maximum retries ($MaxRetries) reached. Unable to execute command on $VMName."
+            }
+        }
+    } while (-not $success -and $retryCount -lt $MaxRetries)
+}
+
 function Set-NICs {
     Param (
         $HCIBoxConfig,
@@ -603,40 +636,27 @@ function Set-NICs {
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
-        # Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
 
-    $int = 9
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
-        $int++
+
         Write-Host "Setting NICs on VM $($VM.Hostname)"
-        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ArgumentList $HCIBoxConfig, $VM -ScriptBlock {
-            $HCIBoxConfig = $args[0]
-            $VM = $args[1]
-            # Create IP Address of Storage Adapters
-            $storageAIP = $VM.StorageAIP
-            $storageBIP = $VM.StorageBIP
+        Invoke-CommandWithRetry -VMName $VM.Hostname -Credential $Credential -MaxRetries 12 -RetryDelay 10 -ScriptBlock {
 
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue
+                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue -PassThru | Select-Object Name,PSComputerName
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
-            foreach ($storageNIC in $storageNICs) {
-                #If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }
-                #If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }
-            }
-
-            # Enable WinRM
-            Write-Host "Enabling Windows Remoting in $env:COMPUTERNAME"
-            Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
-            Enable-PSRemoting | Out-Null
-
-            Start-Sleep -Seconds 60
 
             # Rename non-storage adapters
-            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
+            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC -PassThru | Select-Object Name,PSComputerName
+
+             # Configue WinRM
+            Write-Host "Configuring Windows Remote Management in $env:COMPUTERNAME"
+            Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
+
         }
     }
 }
@@ -1451,7 +1471,7 @@ function Set-HCIDeployPrereqs {
                     [Parameter(Mandatory = $true)]
                     [System.Security.SecureString]$SecureString
                 )
-                
+
                 $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
                 try {
                     return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
@@ -1460,10 +1480,10 @@ function Set-HCIDeployPrereqs {
                     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)
                 }
             }
-            
+
             # Prep nodes for Azure Arc onboarding
-            winrm quickconfig -quiet
-            netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
+            #winrm quickconfig -quiet
+            #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
 
             # Register PSGallery as a trusted repo
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -1486,7 +1506,7 @@ function Set-HCIDeployPrereqs {
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId -ErrorAction Continue
 
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
@@ -1601,6 +1621,10 @@ $HostVMPath = $HCIBoxConfig.HostVMPath
 $InternalSwitch = $HCIBoxConfig.InternalSwitch
 $natDNS = $HCIBoxConfig.natDNS
 $natSubnet = $HCIBoxConfig.natSubnet
+$tenantId = $env:spnTenantId
+$subscriptionId = $env:subscriptionId
+$azureLocation = $env:azureLocation
+$resourceGroup = $env:resourceGroup
 
 Import-Module Hyper-V
 
@@ -1608,6 +1632,19 @@ $VerbosePreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
+
+$DeploymentProgressString = 'Downloading nested VMs VHDX files'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 # Create paths
 foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
@@ -1624,11 +1661,13 @@ Write-Host "[Build cluster - Step 1/11] Downloading HCIBox VHDs" -ForegroundColo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.vhdx "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.sha256 "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/hcibox/preprod/AzureLocal.vhdx' "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp 'https://jsvhdtemp.blob.core.windows.net/vhdx/azurelocal2411.vhdx?sp=r&st=2025-02-16T21:23:23Z&se=2025-02-24T05:23:23Z&spr=https&sv=2022-11-02&sr=b&sig=z5HViDqf2%2BXC3MosKa7Y4talrOZUSL786dPCdhNXArw%3D' "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.vhdx "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.sha256 "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
 
 
-$checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
+<# $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
@@ -1636,7 +1675,7 @@ if ($checksum.Hash -eq $hash) {
 else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw
-}
+} #>
 
 #BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
 #BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
@@ -1695,6 +1734,20 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 ################################################################################
 # Create the three nested Virtual Machines
 ################################################################################
+
+$DeploymentProgressString = 'Creating and configuring nested VMs'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 # First create the Management VM (AzSMGMT)
 Write-Host "[Build cluster - Step 3/11] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
@@ -1736,6 +1789,9 @@ Restart-VMs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
+# Configure networking
+Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
+
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -HCIBoxConfig $HCIBoxConfig
 
@@ -1745,9 +1801,36 @@ Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 #######################################################################################
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
 #######################################################################################
+
+$DeploymentProgressString = 'Provisioning Router VM'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 # Provision Router VM on AzSMGMT
 Write-Host "[Build cluster - Step 7/11] Build router VM..." -ForegroundColor Green
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
+
+$DeploymentProgressString = 'Provisioning Domain controller VM'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 # Provision Domain controller VM on AzSMGMT
 Write-Host "[Build cluster - Step 8/11] Building Domain Controller VM..." -ForegroundColor Green
@@ -1761,7 +1844,28 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 # Prepare the cluster for deployment
 #######################################################################################
 # New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+
+<#
+# Stop for manual testing
+Stop-Transcript
+exit
+#>
+
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
+
+$DeploymentProgressString = 'Preparing Azure Local cluster deployment'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 & "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
@@ -1774,6 +1878,19 @@ Write-Host "[Build cluster - Step 10/11] Validate cluster deployment..." -Foregr
 
 if ("True" -eq $env:autoDeployClusterResource) {
 
+    $DeploymentProgressString = 'Validating Azure Local cluster deployment'
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags['DeploymentProgress'] = $DeploymentProgressString
+    } else {
+        $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 $TemplateFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.json"
 $TemplateParameterFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.parameters.json"
 
@@ -1784,12 +1901,38 @@ Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundC
 
 if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
 
+    $DeploymentProgressString = 'Deploying Azure Local cluster'
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags['DeploymentProgress'] = $DeploymentProgressString
+    } else {
+        $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
     Write-Host "Validation succeeded. Deploying HCI cluster..."
     New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
 
         Write-Host "Deployment succeeded. Upgrading HCI cluster..."
+
+        $DeploymentProgressString = 'Upgrading Azure Local cluster'
+
+        $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+        if ($null -ne $tags) {
+            $tags['DeploymentProgress'] = $DeploymentProgressString
+        } else {
+            $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+        }
+
+        $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+        $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
         Update-HCICluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
