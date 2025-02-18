@@ -141,6 +141,20 @@ foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 }
 
+Connect-AzAccount -Identity
+
+$DeploymentProgressString = "Started bootstrap-script..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+
 ##############################################################
 # Installing PowerShell 7
 ##############################################################
@@ -182,6 +196,18 @@ if (-not (Test-Path $RegistryPath)) {
 Write-Host "Enabling CredSSP."
 Enable-WSManCredSSP -Role Server -Force | Out-Null
 Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null
+
+$DeploymentProgressString = "Restarting and installing WinGet packages..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
 
 $ScheduledTaskExecutable = "pwsh.exe"
 

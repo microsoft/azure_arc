@@ -1621,6 +1621,10 @@ $HostVMPath = $HCIBoxConfig.HostVMPath
 $InternalSwitch = $HCIBoxConfig.InternalSwitch
 $natDNS = $HCIBoxConfig.natDNS
 $natSubnet = $HCIBoxConfig.natSubnet
+$tenantId = $env:tenantId
+$subscriptionId = $env:subscriptionId
+$azureLocation = $env:azureLocation
+$resourceGroup = $env:resourceGroup
 
 Import-Module Hyper-V
 
@@ -1628,6 +1632,21 @@ $VerbosePreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
+
+Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+
+$DeploymentProgressString = 'Downloading nested VMs VHDX files'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 # Create paths
 foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
@@ -1716,6 +1735,20 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 ################################################################################
 # Create the three nested Virtual Machines
 ################################################################################
+
+$DeploymentProgressString = 'Creating and configuring nested VMs'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 # First create the Management VM (AzSMGMT)
 Write-Host "[Build cluster - Step 3/11] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
@@ -1766,9 +1799,36 @@ Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 #######################################################################################
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
 #######################################################################################
+
+$DeploymentProgressString = 'Provisioning Router VM'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 # Provision Router VM on AzSMGMT
 Write-Host "[Build cluster - Step 7/11] Build router VM..." -ForegroundColor Green
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
+
+$DeploymentProgressString = 'Provisioning Domain controller VM'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 # Provision Domain controller VM on AzSMGMT
 Write-Host "[Build cluster - Step 8/11] Building Domain Controller VM..." -ForegroundColor Green
@@ -1791,6 +1851,19 @@ exit
 
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 
+$DeploymentProgressString = 'Preparing Azure Local cluster deployment'
+
+$tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags['DeploymentProgress'] = $DeploymentProgressString
+} else {
+    $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
@@ -1804,6 +1877,19 @@ Write-Host "[Build cluster - Step 10/11] Validate cluster deployment..." -Foregr
 
 if ("True" -eq $env:autoDeployClusterResource) {
 
+    $DeploymentProgressString = 'Validating Azure Local cluster deployment'
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags['DeploymentProgress'] = $DeploymentProgressString
+    } else {
+        $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
 $TemplateFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.json"
 $TemplateParameterFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.parameters.json"
 
@@ -1814,12 +1900,38 @@ Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundC
 
 if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
 
+    $DeploymentProgressString = 'Deploying Azure Local cluster'
+
+    $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+    if ($null -ne $tags) {
+        $tags['DeploymentProgress'] = $DeploymentProgressString
+    } else {
+        $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+    }
+
+    $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+    $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
     Write-Host "Validation succeeded. Deploying HCI cluster..."
     New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
 
         Write-Host "Deployment succeeded. Upgrading HCI cluster..."
+
+        $DeploymentProgressString = 'Upgrading Azure Local cluster'
+
+        $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
+
+        if ($null -ne $tags) {
+            $tags['DeploymentProgress'] = $DeploymentProgressString
+        } else {
+            $tags = @{'DeploymentProgress' = $DeploymentProgressString }
+        }
+
+        $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
+        $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
         Update-HCICluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 

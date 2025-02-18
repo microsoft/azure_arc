@@ -1,10 +1,28 @@
 $ErrorActionPreference = $env:ErrorActionPreference
 
 $Env:HCIBoxLogsDir = "$Env:HCIBoxDir\Logs"
+$tenantId = $env:tenantId
+$subscriptionId = $env:subscriptionId
+$resourceGroup = $env:resourceGroup
 
 $logFilePath = Join-Path -Path $Env:HCIBoxLogsDir -ChildPath ('WinGet-provisioning-' + (Get-Date -Format 'yyyyMMddHHmmss') + '.log')
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
+
+$DeploymentProgressString = "Installing WinGet packages..."
+
+Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
 
 # Install WinGet PowerShell modules
 Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
