@@ -1790,6 +1790,9 @@ Restart-VMs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
+# Configure networking
+Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
+
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -HCIBoxConfig $HCIBoxConfig
 
@@ -1864,7 +1867,6 @@ if ($null -ne $tags) {
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 & "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
