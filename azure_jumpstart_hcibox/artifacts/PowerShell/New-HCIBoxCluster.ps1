@@ -1633,8 +1633,6 @@ $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
 
-Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
-
 $DeploymentProgressString = 'Downloading nested VMs VHDX files'
 
 $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
