@@ -1,7 +1,7 @@
 $ErrorActionPreference = $env:ErrorActionPreference
 
 $Env:HCIBoxLogsDir = "$Env:HCIBoxDir\Logs"
-$tenantId = $env:tenantId
+$tenantId = $env:spnTenantId
 $subscriptionId = $env:subscriptionId
 $resourceGroup = $env:resourceGroup
 
