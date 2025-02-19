@@ -620,6 +620,19 @@ if ($Env:flavor -ne 'DevOps') {
         $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp, $Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
         Invoke-JSSudoCommand -Session $UbuntuSessions -Command "sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 
+        Write-Header 'Installing Dependency Agent for Arc-enabled Windows servers'
+        $VMs = @("$namingPrefix-SQL", "$namingPrefix-Win2K22", "$namingPrefix-Win2K25")
+        $VMs | ForEach-Object -Parallel {
+
+            $null = Connect-AzAccount -Identity -Tenant $using:tenantId -Subscription $using:subscriptionId -Scope Process -WarningAction SilentlyContinue
+
+            $vm = $PSItem
+
+            # Install Dependency Agent
+            New-AzConnectedMachineExtension -ResourceGroupName $resourceGroup -MachineName $vm -Name DependencyAgentWindows -Publisher Microsoft.Azure.Monitor -Type DependencyAgentWindows -Location $azureLocation -Settings @{} -Force -NoWait
+
+        }
+
         Write-Header 'Enabling SSH access and triggering update assessment for Arc-enabled servers'
         $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K22", "$namingPrefix-Win2K25")
         $VMs | ForEach-Object -Parallel {
