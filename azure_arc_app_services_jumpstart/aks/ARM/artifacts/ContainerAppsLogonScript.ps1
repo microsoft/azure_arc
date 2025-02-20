@@ -75,7 +75,7 @@ Start-Sleep -Seconds 10
 
 # Copying kubectl to kubectl-client location
 $Env:KUBECLIENTFOLDER = "C:\Users\$Env:adminUsername\.azure\kubectl-client"
-Copy-Item -Path "$Env:ChocolateyInstall\kubectl.exe" -Destination "$Env:KUBECLIENTFOLDER\kubectl.exe"
+Copy-Item -Path "$Env:ChocolateyInstall\bin\kubectl.exe" -Destination "$Env:KUBECLIENTFOLDER\kubectl.exe"
 Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
