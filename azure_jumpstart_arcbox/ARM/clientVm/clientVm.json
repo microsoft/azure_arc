@@ -355,7 +355,7 @@
         },
         "properties": {
           "hardwareProfile": {
-            "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B4ms', if(equals(parameters('flavor'), 'DataOps'), 'Standard_D4s_v5', 'Standard_D8s_v5'))]"
+            "vmSize": "[if(equals(parameters('flavor'), 'DevOps'), 'Standard_B4ms', if(equals(parameters('flavor'), 'DataOps'), 'Standard_D8s_v5', 'Standard_D8s_v5'))]"
           },
           "storageProfile": {
             "osDisk": {
