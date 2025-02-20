@@ -628,6 +628,8 @@ if ($Env:flavor -ne 'DevOps') {
 
             $vm = $PSItem
 
+            Write-Output "Invoking installation on $vm"
+
             # Install Dependency Agent
             $null = New-AzConnectedMachineExtension -ResourceGroupName $using:resourceGroup -MachineName $vm -Name DependencyAgentWindows -Publisher Microsoft.Azure.Monitoring.DependencyAgent -ExtensionType DependencyAgentWindows -Location $using:azureLocation -Settings @{"enableAMA" = $true} -NoWait
 
