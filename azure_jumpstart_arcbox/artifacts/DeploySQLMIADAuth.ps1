@@ -16,16 +16,8 @@ Import-Module DnsServer
 # Get Activectory Information
 $dcInfo = Get-ADDomainController
 
-az login --identity
-az account set -s $env:subscriptionId
-
-$KeyVault = Get-AzKeyVault -ResourceGroupName $Env:resourceGroup
-if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
-    Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
-}
-
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
-$AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
+$AZDATA_PASSWORD = Get-Secret -Name 'windowsAdminPassword' -AsPlainText
 
 # Setup reverse DNS for AD authentication
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
