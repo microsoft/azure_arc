@@ -73,6 +73,11 @@ $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Start-Sleep -Seconds 10
 
+# Copying kubectl to kubectl-client location
+$Env:KUBECLIENTFOLDER = "C:\Users\$Env:adminUsername\.azure\kubectl-client"
+Copy-Item -Path "$Env:ChocolateyInstall\kubectl.exe" -Destination "$Env:KUBECLIENTFOLDER\kubectl.exe"
+Start-Sleep -Seconds 10
+
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $Env:connectedClusterName `
                         --resource-group $Env:resourceGroup `
