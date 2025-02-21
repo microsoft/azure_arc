@@ -1887,7 +1887,7 @@ try {
     New-AzResourceGroupDeployment -Name 'hcicluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment -ErrorAction Stop
 }
 catch {
-    Write-Error "Validation failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
+    Write-Output "Validation failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
 }
 
 Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundColor Green
@@ -1913,7 +1913,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
         New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
     }
     catch {
-        Write-Error "Deployment failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
+        Write-Output "Deployment failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
     }
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
