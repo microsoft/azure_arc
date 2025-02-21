@@ -47,6 +47,17 @@ Set-Content "$Env:windir\TEMP\hcibox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:HCIBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
 
+#############################################################
+# Create Windows Terminal desktop shortcut
+#############################################################
+
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
 # Setup scheduled task for running tests on each logon
 $TaskName = "Pester tests"
 $ActionScript = "C:\HCIBox\Tests\Invoke-Test.ps1"
