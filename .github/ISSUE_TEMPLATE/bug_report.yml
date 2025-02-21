@@ -9,22 +9,21 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-  - type: dropdown
-    id: jumpstart-solution
+        Thanks for taking the time to fill out this issue!
+        If your bug report is related to documentation, we kindly ask you to open both an issue and a PR in our [documentation repository](https://github.com/Azure/arc_jumpstart_docs).
+        The intent of this "Bug report" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com).
+  - type: checkboxes
+    id: solution
     attributes:
       label: Jumpstart Solution
-      multiple: true
       description: What Jumpstart solution you are running?
       options:
-        - Jumpstart ArcBox
-        - Jumpstart HCIBox
-        - Jumpstart Agora
-        - A specific Jumpstart scenario
-        - Jumpstart Drops
-        - Other
-    validations:
-      required: true
+        - label: Jumpstart ArcBox
+        - label: Jumpstart HCIBox
+        - label: Jumpstart Agora
+        - label: A specific Jumpstart scenario
+        - label: Jumpstart Drops
+        - label: Other
   - type: textarea
     id: what-happened
     attributes:
@@ -70,15 +69,3 @@ body:
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
-  - type: checkboxes
-    id: solution
-    attributes:
-      label: Jumpstart Solution
-      description: What Jumpstart solution you are running?
-      options:
-        - label: Jumpstart ArcBox
-        - label: Jumpstart HCIBox
-        - label: Jumpstart Agora
-        - label: A specific Jumpstart scenario
-        - label: Jumpstart Drops
-        - label: Other
