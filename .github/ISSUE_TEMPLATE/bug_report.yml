@@ -37,21 +37,25 @@ body:
     id: solution-url
     attributes:
       label: We need a URL
-      description: Share with us the URL to the Jumpstart solution you are running
+      description: Share with us the URL to the Jumpstart solution you are having issues with.
       placeholder: ex. https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro
     validations:
       required: true      
   - type: dropdown
-    id: version
+    id: deployment-method
     attributes:
-      label: Version
-      description: What version of our software are you running?
+      label: Deployment Method
+      multiple: true
+      description: What deployment method you are using?
       options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-      default: 0
+        - Azure Portal
+        - Azure CLI
+        - PowerShell
+        - Bicep
+        - ARM Template
+        - Other
     validations:
-      required: true
+      required: true          
   - type: dropdown
     id: browsers
     attributes:
