@@ -2,7 +2,8 @@
 name: "🐛Bug report"
 about: Create a report to help us improve
 title: ''
-labels: ['triage', 'bug']
+labels: ['bug', 'triage needed']
+projects: ["microsoft/162"]
 assignees: ''
 
 ---
@@ -14,7 +15,7 @@ assignees: ''
 
 > **Note:** For ease of issues and pull requests management and tracking, we kindly ask you to provide a meaningful and concise title to this issue and answer all questions to the best of your ability.
 
-**Scenario Type**
+**Jumpstart solution you are trying**
 - [ ] Jumpstart scenario
 - [ ] ArcBox
 - [ ] HCIBox
@@ -39,10 +40,10 @@ assignees: ''
 <!--- A clear and concise description of what you expected to happen. --->
 
 **Environment Details**
-- Azure CLI version: <!-- output of `az --version` -->
-- Operating System: <!-- e.g., Windows 11, Ubuntu 22.04 -->
-- Deployed Region: <!-- e.g., eastus -->
-- Kubernetes Version (if applicable):
+<!---- Azure CLI version: output of `az --version`
+- Operating System: e.g., Windows 11, Ubuntu 22.04 
+- Deployed Region: e.g., eastus
+- Kubernetes Version (if applicable):-->
 
 **Deployment Method Used**
 - [ ] Azure Portal
@@ -52,7 +53,6 @@ assignees: ''
 - [ ] Other (please specify)
 
 **Have you looked at the Troubleshooting and Logs section?**
-<!---Relevant logs retrieval instructions can be found in the Troubleshooting section.
 - [Jumpstart ArcBox for IT Pros troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro/#basic-troubleshooting)
 - [Jumpstart ArcBox for DevOps troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/DevOps/#basic-troubleshooting)
 - [Jumpstart ArcBox for DataOps troubleshooting](https://jumpstart.azure.com/azure_jumpstart_arcbox/DataOps/#basic-troubleshooting)
@@ -62,7 +62,6 @@ assignees: ''
 - [Agora - Contoso Hypermarket troubleshooting](https://jumpstart.azure.com/azure_jumpstart_ag/contoso_hypermarket/troubleshooting/)
 
 Please include relevant log files as specified in the troubleshooting guides.
---->
 
 **Screenshots**
 <!--- If applicable, add screenshots to help explain your problem. --->

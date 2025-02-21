@@ -1,8 +1,9 @@
 ---
-name: "Feature request"
+name: "Feature Request"
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: ['feature-request', 'triage needed']
+projects: ["microsoft/162"]
 assignees: ''
 
 ---
