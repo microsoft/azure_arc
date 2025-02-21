@@ -1909,6 +1909,9 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
 
     Write-Host "Validation succeeded. Deploying HCI cluster..."
 
+    # Debug intermittent deployment failures: "An error occurred while sending the request"
+    $DebugPreference="Continue"
+
     try {
         New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
     }
