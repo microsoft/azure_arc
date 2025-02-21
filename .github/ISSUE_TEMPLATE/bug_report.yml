@@ -1,10 +1,8 @@
 name: Bug Report
-description: File a bug report.
+description: File a bug report or an issue.
 title: "[Bug]: "
 labels: ["bug", "triage"]
-projects: ["octo-org/1", "octo-org/44"]
-assignees:
-  - octocat
+projects: ["microsoft/162"]
 body:
   - type: markdown
     attributes:
@@ -59,6 +57,6 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output. Make sure to include any sensitive information or passwords.
+      label: Relevant log output. Make sure to NOT INCLUDE any sensitive information. passwords, or secrets.
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
