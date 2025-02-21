@@ -34,6 +34,20 @@ resourceGroup=$10
 deployGPUNodes=$11
 scenario=$12
 
+# for debugging
+echo "adminUsername: $adminUsername"
+echo "subscriptionId: $subscriptionId"
+echo "vmName: $vmName"
+echo "location: $location"
+echo "stagingStorageAccountName: $stagingStorageAccountName"
+echo "logAnalyticsWorkspace: $logAnalyticsWorkspace"
+echo "templateBaseUrl: $templateBaseUrl"
+echo "storageContainerName: $storageContainerName"
+echo "k3sControlPlane: $k3sControlPlane"
+echo "resourceGroup: $resourceGroup"
+echo "deployGPUNodes: $deployGPUNodes"
+echo "scenario: $scenario"
+
 echo "export adminUsername=$adminUsername" >> vars.sh
 echo "export subscriptionId=$subscriptionId" >> vars.sh
 echo "export vmName=$vmName" >> vars.sh
