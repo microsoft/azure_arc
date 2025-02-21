@@ -30,9 +30,8 @@ logAnalyticsWorkspace=$6
 templateBaseUrl=$7
 storageContainerName=$8
 k3sControlPlane=$9
-resourceGroup=$10
-deployGPUNodes=$11
-scenario=$12
+deployGPUNodes=$10
+scenario=$11
 
 # for debugging
 
@@ -49,7 +48,6 @@ echo "logAnalyticsWorkspace: $logAnalyticsWorkspace"
 echo "templateBaseUrl: $templateBaseUrl"
 echo "storageContainerName: $storageContainerName"
 echo "k3sControlPlane: $k3sControlPlane"
-echo "resourceGroup: $resourceGroup"
 echo "deployGPUNodes: $deployGPUNodes"
 echo "scenario: $scenario"
 
@@ -62,7 +60,6 @@ echo "export logAnalyticsWorkspace=$logAnalyticsWorkspace" >> vars.sh
 echo "export templateBaseUrl=$templateBaseUrl" >> vars.sh
 echo "export storageContainerName=$storageContainerName" >> vars.sh
 echo "export k3sControlPlane=$k3sControlPlane" >> vars.sh
-echo "export resourceGroup=$resourceGroup" >> vars.sh
 echo "export deployGPUNodes=$deployGPUNodes" >> vars.sh
 echo "export scenario=$scenario" >> vars.sh
 
