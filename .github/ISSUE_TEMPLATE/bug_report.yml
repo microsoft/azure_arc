@@ -33,6 +33,14 @@ body:
       placeholder: Tell us what you see! If applicable, add screenshots to help explain your problem.
     validations:
       required: true
+  - type: input
+    id: solution-url
+    attributes:
+      label: We need a URL
+      description: Share with us the URL to the Jumpstart solution you are running
+      placeholder: ex. https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro
+    validations:
+      required: true      
   - type: dropdown
     id: version
     attributes:
