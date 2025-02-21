@@ -1,4 +1,4 @@
-name: Issue / Bug Report
+name: Issue or Bug Report
 description: File an issue or bug report.
 title: "[Bug]: "
 labels: ['bug', 'triage needed']
