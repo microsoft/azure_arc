@@ -1,8 +1,8 @@
-name: Bug Report
-description: File a bug report.
-title: "[Bug]: "
-labels: ["bug", "triage"]
-projects: ["octo-org/1", "octo-org/44"]
+name: Issue or Bug Report
+description: File an issue or bug report.
+title: "[Issue/Bug]: "
+labels: ['bug', 'triage needed']
+projects: ["microsoft/162"]
 assignees:
   - octocat
 body:
