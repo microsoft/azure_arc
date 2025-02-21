@@ -295,6 +295,33 @@ Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
+Write-Header "Configuring Windows Defender exclusions for Hyper-V."
+
+Add-MpPreference -ExclusionExtension ".vhd"
+Add-MpPreference -ExclusionExtension ".vhdx"
+Add-MpPreference -ExclusionExtension ".avhd"
+Add-MpPreference -ExclusionExtension ".avhdx"
+Add-MpPreference -ExclusionExtension ".vhds"
+Add-MpPreference -ExclusionExtension ".vhdpmem"
+Add-MpPreference -ExclusionExtension ".iso"
+Add-MpPreference -ExclusionExtension ".rct"
+Add-MpPreference -ExclusionExtension ".mrt"
+Add-MpPreference -ExclusionExtension ".vsv"
+Add-MpPreference -ExclusionExtension ".bin"
+Add-MpPreference -ExclusionExtension ".xml"
+Add-MpPreference -ExclusionExtension ".vmcx"
+Add-MpPreference -ExclusionExtension ".vmrs"
+Add-MpPreference -ExclusionExtension ".vmgs"
+Add-MpPreference -ExclusionPath "%ProgramData%\Microsoft\Windows\Hyper-V"
+Add-MpPreference -ExclusionPath "%Public%\Documents\Hyper-V\Virtual Hard Disks"
+Add-MpPreference -ExclusionPath "%SystemDrive%\ProgramData\Microsoft\Windows\Hyper-V\Snapshots"
+Add-MpPreference -ExclusionPath "C:\HCIBox\VHD"
+Add-MpPreference -ExclusionPath "V:\VMs"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmms.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmwp.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmsp.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmcompute.exe"
+
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
