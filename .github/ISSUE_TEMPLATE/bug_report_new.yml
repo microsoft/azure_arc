@@ -1,5 +1,5 @@
-name: Bug Report (Test)
-description: File a bug report.
+name: Issue / Bug Report
+description: File an issue or bug report.
 title: "[Bug]: "
 labels: ['bug', 'triage needed']
 projects: ["microsoft/162"]
@@ -7,7 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this issue or bug report!
+        ⚠️ Note: If your bug report is related to documentation, we kindly ask you to open both an issue and a PR in our [documentation repository](https://github.com/Azure/arc_jumpstart_docs).
+        🛑 Disclaimer: The intent of this "Issue / Bug Report" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com).
   - type: dropdown
     id: jumpstart-solution
     attributes:
@@ -15,11 +17,11 @@ body:
       multiple: true
       description: What Jumpstart solution you are running?
       options:
-        - ArcBox
-        - HCIBox
-        - Agora
+        - Jumpstart ArcBox
+        - Jumpstart HCIBox
+        - Jumpstart Agora
         - A specific Jumpstart scenario
-        - Drops
+        - Jumpstart Drops
         - Other
     validations:
       required: true
@@ -51,12 +53,13 @@ body:
         - PowerShell
         - Bicep
         - ARM Template
-        - Drops
         - Other
+    validations:
+      required: true        
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
+      label: Relevant log output. Make sure to include any sensitive information or passwords.
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
 
