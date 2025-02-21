@@ -10,7 +10,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this issue!
+
         If your bug report is related to documentation, we kindly ask you to open both an issue and a PR in our [documentation repository](https://github.com/Azure/arc_jumpstart_docs).
+
         The intent of this "Bug report" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com).
   - type: checkboxes
     id: solution
