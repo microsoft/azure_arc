@@ -11,25 +11,25 @@ echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $subscriptionId:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $location:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
-echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
-echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $resourceGroup:$10| awk '{print substr($1,2); }' >> vars.sh
-echo $scenario:$11| awk '{print substr($1,2); }' >> vars.sh
+echo $scenario:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $stagingStorageAccountName:$6| awk '{print substr($1,2); }' >> vars.sh
+echo $logAnalyticsWorkspace:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $templateBaseUrl:$8 | awk '{print substr($1,2); }' >> vars.sh
+echo $storageContainerName:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $k3sControlPlane:$10 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:$11| awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
 sed -i '4s/^/export vmName=/' vars.sh
 sed -i '5s/^/export location=/' vars.sh
-sed -i '6s/^/export stagingStorageAccountName=/' vars.sh
-sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
-sed -i '8s/^/export templateBaseUrl=/' vars.sh
-sed -i '9s/^/export storageContainerName=/' vars.sh
-sed -i '10s/^/export k3sControlPlane=/' vars.sh
-sed -i '11s/^/export resourceGroup=/' vars.sh
-sed -i '12s/^/export scenario=/' vars.sh
+sed -i '6s/^/export scenario=/' vars.sh
+sed -i '7s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '8s/^/export logAnalyticsWorkspace=/' vars.sh
+sed -i '9s/^/export templateBaseUrl=/' vars.sh
+sed -i '19s/^/export storageContainerName=/' vars.sh
+sed -i '11s/^/export k3sControlPlane=/' vars.sh
+sed -i '12s/^/export resourceGroup=/' vars.sh
 
 export vmName=$3
 
