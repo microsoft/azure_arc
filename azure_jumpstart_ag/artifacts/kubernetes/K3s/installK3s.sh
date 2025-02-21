@@ -35,6 +35,11 @@ deployGPUNodes=$11
 scenario=$12
 
 # for debugging
+
+
+#!/bin/bash
+echo "Received parameters:" "$@" > /var/log/k3s_install_params.log
+
 echo "adminUsername: $adminUsername"
 echo "subscriptionId: $subscriptionId"
 echo "vmName: $vmName"
