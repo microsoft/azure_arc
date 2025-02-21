@@ -1840,17 +1840,6 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 # Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM... (skipping step)" -ForegroundColor Green
 #New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
-#######################################################################################
-# Prepare the cluster for deployment
-#######################################################################################
-# New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
-
-<#
-# Stop for manual testing
-Stop-Transcript
-exit
-#>
-
 Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 
 $DeploymentProgressString = 'Preparing Azure Local cluster deployment'
@@ -1894,8 +1883,12 @@ if ("True" -eq $env:autoDeployClusterResource) {
 $TemplateFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.json"
 $TemplateParameterFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.parameters.json"
 
-New-AzResourceGroupDeployment -Name 'hcicluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment
-
+try {
+    New-AzResourceGroupDeployment -Name 'hcicluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment -ErrorAction Stop
+}
+catch {
+    Write-Error "Validation failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
+}
 
 Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundColor Green
 
@@ -1915,7 +1908,13 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
     $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
     Write-Host "Validation succeeded. Deploying HCI cluster..."
-    New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment
+
+    try {
+        New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
+    }
+    catch {
+        Write-Error "Deployment failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
+    }
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
 
