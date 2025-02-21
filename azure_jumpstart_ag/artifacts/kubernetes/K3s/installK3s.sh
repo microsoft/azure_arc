@@ -6,7 +6,7 @@ sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --d
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Injecting environment variables
-echo '#!/bin/bash' >> vars.sh
+
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $subscriptionId:$2 | awk '{print substr($1,2); }' >> vars.sh
