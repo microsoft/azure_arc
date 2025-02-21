@@ -6,7 +6,8 @@ projects: ["microsoft/162"]
 body:
   - type: markdown
     attributes:
-      value: Thanks for taking the time to fill out this issue or bug report!
+      value: |
+        Thanks for taking the time to fill out this issue or bug report!
   - type: dropdown
     id: jumpstart-solution
     attributes:
