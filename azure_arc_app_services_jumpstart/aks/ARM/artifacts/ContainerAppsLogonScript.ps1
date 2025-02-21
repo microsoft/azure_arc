@@ -47,7 +47,7 @@ Write-Host "`n"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
-az extension add --source https://download.microsoft.com/download/5/c/2/5c2ec3fc-bd2a-4615-a574-a1b7c8e22f40/containerapp-0.0.1-py2.py3-none-any.whl --yes
+az extension add --name "containerapp" -y
 
 Write-Host "`n"
 az -v
@@ -177,23 +177,32 @@ az resource wait --ids $containerAppEnvId --created
 Write-Host "`n"
 Write-Host "Creating the products api container app"
 Write-Host "`n"
-az containerapp create `
+# az containerapp create `
+#     --name 'products' `
+#     --resource-group $Env:resourceGroup `
+#     --environment $connectedEnvironmentName `
+#     --environment-type connected `
+#     --enable-dapr true `
+#     --dapr-app-id 'products' `
+#     --dapr-app-port 80 `
+#     --dapr-app-protocol 'http' `
+#     --revisions-mode 'single' `
+#     --image $Env:productsImage `
+#     --ingress 'internal' `
+#     --target-port 80 `
+#     --transport 'http' `
+#     --min-replicas 1 `
+#     --max-replicas 1 `
+#     --query properties.configuration.ingress.fqdn
+
+az containerapp up `
     --name 'products' `
     --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
-    --environment-type connected `
-    --enable-dapr true `
-    --dapr-app-id 'products' `
-    --dapr-app-port 80 `
-    --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
     --image $Env:productsImage `
     --ingress 'internal' `
     --target-port 80 `
-    --transport 'http' `
-    --min-replicas 1 `
-    --max-replicas 1 `
-    --query properties.configuration.ingress.fqdn
 
 Write-Host "`n"
 Do {
