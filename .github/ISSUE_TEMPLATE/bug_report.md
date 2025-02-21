@@ -15,7 +15,7 @@ assignees: ''
 
 > **Note:** For ease of issues and pull requests management and tracking, we kindly ask you to provide a meaningful and concise title to this issue and answer all questions to the best of your ability.
 
-**Jumpstart solution you are trying**
+**Jumpstart solution you are running?**
 - [ ] Jumpstart scenario
 - [ ] ArcBox
 - [ ] HCIBox
