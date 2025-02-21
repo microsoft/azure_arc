@@ -35,6 +35,9 @@ param templateBaseUrl string
 @description('Storage account container name for artifacts')
 param storageContainerName string
 
+@description('The scenario to deploy')
+param scenario string
+
 @maxLength(5)
 @description('Random GUID')
 param namingGuid string
@@ -166,7 +169,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} ${scenario}'
       fileUris: [
         '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
       ]

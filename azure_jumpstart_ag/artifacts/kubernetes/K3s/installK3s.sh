@@ -31,6 +31,7 @@ sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
 sed -i '11s/^/export resourceGroup=/' vars.sh
 sed -i '12s/^/export deployGPUNodes=/' vars.sh
+sed -i '13s/^/export scenario=/' vars.sh
 
 export vmName=$3
 
@@ -311,7 +312,8 @@ fi
 
 
 
-# Add the if statement to check the scenario and run the curl command if scenario is contoso-motors
+# check the scenario and run the curl command if scenario is contoso-motors
+if [ "$scenario" == "contoso_motors" ]; then
     echo "Running curl command to install OpenVINO Toolkit Operator"
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
@@ -320,10 +322,10 @@ fi
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
     echo "Installing OVMS and InfluxDB Helm charts"
-    helm install ovms --create-namespace -n contoso-motors oci://jumpstartprod.azurecr.io/helm/ovms --version 0.1.0
+    helm install ovms --create-namespace -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
     sleep 10
-    helm install influxdb -n contoso-motors oci://jumpstartprod.azurecr.io/helm/influxdb --version 0.1.1
-
+    helm install influxdb -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.1
+fi
 
 # Uploading this script log to staging storage for ease of troubleshooting
 echo ""
