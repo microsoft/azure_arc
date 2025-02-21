@@ -56,22 +56,12 @@ body:
         - Other
     validations:
       required: true          
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
+      label: Relevant log output. Make sure to include any sensitive information or passwords.
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      render: shell      
   - type: checkboxes
     id: terms
     attributes:
