@@ -35,6 +35,9 @@ param templateBaseUrl string
 @description('Storage account container name for artifacts')
 param storageContainerName string
 
+@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
+param deployGPUNodes bool = false
+
 @description('The scenario to deploy')
 param scenario string
 
@@ -169,7 +172,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${scenario} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} '
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} ${deployGPUNodes} ${scenario} '
       fileUris: [
         '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
       ]
