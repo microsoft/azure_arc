@@ -71,7 +71,7 @@ az -v
 
 # Downloading Microk8s Kubernetes cluster kubeconfig file
 Write-Host "Downloading Microk8s Kubernetes cluster kubeconfig file"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging/config"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging/config/*?"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
