@@ -1,6 +1,6 @@
 name: Issue or Bug Report
 description: File an issue or bug report.
-title: "[Issue/Bug]: "
+title: "[Bug]: "
 labels: ['bug', 'triage needed']
 projects: ["microsoft/162"]
 assignees:
