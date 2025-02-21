@@ -7,20 +7,9 @@ sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Injecting environment variables
 
- echo '#!/bin/bash' > vars.sh
+echo '#!/bin/bash' > vars.sh
 
-# echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
-# echo $subscriptionId:$2 | awk '{print substr($1,2); }' >> vars.sh
-# echo $vmName:$3 | awk '{print substr($1,2); }' >> vars.sh
-# echo $location:$4 | awk '{print substr($1,2); }' >> vars.sh
-# echo $stagingStorageAccountName:$5 | awk '{print substr($1,2); }' >> vars.sh
-# echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
-# echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
-# echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
-# echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
-# echo $resourceGroup:$10| awk '{print substr($1,2); }' >> vars.sh
-# echo $deployGPUNodes:$11| awk '{print substr($1,2); }' >> vars.sh
-# echo $scenario:$12| awk '{print substr($1,2); }' >> vars.sh
+
 adminUsername=$1
 subscriptionId=$2
 vmName=$3
@@ -33,25 +22,6 @@ k3sControlPlane=$9
 resourceGroup=${10}
 scenario=${11}
 
-# for debugging
-
-
-#!/bin/bash
-echo "Received parameters:" "$@" > /var/log/k3s_install_params.log
-
-#debugging
-echo "adminUsername: $adminUsername"
-echo "subscriptionId: $subscriptionId"
-echo "vmName: $vmName"
-echo "location: $location"
-echo "stagingStorageAccountName: $stagingStorageAccountName"
-echo "logAnalyticsWorkspace: $logAnalyticsWorkspace"
-echo "templateBaseUrl: $templateBaseUrl"
-echo "storageContainerName: $storageContainerName"
-echo "k3sControlPlane: $k3sControlPlane"
-echo "resourceGroup: $resourceGroup"
-echo "scenario: $scenario"
-
 echo "export adminUsername=$adminUsername" >> vars.sh
 echo "export subscriptionId=$subscriptionId" >> vars.sh
 echo "export vmName=$vmName" >> vars.sh
@@ -63,20 +33,6 @@ echo "export storageContainerName=$storageContainerName" >> vars.sh
 echo "export k3sControlPlane=$k3sControlPlane" >> vars.sh
 echo "export resourceGroup=$resourceGroup" >> vars.sh
 echo "export scenario=$scenario" >> vars.sh
-
-
-# sed -i '2s/^/export adminUsername=/' vars.sh
-# sed -i '3s/^/export subscriptionId=/' vars.sh
-# sed -i '4s/^/export vmName=/' vars.sh
-# sed -i '5s/^/export location=/' vars.sh
-# sed -i '6s/^/export stagingStorageAccountName=/' vars.sh
-# sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
-# sed -i '8s/^/export templateBaseUrl=/' vars.sh
-# sed -i '9s/^/export storageContainerName=/' vars.sh
-# sed -i '10s/^/export k3sControlPlane=/' vars.sh
-# sed -i '11s/^/export resourceGroup=/' vars.sh
-# sed -i '12s/^/export deployGPUNodes=/' vars.sh
-# sed -i '13s/^/export scenario=/' vars.sh
 
 export vmName=$3
 
