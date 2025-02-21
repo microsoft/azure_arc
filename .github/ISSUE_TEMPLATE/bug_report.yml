@@ -1,62 +1,64 @@
 name: Bug Report
-description: File a bug report or an issue.
+description: File a bug report.
 title: "[Bug]: "
-labels: ["bug", "triage"]
+labels: ["bug", "triage needed"]
 projects: ["microsoft/162"]
+assignees:
+  - octocat
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  - type: dropdown
-    id: jumpstart-solution
+  - type: input
+    id: contact
     attributes:
-      label: Jumpstart Solution
-      multiple: true
-      description: What Jumpstart solution you are running?
-      options:
-        - Jumpstart ArcBox
-        - Jumpstart HCIBox
-        - Jumpstart Agora
-        - A specific Jumpstart scenario
-        - Jumpstart Drops
-        - Other
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
     validations:
-      required: true
+      required: false
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen and how to reproduce?
-      placeholder: Tell us what you see! If applicable, add screenshots to help explain your problem.
-    validations:
-      required: true
-  - type: input
-    id: solution-url
-    attributes:
-      label: We need a URL
-      description: Share with us the URL to the Jumpstart solution you are running
-      placeholder: ex. https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
     validations:
       required: true
   - type: dropdown
-    id: deployment-method
+    id: version
     attributes:
-      label: Deployment Method
-      multiple: true
-      description: What deployment method you are using?
+      label: Version
+      description: What version of our software are you running?
       options:
-        - Azure Portal
-        - Azure CLI
-        - PowerShell
-        - Bicep
-        - ARM Template
-        - Other
+        - 1.0.2 (Default)
+        - 1.0.3 (Edge)
+      default: 0
     validations:
-      required: true      
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output. Make sure to NOT INCLUDE any sensitive information. passwords, or secrets.
+      label: Relevant log output
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
