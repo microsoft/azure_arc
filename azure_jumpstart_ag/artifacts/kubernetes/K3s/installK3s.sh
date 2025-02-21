@@ -30,8 +30,8 @@ logAnalyticsWorkspace=$6
 templateBaseUrl=$7
 storageContainerName=$8
 k3sControlPlane=$9
-resourceGroup=$10
-scenario=$11
+resourceGroup=${10}
+scenario=${11}
 
 # for debugging
 
@@ -39,6 +39,7 @@ scenario=$11
 #!/bin/bash
 echo "Received parameters:" "$@" > /var/log/k3s_install_params.log
 
+#debugging
 echo "adminUsername: $adminUsername"
 echo "subscriptionId: $subscriptionId"
 echo "vmName: $vmName"
