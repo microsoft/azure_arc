@@ -10,48 +10,56 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  - type: input
-    id: contact
+  - type: dropdown
+    id: jumpstart-solution
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
+      label: Jumpstart Solution
+      multiple: true
+      description: What Jumpstart solution you are running?
+      options:
+        - Jumpstart ArcBox
+        - Jumpstart HCIBox
+        - Jumpstart Agora
+        - A specific Jumpstart scenario
+        - Jumpstart Drops
+        - Other
     validations:
-      required: false
+      required: true
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: Also tell us, what did you expect to happen and how to reproduce?
+      placeholder: Tell us what you see! If applicable, add screenshots to help explain your problem.
+    validations:
+      required: true
+  - type: input
+    id: solution-url
+    attributes:
+      label: We need a URL
+      description: Share with us the URL to the Jumpstart solution you are running
+      placeholder: ex. https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro
     validations:
       required: true
   - type: dropdown
-    id: version
+    id: deployment-method
     attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-      default: 0
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
+      label: Deployment Method
       multiple: true
+      description: What deployment method you are using?
       options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+        - Azure Portal
+        - Azure CLI
+        - PowerShell
+        - Bicep
+        - ARM Template
+        - Other
+    validations:
+      required: true      
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
+      label: Relevant log output. Make sure to include any sensitive information or passwords.
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
   - type: checkboxes
