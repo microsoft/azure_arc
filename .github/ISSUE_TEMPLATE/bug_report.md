@@ -1,12 +1,12 @@
 ---
-name: "Bug report"
+name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ['bug', 'triage needed']
-projects: ["microsoft/162"]
+labels: bug, triage needed
 assignees: ''
 
 ---
+
 <!--- 🛑 Please check existing issues first: https://github.com/microsoft/azure_arc/issues --->
 
 <!--- Disclaimer: The intent of this "Bug report" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com). --->
