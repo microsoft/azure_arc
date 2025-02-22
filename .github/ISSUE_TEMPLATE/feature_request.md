@@ -1,11 +1,12 @@
 ---
-name: "Feature request"
+name: Feature Request
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: triage needed
 assignees: ''
 
 ---
+
 <!--- Disclaimer: The intent of this "Feature request" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com). --->
 
 > **Note:** For ease of issues and pull requests management and tracking, we kindly ask you to provide a meaningful and concise title to this feature request and answer all questions to the best of your ability.
