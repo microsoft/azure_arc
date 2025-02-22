@@ -177,32 +177,23 @@ az resource wait --ids $containerAppEnvId --created
 Write-Host "`n"
 Write-Host "Creating the products api container app"
 Write-Host "`n"
-# az containerapp create `
-#     --name 'products' `
-#     --resource-group $Env:resourceGroup `
-#     --environment $connectedEnvironmentName `
-#     --environment-type connected `
-#     --enable-dapr true `
-#     --dapr-app-id 'products' `
-#     --dapr-app-port 80 `
-#     --dapr-app-protocol 'http' `
-#     --revisions-mode 'single' `
-#     --image $Env:productsImage `
-#     --ingress 'internal' `
-#     --target-port 80 `
-#     --transport 'http' `
-#     --min-replicas 1 `
-#     --max-replicas 1 `
-#     --query properties.configuration.ingress.fqdn
-
-az containerapp up `
+az containerapp create `
     --name 'products' `
     --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
+    --environment-type connected `
+    --enable-dapr true `
+    --dapr-app-id 'products' `
+    --dapr-app-port 80 `
+    --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
     --image $Env:productsImage `
     --ingress 'internal' `
     --target-port 80 `
+    --transport 'http' `
+    --min-replicas 1 `
+    --max-replicas 1 `
+    --query properties.configuration.ingress.fqdn
 
 Write-Host "`n"
 Do {
