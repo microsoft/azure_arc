@@ -1911,7 +1911,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
         New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
     }
     catch {
-        Write-Output "Deployment failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
+        Write-Output "Deployment command failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
     }
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
