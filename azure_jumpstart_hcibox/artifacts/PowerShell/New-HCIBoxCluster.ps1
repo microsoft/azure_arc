@@ -1628,11 +1628,6 @@ $resourceGroup = $env:resourceGroup
 
 Import-Module Hyper-V
 
-$VerbosePreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop"
-$WarningPreference = "Continue"
-$ProgressPreference = "SilentlyContinue"
-
 $DeploymentProgressString = 'Downloading nested VMs VHDX files'
 
 $tags = Get-AzResourceGroup -Name $env:resourceGroup | Select-Object -ExpandProperty Tags
