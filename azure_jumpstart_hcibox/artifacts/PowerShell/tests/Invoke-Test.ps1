@@ -2,6 +2,43 @@
 
 $Env:HCIBoxTestsDir = "$Env:HCIBoxDir\Tests"
 
+function Wait-AzDeployment {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ResourceGroupName,
+
+        [Parameter(Mandatory=$true)]
+        [string]$DeploymentName,
+
+        [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
+    )
+
+    $startTime = Get-Date
+    $endTime = $startTime.AddMinutes($TimeoutMinutes)
+
+    Write-Host "Waiting for deployment '$DeploymentName' in resource group '$ResourceGroupName' to complete..."
+
+    while ($true) {
+        $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName
+
+        if ($deployment.ProvisioningState -ne "InProgress") {
+            Write-Host "Deployment completed with state: $($deployment.ProvisioningState)"
+            return $deployment.ProvisioningState
+        }
+
+        if (Get-Date -gt $endTime) {
+            Write-Host "Timeout reached. Deployment still in progress."
+            return "Timeout"
+        }
+
+        Write-Host "Deployment still in progress. Checking again in 1 minute..."
+        Start-Sleep -Seconds 60
+    }
+}
+
+# Wait for the deployment to complete
+Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+
 Invoke-Pester -Path "$Env:HCIBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
 $tests_failed = $tests_common.Failed.Count
