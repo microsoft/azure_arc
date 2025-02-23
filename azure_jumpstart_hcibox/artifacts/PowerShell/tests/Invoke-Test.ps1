@@ -47,7 +47,7 @@ function Wait-AzLocalClusterConnectivity {
         [Parameter(Mandatory=$true)]
         [string]$ClusterName,
 
-        [int]$TimeoutMinutes = 10  # Default timeout of 10 minutes
+        [int]$TimeoutMinutes = 60  # Default timeout of 60 minutes
     )
 
     $startTime = Get-Date
