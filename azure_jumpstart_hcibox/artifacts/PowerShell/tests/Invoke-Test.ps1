@@ -2,6 +2,9 @@
 
 $Env:HCIBoxTestsDir = "$Env:HCIBoxDir\Tests"
 
+# Import Configuration data file
+$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+
 function Wait-AzDeployment {
     param(
         [Parameter(Mandatory=$true)]
@@ -36,8 +39,45 @@ function Wait-AzDeployment {
     }
 }
 
+function Wait-AzLocalClusterConnectivity {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ResourceGroupName,
+
+        [Parameter(Mandatory=$true)]
+        [string]$ClusterName,
+
+        [int]$TimeoutMinutes = 10  # Default timeout of 10 minutes
+    )
+
+    $startTime = Get-Date
+    $endTime = $startTime.AddMinutes($TimeoutMinutes)
+
+    Write-Host "Waiting for cluster '$ClusterName' in resource group '$ResourceGroupName' to be 'Connected'..."
+
+    while ($true) {
+        $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName
+
+        if ($clusterObject -and $clusterObject.ConnectivityStatus -eq "Connected") {
+            Write-Host "Cluster '$ClusterName' is now Connected."
+            return $true
+        }
+
+        if ([DateTime]::Now -gt $endTime) {
+            Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected."
+            return $false
+        }
+
+        Write-Host "Cluster '$ClusterName' is still not Connected. Checking again in 30 seconds..."
+        Start-Sleep -Seconds 30
+    }
+}
+
 # Wait for the deployment to complete
 Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+
+# Wait for the cluster to be connected
+Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
 
 Invoke-Pester -Path "$Env:HCIBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
