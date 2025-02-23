@@ -1,5 +1,11 @@
 blank_issues_enabled: false
-# contact_links:
+contact_links:
+  - name: I have an idea/suggestion.
+    url: https://github.com/microsoft/azure_arc/discussions/new?category=ideas
+    about: Please submit your ideas here.
+  - name: I have a question.
+    url: https://github.com/microsoft/azure_arc/discussions/new?category=q-a
+    about: Please ask and answer questions here.
 #   - name: Getting Started Guide
 #     url: https://jumpstart.azure.com/getting-started/
 #     about: Get started with Azure Arc using Jumpstart
