@@ -21,6 +21,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
   properties: {
     supportsHttpsTrafficOnly: true
+    isHnsEnabled: true
   }
 }
 

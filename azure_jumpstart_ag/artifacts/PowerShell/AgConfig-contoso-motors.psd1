@@ -57,17 +57,18 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="latest"}
     )
 
     # PowerShell modules
     PowerShellModules       = @(
-        @{name='Az.ConnectedKubernetes'; version="0.10.3"},
+        @{name='Az.ConnectedKubernetes'; version="latest"},
         @{name='Az.KubernetesConfiguration'; version="latest"},
         @{name='Az.Kusto'; version="latest"},
         @{name='Az.EventGrid'; version="latest"},
         @{name='Az.Storage'; version="latest"},
-        @{name='Az.EventHub'; version="latest"}
+        @{name='Az.EventHub'; version="latest"},
+        @{name='powershell-yaml'; version="latest"}
     )
 
     # Winget packages list
@@ -92,7 +93,8 @@
         'FireDaemon.OpenSSL',
         'thomasnordquist.MQTT-Explorer',
         'GitHub.cli',
-        'Python.Python.3.12'
+        'Python.Python.3.12',
+        'Derailed.k9s'
     )
 
     # Pip packages list
@@ -143,51 +145,29 @@
     natSubnet               = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
     natDNS                  = "%staging-natDNS%"                     # Do not change - can be configured by passing the optional natDNS parameter to the ARM deployment.
 
-    # AKS Edge Essentials variables
+    # Site Kubernetes cluster configurations
     SiteConfig              = @{
         Detroit = @{
-            ArcClusterName         = "Ag-ArcK8s-Detroit"
-            NetIPAddress           = "172.20.1.2"
-            DefaultGateway         = "172.20.1.1"
-            PrefixLength           = "24"
-            DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart    = "172.20.1.31"
-            ServiceIPRangeSize     = "10"
-            ControlPlaneEndpointIp = "172.20.1.21"
-            LinuxNodeIp4Address    = "172.20.1.11"
-            Subnet                 = "172.20.1.0/24"
+            ArcClusterName         = "Ag-K3s-Detroit"
             FriendlyName           = "Detroit"
-            IsProduction           = $true
-            Type                   = "AKSEE"
+            GrafanaDataSource      = "detroit"
+            Type                   = "k3s"
             Branch                 = "main"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "detroit"
-            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            clusterLogSize         = "1024"
-            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+            IsProduction           = $true
         }
         Monterrey = @{
-            ArcClusterName         = "Ag-ArcK8s-Monterrey"
-            NetIPAddress           = "172.20.1.3"
-            DefaultGateway         = "172.20.1.1"
-            PrefixLength           = "24"
-            DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart    = "172.20.1.71"
-            ServiceIPRangeSize     = "10"
-            ControlPlaneEndpointIp = "172.20.1.61"
-            LinuxNodeIp4Address    = "172.20.1.51"
-            Subnet                 = "172.20.1.0/24"
+            ArcClusterName         = "Ag-K3s-Monterrey"
             FriendlyName           = "Monterrey"
-            IsProduction           = $true
-            Type                   = "AKSEE"
+            GrafanaDataSource      = "monterrey"
+            Type                   = "k3s"
             Branch                 = "main"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "monterrey"
-            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            clusterLogSize         = "1024"
-            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+            IsProduction           = $true
         }
     }
 
@@ -221,7 +201,7 @@
         inferencing_deployment = @{
             GitOpsConfigName = "contoso-motors"
             KustomizationName = "contoso-motors"
-            KustomizationPath="./contoso_manufacturing/operations"
+            KustomizationPath="./agora/contoso_motors"
             Namespace = "contoso-motors"
             Order = 1
         }
