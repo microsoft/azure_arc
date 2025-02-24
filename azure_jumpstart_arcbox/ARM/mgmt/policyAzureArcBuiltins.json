@@ -40,7 +40,7 @@
                         "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
                     },
                     "enableProcessesAndDependencies": {
-                        "value": true
+                        "value": false
                     }
                 }
             },
