@@ -105,6 +105,8 @@ param scenario string = 'contoso_motors'
 param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 //param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
 
+param deployGPUNodes bool = false
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
 
@@ -146,6 +148,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
     vmName : k3sArcDataClusterName
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
+    scenario: scenario
   }
 }
 
@@ -161,6 +164,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
     vmName : k3sArcClusterName
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
+    scenario: scenario
   }
 }
 
@@ -176,7 +180,6 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
-    //deployGPUNodes: deployGPUNodes
     k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
@@ -196,7 +199,6 @@ module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [
     vmName : '${k3sArcClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
-    //deployGPUNodes: deployGPUNodes
     k8sWorkerNodesSku: k8sWorkerNodesSku
   }
   dependsOn: [
