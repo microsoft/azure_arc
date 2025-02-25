@@ -142,6 +142,9 @@
       "apiVersion": "2022-03-01",
       "name": "[parameters('clientVMName')]",
       "location": "[parameters('azureLocation')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -204,7 +207,33 @@
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
       ]
-    }
+    },
+      {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2022-04-01",
+        "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'Microsoft.Authorization/roleAssignments', 'Reader')]",
+        "properties": {
+          "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]",
+          "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+          "principalType": "ServicePrincipal"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
+        ]
+      },
+      {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2022-04-01",
+        "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'Microsoft.Authorization/roleAssignments', 'keyVaultSecretReader')]",
+        "properties": {
+          "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]",
+          "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+          "principalType": "ServicePrincipal"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
+        ]
+      }
   ],
   "outputs": {
     "scriptfile": {
