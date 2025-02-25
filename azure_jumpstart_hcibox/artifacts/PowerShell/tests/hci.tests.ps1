@@ -1,8 +1,11 @@
 
 BeforeDiscovery {
 
-    $VMs = @("AzSHOST1", "AzSHOST2")
-    $clusters = @("hciboxcluster")
+    # Import Configuration data file
+    $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+
+    $VMs = $HCIBoxConfig.NodeHostConfig.Hostname
+    $clusters = @($HCIBoxConfig.ClusterName)
 
     # Login to Azure PowerShell with service principal provided by user
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
@@ -16,7 +19,7 @@ Describe "<cluster>" -ForEach $clusters {
         $cluster = $_
         $clusterObject = Get-AzStackHciCluster -ResourceGroupName $env:resourceGroup -Name $cluster
     }
-    It "Cluster exists" {        
+    It "Cluster exists" {
         $clusterObject | Should -Not -BeNullOrEmpty
     }
     It "Azure Arc Connected cluster is successfully provisioned" {
