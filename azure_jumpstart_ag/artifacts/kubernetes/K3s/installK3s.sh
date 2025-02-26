@@ -9,7 +9,6 @@ sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 echo '#!/bin/bash' > vars.sh
 
-
 adminUsername=$1
 subscriptionId=$2
 vmName=$3
@@ -21,6 +20,7 @@ storageContainerName=$8
 k3sControlPlane=$9
 resourceGroup=${10}
 scenario=${11}
+influxdbPassword=${12}
 
 echo "export adminUsername=$adminUsername" >> vars.sh
 echo "export subscriptionId=$subscriptionId" >> vars.sh
@@ -33,6 +33,7 @@ echo "export storageContainerName=$storageContainerName" >> vars.sh
 echo "export k3sControlPlane=$k3sControlPlane" >> vars.sh
 echo "export resourceGroup=$resourceGroup" >> vars.sh
 echo "export scenario=$scenario" >> vars.sh
+echo "export influxdbPassword=$influxdbPassword" >> vars.sh
 
 export vmName=$3
 
@@ -321,6 +322,8 @@ if [ "$scenario" == "contoso_motors" ]; then
     sleep 10
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+
+    kubectl create secret generic influxdb-pass -n contoso-motors --from-literal=password=$influxdbPassword
 
     echo "Installing OVMS and InfluxDB Helm charts"
     helm install ovms --create-namespace -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
