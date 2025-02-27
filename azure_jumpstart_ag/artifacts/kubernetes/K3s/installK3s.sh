@@ -328,7 +328,7 @@ if [ "$scenario" == "contoso_motors" ]; then
     kubectl create secret generic influxdb-pass -n contoso-motors --from-literal=password=$influxdbPassword
 
     echo "Installing OVMS and InfluxDB Helm charts"
-    helm install ovms --create-namespace -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
+    helm install ovms -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
     sleep 10
     helm install influxdb -n contoso-motors oci://mcr20250211.azurecr.io/helm/influxdb --version 0.1.1
 fi
