@@ -323,6 +323,8 @@ if [ "$scenario" == "contoso_motors" ]; then
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
+    kubectl create ns contoso-motors
+
     kubectl create secret generic influxdb-pass -n contoso-motors --from-literal=password=$influxdbPassword
 
     echo "Installing OVMS and InfluxDB Helm charts"
