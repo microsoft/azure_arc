@@ -148,7 +148,6 @@
             "networkPlugin": "azure"
           },
         "linuxProfile": {
-          "condition": "[greater(length(parameters('sshRSAPublicKey')), 0)]",
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
             "publicKeys": [
