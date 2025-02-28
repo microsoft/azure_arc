@@ -38,26 +38,12 @@ properties:
         id: Kubernetes.kubectl
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: edge
-      directives:
-        description: Install Microsoft Edge
-      settings:
-        id: Microsoft.Edge
-        source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: azcopy
       directives:
         description: Install azcopy
       settings:
         id: Microsoft.Azure.AZCopy.10
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: DotNetSDK8
-      directives:
-        description: Install Microsoft DotNet SDK 8
-      settings:
-        id: Microsoft.DotNet.SDK.8
-        source: winget    
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: helm
       directives:
@@ -72,25 +58,4 @@ properties:
       settings:
         id: Microsoft.Sysinternals.BGInfo
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: OpenSSL
-      directives:
-        description: Install OpenSSL
-      settings:
-        id: FireDaemon.OpenSSL
-        source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: Microsoft.AzureDataStudio
-      directives:
-        description: Install Microsoft Azure Data Studio
-      settings:
-        id: Microsoft.AzureDataStudio
-        source: winget
-    - resource: DSCR_Font/cFont
-      id: CascadiaMono
-      directives:
-        description: Install font CascadiaMono
-      settings:
-        FontName: Cascadia Mono
-        FontFile: C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.18.3181.0_x64__8wekyb3d8bbwe\CascadiaMono.ttf
   configurationVersion: 0.2.0
