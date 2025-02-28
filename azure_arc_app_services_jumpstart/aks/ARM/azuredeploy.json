@@ -138,21 +138,21 @@
         },
         "productsImage": {
             "type": "string",
-            "defaultValue": "jumpstartprod.azurecr.io/products:latest",
+            "defaultValue": "mcr.microsoft.com/k8se/products:latest",
             "metadata": {
                 "description": "Products API Image"
             }
         },
         "inventoryImage": {
             "type": "string",
-            "defaultValue": "jumpstartprod.azurecr.io/inventory:latest",
+            "defaultValue": "mcr.microsoft.com/k8se/inventory:latest",
             "metadata": {
                 "description": "Inventory API Image"
             }
         },
         "storeImage": {
             "type": "string",
-            "defaultValue": "jumpstartprod.azurecr.io/store:latest",
+            "defaultValue": "mcr.microsoft.com/k8se/store:latest",
             "metadata": {
                 "description": "Store API Image"
             }
