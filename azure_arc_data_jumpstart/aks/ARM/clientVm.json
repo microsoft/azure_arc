@@ -259,7 +259,7 @@
     },
     {
       "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2024-05-01",
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('azureLocation')]",
       "properties": {
@@ -349,7 +349,7 @@
       "condition": "[parameters('deployBastion')]",
       "name": "[parameters('bastionHostName')]",
       "location": "[parameters('azureLocation')]",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2024-05-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
       ],

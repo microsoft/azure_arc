@@ -195,7 +195,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('vmName'),'/DeployADDS')]",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2024-07-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
@@ -215,13 +215,13 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-08-01",
+      "apiVersion": "2024-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('azureLocation')]"
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-      "apiVersion": "2022-05-01",
+      "apiVersion": "2024-05-01",
       "condition": "[parameters('deployBastion')]",
       "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
       "name": "[concat(parameters('networkSecurityGroupName'),'/allow_RDP_3389')]",
