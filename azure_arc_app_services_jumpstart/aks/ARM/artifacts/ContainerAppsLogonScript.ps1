@@ -224,11 +224,11 @@ az containerapp create `
     --max-replicas 1 `
     --query properties.configuration.ingress.fqdn
 
-Do {
-    Write-Host "Waiting for inventory api to become available."
-    Start-Sleep -Seconds 15
-    $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($inventoryapi -eq "Nope")
+# Do {
+#     Write-Host "Waiting for inventory api to become available."
+#     Start-Sleep -Seconds 15
+#     $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+#     } while ($inventoryapi -eq "Nope")
 
 # Deploying Store API Container App
 Write-Host "`n"
