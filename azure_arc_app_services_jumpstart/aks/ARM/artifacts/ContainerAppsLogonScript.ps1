@@ -196,11 +196,11 @@ az containerapp create `
     --query properties.configuration.ingress.fqdn
 
 Write-Host "`n"
-Do {
-    Write-Host "Waiting for products api to become available."
-    Start-Sleep -Seconds 15
-    $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($productsapi -eq "Nope")
+# Do {
+#     Write-Host "Waiting for products api to become available."
+#     Start-Sleep -Seconds 15
+#     $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+#     } while ($productsapi -eq "Nope")
 
 # Deploying Inventory API Container App
 Write-Host "`n"
