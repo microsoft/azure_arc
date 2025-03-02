@@ -126,8 +126,8 @@ workflow ClientTools_01
                             }
                         }
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "$tempDir\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "$tempDir\AZDataCLI.msi"
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "$using:tempDir\azuredatastudio.zip"
+                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "$using:tempDir\AZDataCLI.msi"
                 }
         }
 
@@ -139,8 +139,8 @@ workflow ClientTools_02
             Parallel
             {
                 InlineScript {
-                    Expand-Archive '$tempDir\azuredatastudio.zip' -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I $tempDir\AZDataCLI.msi /quiet'
+                    Expand-Archive "$using:tempDir\azuredatastudio.zip" -DestinationPath "C:\Program Files\Azure Data Studio"
+                    Start-Process msiexec.exe -Wait -ArgumentList "/I $using:tempDir\AZDataCLI.msi /quiet"
                 }
             }
         }
