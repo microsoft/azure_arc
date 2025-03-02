@@ -252,11 +252,11 @@ az containerapp create `
     --max-replicas 1 `
     --query properties.configuration.ingress.fqdn
 
-Do {
-    Write-Host "Waiting for store api to become available."
-    Start-Sleep -Seconds 15
-    $storeapi = $(if(kubectl get pods -n $namespace | Select-String "store" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($storeapi -eq "Nope")
+# Do {
+#     Write-Host "Waiting for store api to become available."
+#     Start-Sleep -Seconds 15
+#     $storeapi = $(if(kubectl get pods -n $namespace | Select-String "store" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+#     } while ($storeapi -eq "Nope")
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
