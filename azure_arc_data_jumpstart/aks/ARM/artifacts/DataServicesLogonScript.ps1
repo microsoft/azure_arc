@@ -81,6 +81,10 @@ Write-Host "`n"
 Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
+# Copy kubectl.exe file in the user directory
+$currentUserDirectory = [System.Environment]::GetFolderPath('UserProfile')
+Copy-Item -Path 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe' -Destination "$currentUserDirectory\.azure\kubectl-client\kubectl.exe"
+
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
