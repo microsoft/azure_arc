@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: dbconnecttest
-        image: jumpstartprod.azurecr.io/dbconnecttest:latest
+        image: mcr.microsoft.com/jumpstart/arcbox/dbconnecttest:1.0.0
         volumeMounts:
         - name: secrets
           mountPath: /app/secrets
