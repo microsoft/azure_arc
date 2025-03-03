@@ -196,11 +196,11 @@ az containerapp create `
     --query properties.configuration.ingress.fqdn
 
 Write-Host "`n"
-# Do {
-#     Write-Host "Waiting for products api to become available."
-#     Start-Sleep -Seconds 15
-#     $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-#     } while ($productsapi -eq "Nope")
+Do {
+    Write-Host "Waiting for products api to become available."
+    Start-Sleep -Seconds 15
+    $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($productsapi -eq "Nope")
 
 # Deploying Inventory API Container App
 Write-Host "`n"
@@ -224,11 +224,11 @@ az containerapp create `
     --max-replicas 1 `
     --query properties.configuration.ingress.fqdn
 
-# Do {
-#     Write-Host "Waiting for inventory api to become available."
-#     Start-Sleep -Seconds 15
-#     $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-#     } while ($inventoryapi -eq "Nope")
+Do {
+    Write-Host "Waiting for inventory api to become available."
+    Start-Sleep -Seconds 15
+    $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($inventoryapi -eq "Nope")
 
 # Deploying Store API Container App
 Write-Host "`n"
@@ -252,11 +252,11 @@ az containerapp create `
     --max-replicas 1 `
     --query properties.configuration.ingress.fqdn
 
-# Do {
-#     Write-Host "Waiting for store api to become available."
-#     Start-Sleep -Seconds 15
-#     $storeapi = $(if(kubectl get pods -n $namespace | Select-String "store" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-#     } while ($storeapi -eq "Nope")
+Do {
+    Write-Host "Waiting for store api to become available."
+    Start-Sleep -Seconds 15
+    $storeapi = $(if(kubectl get pods -n $namespace | Select-String "store" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($storeapi -eq "Nope")
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
