@@ -73,11 +73,15 @@ function Wait-AzLocalClusterConnectivity {
     }
 }
 
-# Wait for the deployment to complete
-Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+if ("True" -eq $env:autoDeployClusterResource) {
 
-# Wait for the cluster to be connected
-Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
+    # Wait for the deployment to complete
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+
+    # Wait for the cluster to be connected
+    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
+
+}
 
 Invoke-Pester -Path "$Env:HCIBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
