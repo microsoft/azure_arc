@@ -50,6 +50,12 @@ param autoUpgradeClusterResource bool = false
 @description('Enable automatic logon into HCIBox Virtual Machine')
 param vmAutologon bool = true
 
+param resourceTags object = {
+  Project: 'jumpstart_HCIBox'
+  CostControl: 'Ignore'
+  SecurityControl: 'Ignore'
+}
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -57,6 +63,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -65,6 +72,7 @@ module networkDeployment 'network/network.bicep' = {
   params: {
     deployBastion: deployBastion
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -72,6 +80,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -95,5 +104,6 @@ module hostDeployment 'host/host.bicep' = {
     autoDeployClusterResource: autoDeployClusterResource
     autoUpgradeClusterResource: autoUpgradeClusterResource
     vmAutologon: vmAutologon
+    resourceTags: resourceTags
   }
 }
