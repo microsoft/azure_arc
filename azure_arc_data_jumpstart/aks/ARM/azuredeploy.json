@@ -47,7 +47,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.28.5",
+      "defaultValue": "1.31.3",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes"
@@ -147,7 +147,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys a VNET and Subnet for Client VM",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "VNETDeployment",
       "properties": {
         "mode": "Incremental",
@@ -177,7 +177,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Updates VNet DNS servers after ADDS VM is deployed",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "updateVNetDNSServers",
       "condition": "[parameters('enableADAuth')]",
       "dependsOn": ["VNETDeployment", "addsVmDeployment"],
@@ -212,7 +212,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys an AKS Cluster",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "aksDeployment",
       "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
@@ -246,7 +246,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys Active Directory Domain Services Windows VM",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "addsVmDeployment",
       "condition": "[parameters('enableADAuth')]",
       "dependsOn": ["VNETDeployment"],
@@ -290,7 +290,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys the Client Windows VM",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "clientVmDeployment",
       "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
@@ -364,7 +364,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2024-11-01",
       "name": "logAnalyticsDeployment",
       "properties": {
         "mode": "Incremental",
