@@ -50,11 +50,20 @@ param autoUpgradeClusterResource bool = false
 @description('Enable automatic logon into HCIBox Virtual Machine')
 param vmAutologon bool = true
 
-param resourceTags object = {
+@description('Setting this parameter to `true` will add the `CostControl` and `SecurityControl` tags to the provisioned resources. These tags are applicable to ONLY Microsoft-internal Azure lab tenants and designed for managing automated governance processes related to cost optimization and security controls')
+param governResourceTags bool = true
+
+@description('Tags to be added to all resources')
+
+param tags object = {
   Project: 'jumpstart_HCIBox'
-  CostControl: 'Ignore'
-  SecurityControl: 'Ignore'
 }
+
+// if governResourceTags is true, add the following tags
+var resourceTags = governResourceTags ? union(tags, {
+    CostControl: 'Ignore'
+    SecurityControl: 'Ignore'
+}) : tags
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
