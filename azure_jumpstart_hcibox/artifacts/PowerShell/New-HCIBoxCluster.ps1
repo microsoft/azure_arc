@@ -1910,6 +1910,31 @@ catch {
     Write-Output "Validation failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
 }
 
+
+    # Adding known governance tags for avoiding disruptions to the deployment. These resources are not created by the Bicep template for HCIBox, hence the need to add them as part of the automation.
+    $tags = @{
+        'CostControl' = 'Ignore'
+        'SecurityControl' = 'Ignore'
+    }
+    Get-AzKeyVault -ResourceGroupName $env:resourceGroup |
+    ForEach-Object {
+
+        $null = Set-AzResource -ResourceName $PSItem.VaultName -ResourceGroupName $env:resourceGroup -ResourceType 'Microsoft.KeyVault/vaults' -Tag $tags -Force
+
+    }
+    Get-AzStorageAccount -ResourceGroupName $env:resourceGroup |
+    ForEach-Object {
+
+        $null = Set-AzResource -ResourceName $PSItem.StorageAccountName -ResourceGroupName $env:resourceGroup -ResourceType 'Microsoft.Storage/storageAccounts' -Tag $tags -Force
+
+    }
+    Get-AzDisk -ResourceGroupName $env:resourceGroup |
+    ForEach-Object {
+
+        $null = Set-AzResource -ResourceName $PSItem.Name -ResourceGroupName $env:resourceGroup -ResourceType 'Microsoft.Compute/disks' -Tag $tags -Force
+
+    }
+
 Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundColor Green
 
 if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {

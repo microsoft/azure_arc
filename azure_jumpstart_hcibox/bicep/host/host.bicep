@@ -19,9 +19,7 @@ param location string = resourceGroup().location
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-param resourceTags object = {
-  Project: 'jumpstart_HCIBox'
-}
+param resourceTags object
 
 @description('Client id of the service principal')
 param spnClientId string
@@ -98,6 +96,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
       }
     ]
   }
+  tags: resourceTags
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
@@ -111,6 +110,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   sku: {
     name: 'Basic'
   }
+  tags: resourceTags
 }
 
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {

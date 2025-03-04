@@ -16,6 +16,8 @@ param networkSecurityGroupName string = 'HCIBox-NSG'
 @description('Name of the Bastion Network Security Group')
 param bastionNetworkSecurityGroupName string = 'HCIBox-Bastion-NSG'
 
+param resourceTags object
+
 var addressPrefix = '172.16.0.0/16'
 var subnetAddressPrefix = '172.16.1.0/24'
 var bastionSubnetName = 'AzureBastionSubnet'
@@ -68,6 +70,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
       }
     ]
   }
+ tags: resourceTags
 }
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
@@ -75,9 +78,10 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   location: location
   properties: {
     securityRules: [
-      
+
     ]
   }
+  tags: resourceTags
 }
 
 resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true) {
@@ -203,6 +207,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       }
     ]
   }
+  tags: resourceTags
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (deployBastion == true) {
@@ -216,6 +221,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (
   sku: {
     name: 'Standard'
   }
+  tags: resourceTags
 }
 
 resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBastion == true) {
@@ -236,6 +242,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBas
       }
     ]
   }
+  tags: resourceTags
 }
 
 output vnetId string = arcVirtualNetwork.id

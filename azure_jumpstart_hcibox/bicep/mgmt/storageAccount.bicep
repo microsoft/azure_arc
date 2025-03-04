@@ -10,6 +10,8 @@ param storageAccountType string = 'Standard_LRS'
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
+param resourceTags object
+
 var storageAccountName = 'hcibox${uniqueString(resourceGroup().id)}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
@@ -22,6 +24,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
   }
+  tags: resourceTags
 }
 
 output storageAccountName string = storageAccountName

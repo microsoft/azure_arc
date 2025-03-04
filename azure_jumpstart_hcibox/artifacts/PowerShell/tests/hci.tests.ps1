@@ -14,22 +14,24 @@ BeforeDiscovery {
 
 }
 
-Describe "<cluster>" -ForEach $clusters {
-    BeforeAll {
-        $cluster = $_
-        $clusterObject = Get-AzStackHciCluster -ResourceGroupName $env:resourceGroup -Name $cluster
+if ("True" -eq $env:autoDeployClusterResource) {
+    Describe "<cluster>" -ForEach $clusters {
+        BeforeAll {
+            $cluster = $_
+            $clusterObject = Get-AzStackHciCluster -ResourceGroupName $env:resourceGroup -Name $cluster
+        }
+        It "Cluster exists" {
+            $clusterObject | Should -Not -BeNullOrEmpty
+        }
+        It "Azure Arc Connected cluster is successfully provisioned" {
+            $clusterObject.ProvisioningState | Should -Be "Succeeded"
+        }
+        It "Azure Arc Connected cluster is connected" {
+            $clusterObject.ConnectivityStatus | Should -Be "Connected"
+        }
     }
-    It "Cluster exists" {
-        $clusterObject | Should -Not -BeNullOrEmpty
-    }
-    It "Azure Arc Connected cluster is successfully provisioned" {
-        $clusterObject.ProvisioningState | Should -Be "Succeeded"
-    }
-    It "Azure Arc Connected cluster is connected" {
-        $clusterObject.ConnectivityStatus | Should -Be "Connected"
-    }
-}
 
+}
 
 Describe "<vm>" -ForEach $VMs {
     BeforeAll {
