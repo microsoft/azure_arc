@@ -110,28 +110,22 @@ function Set-K3sClusters {
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
             kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-            # Initialize serviceIpRange as empty
-            $serviceIpRange = @()
-
-            # Loop until serviceIpRange is not empty
-            while ($serviceIpRange.Count -eq 0) {
-                $serviceIpRange = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv)
-                if ($serviceIpRange.Count -eq 0) {
-                    Write-Host "serviceIpRange is empty, retrying..."
+            # Wait for kube-vip to assign a private IP address
+            while ($kubeVipPrivateIP -eq $null) {
+                Write-Host "Waiting for kube-vip to assign a private IP address from $vmName-NIC"
+                $kubeVipPrivateIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -o tsv)
+                if ($kubeVipPrivateIP -eq $null) {
+                    Write-Host "kubeVipPrivateIP is null; retrying..."
                     Start-Sleep -Seconds 5
                 }
             }
+            
+            #debug output
+            Write-Host "About to create kubevip configmap using $kubeVipPrivateIP"
 
-            $sortedIps = $serviceIpRange | Sort-Object { [System.Version]$_ }
-            $lowestServiceIp = $sortedIps[0]
-            $highestServiceIp = $sortedIps[-1]
 
-            kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
-            Start-Sleep -Seconds 30
-
-            # Write-Host "Creating longhorn storage on K3scluster"
-            # kubectl apply -f "$($Agconfig.AgDirectories.AgToolsDir)\longhorn.yaml"
-            # Start-Sleep -Seconds 30
+            kubectl create configmap -n kube-system kubevip --from-literal cidr-global=$kubeVipPrivateIP/32
+   
         }
     }
 }
