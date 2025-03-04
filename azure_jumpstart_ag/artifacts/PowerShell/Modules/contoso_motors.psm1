@@ -89,7 +89,7 @@ function Merge-K3sConfigFilesContosoMotors{
 
 }
 
-function Set-K3sClusters {
+function Set-K3sClustersContosoMotors {
     Write-Host "Configuring kube-vip on K3s clusters"
     az login --identity
     az account set -s $subscriptionId
