@@ -96,6 +96,10 @@ param vmAutologon bool = true
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_motors'
 
+@description('The InfluxDB admin password')
+@secure()
+param influxDBPassword string = windowsAdminPassword
+
 @description('The sku name of the K3s cluster worker nodes.')
 @allowed([
   'Standard_D8s_v5'
@@ -149,6 +153,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
     scenario: scenario
+    influxDBPassword: windowsAdminPassword
   }
 }
 
@@ -165,6 +170,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
     scenario: scenario
+    influxDBPassword: windowsAdminPassword
   }
 }
 
