@@ -114,6 +114,8 @@ function Set-K3sClusters {
             while ($kubeVipPrivateIP -eq $null) {
                 Write-Host "Waiting for kube-vip to assign a private IP address from $vmName-NIC"
                 $kubeVipPrivateIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -o tsv)
+                # debug
+                Write-Host "kubeVipPrivateIP: $kubeVipPrivateIP"
                 if ($kubeVipPrivateIP -eq $null) {
                     Write-Host "kubeVipPrivateIP is null; retrying..."
                     Start-Sleep -Seconds 5
