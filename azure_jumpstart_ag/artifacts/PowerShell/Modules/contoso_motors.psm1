@@ -110,6 +110,9 @@ function Set-K3sClusters {
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
             kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
+            # Initialize kubeVipPrivateIP as null
+            $kubeVipPrivateIP = $null
+
             # Wait for kube-vip to assign a private IP address
             while ($kubeVipPrivateIP -eq $null) {
                 Write-Host "Waiting for kube-vip to assign a private IP address from $vmName-NIC"
