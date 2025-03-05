@@ -42,7 +42,7 @@ param location string = resourceGroup().location
 param rdpPort string = '3389'
 
 @description('Choice to enable automatic deployment of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Default is false.')
-param autoDeployClusterResource bool = false
+param autoDeployClusterResource bool = true
 
 @description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
 param autoUpgradeClusterResource bool = false
