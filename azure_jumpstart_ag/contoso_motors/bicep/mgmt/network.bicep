@@ -1,11 +1,12 @@
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string
+@description('Name of the K3s subnet in the cloud virtual network')
+param subnetNameCloudK3s string
 
-@description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string
+@description('Name of the inner-loop subnet in the cloud virtual network')
+param subnetNameCloud string
+
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -25,8 +26,8 @@ param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
 param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
 
 var addressPrefixCloud = '10.16.0.0/16'
-var subnetAddressPrefixAksDev = '10.16.80.0/21'
-var subnetAddressPrefixInnerLoop = '10.16.64.0/21'
+var subnetAddressPrefixK3s = '10.16.80.0/21'
+var subnetAddressPrefixCloud = '10.16.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
@@ -45,11 +46,11 @@ var bastionSubnet = [
     }
   }
 ]
-var cloudAKSDevSubnet = [
+var cloudK3sSubnet = [
   {
-    name: subnetNameCloudAksStaging
+    name: subnetNameCloudK3s
     properties: {
-      addressPrefix: subnetAddressPrefixAksDev
+      addressPrefix: subnetAddressPrefixK3s
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
@@ -59,11 +60,11 @@ var cloudAKSDevSubnet = [
   }
 ]
 
-var cloudAKSInnerLoopSubnet = [
+var cloudSubnet = [
   {
-    name: subnetNameCloudAksInnerLoop
+    name: subnetNameCloud
     properties: {
-      addressPrefix: subnetAddressPrefixInnerLoop
+      addressPrefix: subnetAddressPrefixCloud
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
@@ -83,7 +84,10 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false)
+    ? union(cloudK3sSubnet, cloudSubnet)
+    : union(cloudK3sSubnet, cloudSubnet, bastionSubnet)
+    //subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
   }
 }
 
@@ -363,6 +367,6 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
 }
 
 output vnetId string = cloudVirtualNetwork.id
-output devSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output k3sSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
 output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
 output virtualNetworkNameCloud string = cloudVirtualNetwork.name

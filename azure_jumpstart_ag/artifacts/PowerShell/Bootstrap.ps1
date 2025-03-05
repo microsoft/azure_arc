@@ -34,7 +34,8 @@ param (
   [string]$speachToTextEndpoint,
   [object]$azureOpenAIModel,
   [string]$openAIDeploymentName,
-  [string]$acrName
+  [string]$acrName,
+  [string]$AZCOPY_AUTO_LOGIN_TYPE
 )
 
 ##############################################################
@@ -78,10 +79,11 @@ param (
 [System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureOpenAIModel', $azureOpenAIModel, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('openAIDeploymentName', $openAIDeploymentName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZCOPY_AUTO_LOGIN_TYPE', 'MSI', [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
-
+Write-Host "Scenario from the configuration is $scenario"
 ##############################################################
 # Change RDP Port
 ##############################################################
@@ -314,6 +316,9 @@ if($scenario -eq "contoso_supermarket"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 }
 elseif ($scenario -eq "contoso_motors") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipRbac.yml") -OutFile "$AgToolsDir\kubeVipRbac.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipDaemon.yml") -OutFile "$AgToolsDir\kubeVipDaemon.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-motors") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings_motors.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
@@ -412,7 +417,7 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 ##############################################################
 # Install Hyper-V, WSL and reboot
 ##############################################################
-if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+if($scenario -eq "contoso_supermarket"){
   Write-Header "Installing Hyper-V"
   Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
   Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart

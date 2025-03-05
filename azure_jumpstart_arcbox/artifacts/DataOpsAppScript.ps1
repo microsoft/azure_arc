@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: jumpstartdev.azurecr.io/demoapp
+        image: mcr.microsoft.com/jumpstart/arcbox/demoapp:1.0.1
         ports:
         - containerPort: 80
         volumeMounts:

@@ -238,7 +238,7 @@ if ($null -eq $lbrule -or $lbrule.Count -le 0)
 }
 
 $frontendIpConfId = $lbrule.frontendIpConfiguration.id
-$pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIpAddress.id}") | ConvertFrom-Json
+$pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIPAddress.id}") | ConvertFrom-Json
 $publicIp =  (az network public-ip show --ids $pubipid.id --query "ipAddress").trim('"')
 Write-Host "SQLMI public ip address $publicIp"
 
