@@ -1,5 +1,5 @@
 ---
-name: Feature Request
+name: Feature Request (OLD)
 about: Suggest an idea for this project
 title: ''
 labels: triage needed
