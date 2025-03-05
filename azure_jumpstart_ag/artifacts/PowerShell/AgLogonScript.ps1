@@ -172,7 +172,7 @@ if ($scenario -eq "contoso_supermarket") {
 if($scenario -eq "contoso_motors"){
     Get-K3sConfigFileContosoMotors 
     Merge-K3sConfigFilesContosoMotors
-    Set-K3sClustersContosoMotors
+    #Set-K3sClustersContosoMotors # comment this out to not use kube-vip
 }
 
 if($scenario -eq "contoso_hypermarket"){
