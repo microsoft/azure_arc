@@ -125,12 +125,20 @@ function Set-K3sClustersContosoMotors {
                 }
             }
             
-            #debug output
-            Write-Host "About to create kubevip configmap using $kubeVipPrivateIP"
-
-
-            kubectl create configmap -n kube-system kubevip --from-literal cidr-global=$kubeVipPrivateIP/32
-   
+            # Check if the ConfigMap exists and has the cidr-global property
+            # we have to ensure that the kubevip configmap is created with the cidr-global property
+            $configMap = kubectl get configmap kubevip -n kube-system -o json | ConvertFrom-Json
+            if ($configMap -and $configMap.data -and $configMap.data.'cidr-global') {
+                Write-Host "ConfigMap 'kubevip' already exists and has 'cidr-global' property."
+            } else {
+                if ($configMap) {
+                    Write-Host "ConfigMap 'kubevip' exists but does not have 'cidr-global' property. Deleting and re-creating it."
+                    kubectl delete configmap kubevip -n kube-system
+                } else {
+                    Write-Host "ConfigMap 'kubevip' does not exist. Creating it."
+                }
+                kubectl create configmap -n kube-system kubevip --from-literal cidr-global=$kubeVipPrivateIP/32
+            }
         }
     }
 }
