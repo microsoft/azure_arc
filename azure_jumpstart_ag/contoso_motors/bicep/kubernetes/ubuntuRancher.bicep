@@ -175,7 +175,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     protectedSettings: {
       commandToExecute: 'bash installK3s-motors.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} ${scenario} ${influxDBPassword} ${templateBaseUrl}'
       fileUris: [
-        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
+        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s-motors.sh'
       ]
     }
   }
