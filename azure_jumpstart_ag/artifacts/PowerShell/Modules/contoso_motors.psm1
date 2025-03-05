@@ -98,7 +98,7 @@ function Set-K3sClustersContosoMotors {
             $clusterName = $cluster.Value.FriendlyName.ToLower()
             $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
             kubectx $clusterName
-            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -o tsv)
+            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -o tsv)
             Write-Host "Assigning kube-vip-role on k3s cluster"
             $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
             kubectl apply -f $kubeVipRbac
@@ -116,7 +116,7 @@ function Set-K3sClustersContosoMotors {
             # Wait for kube-vip to assign a private IP address
             while ($kubeVipPrivateIP -eq $null) {
                 Write-Host "Waiting for kube-vip to assign a private IP address from $vmName-NIC"
-                $kubeVipPrivateIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -o tsv)
+                $kubeVipPrivateIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -o tsv)
                 # debug
                 Write-Host "kubeVipPrivateIP: $kubeVipPrivateIP"
                 if ($kubeVipPrivateIP -eq $null) {
