@@ -13,6 +13,9 @@ function Wait-AzDeployment {
         [Parameter(Mandatory = $true)]
         [string]$DeploymentName,
 
+        [Parameter(Mandatory = $true)]
+        [string]$ClusterName,
+
         [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
     )
 
@@ -90,7 +93,7 @@ function Wait-AzLocalClusterConnectivity {
 if ('True' -eq $env:autoDeployClusterResource) {
 
     # Wait for the deployment to complete
-    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy -ClusterName $HCIBoxConfig.ClusterName
 
     # Wait for the cluster to be connected
     Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
