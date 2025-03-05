@@ -98,7 +98,7 @@ function Set-K3sClustersContosoMotors {
             $clusterName = $cluster.Value.FriendlyName.ToLower()
             $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
             kubectx $clusterName
-            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv)
+            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -o tsv)
             Write-Host "Assigning kube-vip-role on k3s cluster"
             $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
             kubectl apply -f $kubeVipRbac
