@@ -1,3 +1,4 @@
+name: Auto Message on Issues
 on:
   issues:
     types: [opened]
