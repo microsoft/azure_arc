@@ -1,0 +1,38 @@
+name: Auto Message for PRs and Issues
+on:
+  pull_request:
+    types: [opened]
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to run against"
+        required: true
+        default: "main"
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch (for manual run)
+        run: |
+          echo "Running against branch: ${{ github.event.inputs.branch || github.ref_name }}"
+
+      - name: Add PR or Issue Comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const isPR = context.payload.pull_request ? true : false;
+            const branch = context.payload.pull_request ? context.payload.pull_request.base.ref : "${{ github.event.inputs.branch }}";
+            const message = isPR
+              ? `🚀 Thank you for your PR! Our team will review it soon. Please ensure tests are passing and link any relevant issues.\n\n_Target branch: **${branch}**_`
+              : `👋 Thanks for opening this issue! Our team will review it soon. Meanwhile, please ensure you've provided enough details for us to assist.\n\n_Target branch: **${branch}**_`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue ? context.payload.issue.number : context.payload.pull_request.number,
+              body: message
+            });
