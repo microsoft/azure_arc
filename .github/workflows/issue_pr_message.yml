@@ -1,24 +1,19 @@
-name: Auto Message for PRs and Issues
 on:
-  fork:
-  push:
-    branches: [main]
   issues:
     types: [opened]
-  issue_comment:
-    types: [created]
-  pull_request_target:
-    types: [opened]
-  pull_request_review_comment:
-    types: [created]
-
+   
 jobs:
-  welcome:
+  thank-user:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    name: Say thanks for the Issue
     steps:
-      - uses: actions/checkout@v1
-      - uses: EddieHubCommunity/gh-action-community/src/welcome@main
+      - name: comment on the issue
+        uses: hasura/comment-progress@v2.3.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: 'Hey friend! Thanks for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
-          pr-message: 'Hi friend! Thanks you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
+          github-token: ${{ secrets.CLI_BOT }}
+          repository: 'Azure/azure-cli'
+          number: ${{ github.event.issue.number }}
+          id: thank-you-comment
+          message: 'Thank you for opening this issue, we will look into it.'
