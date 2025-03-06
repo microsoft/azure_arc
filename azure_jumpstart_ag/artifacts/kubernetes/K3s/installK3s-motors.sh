@@ -50,7 +50,7 @@ chmod +x vars.sh
 . ./vars.sh
 
 # Creating login message of the day (motd)
-curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/kubernetes/K3/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
@@ -341,7 +341,8 @@ if [ "$scenario" == "contoso_motors" ]; then
     kubectl create secret generic influxdb-pass -n contoso-motors --from-literal=password=$influxdbPassword
 
     echo "Installing OVMS and InfluxDB Helm charts"
-    helm install ovms -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
+    # TODO: replace the OVMS chart with the MCR one after testing the service type change
+    helm install ovms -n contoso-motors mcr20250211.azurecr.io/helm/ovms --version 0.1.1
     sleep 10
     helm install influxdb -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/influxdb --version 0.1.1
 fi
