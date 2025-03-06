@@ -21,7 +21,6 @@ k3sControlPlane=$9
 resourceGroup=${10}
 scenario=${11}
 influxdbPassword=${12}
-templateBaseUrl=${13}
 
 echo "export adminUsername=$adminUsername" >> vars.sh
 echo "export subscriptionId=$subscriptionId" >> vars.sh
@@ -35,7 +34,6 @@ echo "export k3sControlPlane=$k3sControlPlane" >> vars.sh
 echo "export resourceGroup=$resourceGroup" >> vars.sh
 echo "export scenario=$scenario" >> vars.sh
 echo "export influxdbPassword=$influxdbPassword" >> vars.sh
-echo "export templateBaseUrl=$templateBaseUrl" >> vars.sh
 
 export vmName=$3
 
@@ -176,12 +174,23 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo "Copying Rancher K3s kubeconfig file to staging storage account"
     echo ""
     localPath="/home/$adminUsername/.kube/config"
+    modifiedConfigPath="/home/$adminUsername/.kube/modified-config"
     k3sClusterNodeConfig="/home/$adminUsername/k3sClusterNodeConfig.yaml"
     echo "k3sNodeToken: $(sudo cat /var/lib/rancher/k3s/server/node-token)" >> $k3sClusterNodeConfig
     echo "k3sClusterIp: $publicIp" >> $k3sClusterNodeConfig
-    # Copying kubeconfig file to staging storage account
+
+    # Copy the original kubeconfig file to a new file called modified-config
+    cp $localPath $modifiedConfigPath
+
+    # Retrieve the private IP address of the machine
+    privateIp=$(hostname -I | awk '{print $1}')
+
+    # Modify the new kubeconfig file to use private IP address instead of 127.0.0.1 before uploading
+    sed -i "s|server: https://127.0.0.1:6443|server: https://$privateIp:6443|g" $modifiedConfigPath
+
+    # Copying modified kubeconfig file to staging storage account
     azcopy make "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName"
-    azcopy cp $localPath "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/config"
+    azcopy cp $modifiedConfigPath "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/config"
     azcopy cp $k3sClusterNodeConfig "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/k3sClusterNodeConfig.yaml"
 
     # Onboard the cluster to Azure Arc
