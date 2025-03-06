@@ -42,13 +42,28 @@ param location string = resourceGroup().location
 param rdpPort string = '3389'
 
 @description('Choice to enable automatic deployment of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Default is false.')
-param autoDeployClusterResource bool = false
+param autoDeployClusterResource bool = true
 
 @description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
 param autoUpgradeClusterResource bool = false
 
 @description('Enable automatic logon into HCIBox Virtual Machine')
 param vmAutologon bool = true
+
+@description('Setting this parameter to `true` will add the `CostControl` and `SecurityControl` tags to the provisioned resources. These tags are applicable to ONLY Microsoft-internal Azure lab tenants and designed for managing automated governance processes related to cost optimization and security controls')
+param governResourceTags bool = true
+
+@description('Tags to be added to all resources')
+
+param tags object = {
+  Project: 'jumpstart_HCIBox'
+}
+
+// if governResourceTags is true, add the following tags
+var resourceTags = governResourceTags ? union(tags, {
+    CostControl: 'Ignore'
+    SecurityControl: 'Ignore'
+}) : tags
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
@@ -57,6 +72,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -65,6 +81,7 @@ module networkDeployment 'network/network.bicep' = {
   params: {
     deployBastion: deployBastion
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -72,6 +89,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
     location: location
+    resourceTags: resourceTags
   }
 }
 
@@ -95,5 +113,6 @@ module hostDeployment 'host/host.bicep' = {
     autoDeployClusterResource: autoDeployClusterResource
     autoUpgradeClusterResource: autoUpgradeClusterResource
     vmAutologon: vmAutologon
+    resourceTags: resourceTags
   }
 }

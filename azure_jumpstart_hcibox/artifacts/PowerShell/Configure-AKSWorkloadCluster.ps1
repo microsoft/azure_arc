@@ -1,9 +1,9 @@
 $WarningPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop" 
+$ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
-# Set groupObjectID to the object ID of the Microsoft Entra ID group that will be granted access to the AKS workload cluster. 
-#$groupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Uncomment this line and change the value to your Microsoft Entra ID group id 
+# Set groupObjectID to the object ID of the Microsoft Entra ID group that will be granted access to the AKS workload cluster.
+#$groupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Uncomment this line and change the value to your Microsoft Entra ID group id
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
@@ -27,7 +27,7 @@ $lnetName = "hcibox-aks-lnet-vlan110"
 $customLocName = $HCIBoxConfig.rbCustomLocationName
 $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "SilentlyContinue"
-Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Credential $domainCred -Authentication CredSSP -ArgumentList $HCIBoxConfig -ScriptBlock {
+Invoke-Command -VMName "$($HCIBoxConfig.NodeHostConfig[0].Hostname)" -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
     $HCIBoxConfig = $args[0]
     az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
     az config set extension.use_dynamic_install=yes_without_prompt | Out-Null
@@ -35,7 +35,7 @@ Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCI
     az extension add --name stack-hci-vm
     $customLocationID=(az customlocation show --resource-group $using:rg --name $using:customLocName --query id -o tsv)
     $switchName='"ConvergedSwitch(hci)"'
-    
+
     $addressPrefixes = $HCIBoxConfig.AKSIPPrefix
     $gateway = $HCIBoxConfig.AKSGWIP
     $dnsServers = $HCIBoxConfig.AKSDNSIP
