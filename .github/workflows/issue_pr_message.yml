@@ -1,20 +1,12 @@
-name: Auto Message on Issues
-on:
-  issues:
-    types: [opened]
-   
+name: Auto message for PRs and Issues
+on: [pull_request, issues]
 jobs:
-  thank-user:
+  build:
+    name: Hello new contributor
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    name: Say thanks for the Issue
     steps:
-      - name: comment on the issue
-        uses: hasura/comment-progress@v2.3.0
+      - uses: actions/first-interaction@v1
         with:
-          github-token: ${{ secrets.CLI_BOT }}
-          repository: 'Azure/azure-cli'
-          number: ${{ github.event.issue.number }}
-          id: thank-you-comment
-          message: 'Thank you for opening this issue, we will look into it.'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "Hey, thank you for opening your first Issue ! 🙂"
+          pr-message: "Hey, thank you for opening your Pull Request !"
