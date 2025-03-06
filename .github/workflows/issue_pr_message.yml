@@ -1,38 +1,24 @@
 name: Auto Message for PRs and Issues
 on:
-  pull_request:
-    types: [opened]
+  fork:
+  push:
+    branches: [main]
   issues:
     types: [opened]
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to run against"
-        required: true
-        default: "main"
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened]
+  pull_request_review_comment:
+    types: [created]
 
 jobs:
-  comment:
+  welcome:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch (for manual run)
-        run: |
-          echo "Running against branch: ${{ github.event.inputs.branch || github.ref_name }}"
-
-      - name: Add PR or Issue Comment
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v1
+      - uses: EddieHubCommunity/gh-action-community/src/welcome@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const isPR = context.payload.pull_request ? true : false;
-            const branch = context.payload.pull_request ? context.payload.pull_request.base.ref : "${{ github.event.inputs.branch }}";
-            const message = isPR
-              ? `🚀 Thank you for your PR! Our team will review it soon. Please ensure tests are passing and link any relevant issues.\n\n_Target branch: **${branch}**_`
-              : `👋 Thanks for opening this issue! Our team will review it soon. Meanwhile, please ensure you've provided enough details for us to assist.\n\n_Target branch: **${branch}**_`;
-
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.issue ? context.payload.issue.number : context.payload.pull_request.number,
-              body: message
-            });
+          issue-message: 'Hey friend! Thanks for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
+          pr-message: 'Hi friend! Thanks you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
