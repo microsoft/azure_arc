@@ -34,10 +34,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'mrhoads'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'motors-kubevip-20250304'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -111,7 +111,7 @@ param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 
 param deployGPUNodes bool = false
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/refs/heads/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
