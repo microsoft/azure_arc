@@ -83,13 +83,15 @@ configuration:
         - addLabel:
             label: Issue-Addressed
 
-      - description: Add needs attention label to reopened Issues
+      - description: Add needs attention label to reopened issues
         triggerOnOwnActions: false
         if:
         - payloadType: Issues
         - isAction:
             action: Reopened
         then:
+        - removeLabel:
+            label: Issue-Addressed        
         - addLabel:
             label: Needs-Attention
 
