@@ -23,13 +23,13 @@ body:
         - label: Jumpstart Agora
         - label: A specific Jumpstart scenario
         - label: Jumpstart Drops
-        - label: Other
+        - label: Something else
   - type: textarea
     id: feature-description
     attributes:
       label: Feature Description
-      description: Describe the feature you'd like to see
-      placeholder: A clear and concise description of what you want to happen
+      description: Describe the feature you'd like to see.
+      placeholder: A clear and concise description of what you want to happen.
     validations:
       required: true
   - type: textarea
@@ -37,7 +37,7 @@ body:
     attributes:
       label: Motivation
       description: What problem does this feature solve? Why is it needed?
-      placeholder: Describe the use case and value this feature would bring
+      placeholder: Describe the use case and value this feature would bring.
     validations:
       required: true
   - type: textarea
@@ -45,7 +45,7 @@ body:
     attributes:
       label: Proposed Solution
       description: How do you think this should be implemented?
-      placeholder: Describe your suggested approach to implementing this feature
+      placeholder: Describe your suggested approach to implementing this feature.
     validations:
       required: false
   - type: input
@@ -60,8 +60,8 @@ body:
     id: additional-context
     attributes:
       label: Additional Context
-      description: Add any other context or screenshots about the feature request here
-      placeholder: Any other information that might help us understand your request
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: Any other information that might help us understand your request.
   - type: checkboxes
     id: terms
     attributes:
