@@ -84,15 +84,15 @@ configuration:
                 
                 By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
   
-      - description: Clear labels when an issue is closed
-        triggerOnOwnActions: false
-        if:
-        - payloadType: Issues
-        - isAction:
-            action: Closed
-        then:
-        - removeLabel:
-            label: Needs-Triage
+      # - description: Clear labels when an issue is closed
+      #   triggerOnOwnActions: false
+      #   if:
+      #   - payloadType: Issues
+      #   - isAction:
+      #       action: Closed
+      #   then:
+      #   - removeLabel:
+      #       label: Needs-Triage
     
       # - description: Close issues that have not been triaged in 21 days
       #   resource: repository
