@@ -78,7 +78,19 @@ configuration:
         then:
         - removeLabel:
             label: Needs-Triage
-    
+        - addLabel:
+            label: Issue-Addressed
+
+      - description: Add Needs-Triage to reopened Issues
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Reopened
+        then:
+        - addLabel:
+            label: Needs-Triage
+
     scheduledSearches:
     - description: Close stale issues
       frequencies:
