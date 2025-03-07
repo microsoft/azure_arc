@@ -305,6 +305,26 @@ if ($existingRule) {
     Write-Host "Firewall rule '$ruleName' created successfully. RDP UDP is now blocked."
 }
 
+# Define the registry path
+$registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+
+# Define the registry key name
+$registryName = "fClientDisableUDP"
+
+# Define the value (1 = Disable Connect Time Detect and Continuous Network Detect)
+$registryValue = 1
+
+# Check if the registry path exists, if not, create it
+if (-not (Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+
+# Set the registry key
+Set-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -Type DWord
+
+# Confirm the change
+Write-Host "Registry setting applied successfully. fClientDisableUDP set to $registryValue"
+
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V."
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
