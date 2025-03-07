@@ -79,23 +79,23 @@ configuration:
       #   - removeLabel:
       #       label: Needs-Triage
     
-      # - description: Close issues that have not been triaged in 21 days
-      #   resource: repository
-      #   configuration:
-      #       resourceManagementConfiguration:
-      #       scheduledSearches:
-      #         - frequencies:
-      #             - daily:
-      #                 time: 00:00
-      #           filters:
-      #             - isOpen
-      #             - hasNoLabel
-      #             - noActivitySince:
-      #                 days: 21
-      #           actions:
-      #             - addReply:
-      #                 reply: >-
-      #                   Closing issue due to no activity in 21 days.
-      #             - closeIssue
+      - description: Close issues that have not been triaged in 21 days
+        resource: repository
+        configuration:
+            resourceManagementConfiguration:
+            scheduledSearches:
+              - frequencies:
+                  - daily:
+                      time: 00:00
+                filters:
+                  - isOpen
+                  - hasNoLabel
+                  - noActivitySince:
+                      days: 21
+                actions:
+                  - addReply:
+                      reply: >-
+                        Closing issue due to no activity in 21 days.
+                  - closeIssue
 onFailure:
 onSuccess:
