@@ -342,7 +342,7 @@ if [ "$scenario" == "contoso_motors" ]; then
 
     echo "Installing OVMS and InfluxDB Helm charts"
     # TODO: replace the OVMS chart with the MCR one after testing the service type change
-    helm install ovms -n contoso-motors oci://mcr20250211.azurecr.io/helm/ovms --version 0.1.1
+    helm install ovms -n contoso-motors oci://micr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.1
     sleep 10
     helm install influxdb -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/influxdb --version 0.1.1
 fi
