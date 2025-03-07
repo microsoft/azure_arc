@@ -81,21 +81,28 @@ configuration:
     
       - description: Close issues that have not been triaged in 21 days
         resource: repository
+        disabled: false
+        where:
         configuration:
-            resourceManagementConfiguration:
+          resourceManagementConfiguration:
             scheduledSearches:
-              - frequencies:
-                  - daily:
-                      time: 00:00
-                filters:
-                  - isOpen
-                  - hasNoLabel
-                  - noActivitySince:
-                      days: 21
-                actions:
-                  - addReply:
-                      reply: >-
-                        Closing issue due to no activity in 21 days.
-                  - closeIssue
+            - description: Close stale issues
+              frequencies:
+              - daily:
+                  time: 1:0
+              filters:
+              - isIssue
+              - isOpen
+              - hasLabel:
+                  label: needs-author-feedback
+              - hasLabel:
+                  label: no-recent-activity
+              - noActivitySince:
+                  days: 21
+              actions:
+              - closeIssue:
+                  comment: >-
+                    This issue has been automatically closed due to inactivity. If you believe this was done in error, please reach out to the Arc Jumpstart team.
+
 onFailure:
 onSuccess:
