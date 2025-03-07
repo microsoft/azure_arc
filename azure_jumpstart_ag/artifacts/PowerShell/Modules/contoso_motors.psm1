@@ -172,7 +172,6 @@ function Deploy-MotorsConfigs {
                 Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
                 $type = "connectedClusters"
 
-                # TODO: MCR - I don't think we need to check if the API server is available here.  
                 # Wait for Kubernetes API server to become available
                 $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
                 $apiServerAddress = $apiServer -replace '.*https://| .*$'
