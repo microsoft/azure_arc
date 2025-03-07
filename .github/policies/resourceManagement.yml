@@ -109,7 +109,8 @@ configuration:
                       days: 21
                 actions:
                   - addReply:
-                      reply: "Closing issue due to no activity in 21 days"
+                      reply: >-
+                        Closing issue due to no activity in 21 days.
                   - closeIssue
 onFailure:
 onSuccess:
