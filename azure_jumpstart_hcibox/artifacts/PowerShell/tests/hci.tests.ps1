@@ -1,8 +1,11 @@
 
 BeforeDiscovery {
 
-    $VMs = @("AzSHOST1", "AzSHOST2")
-    $clusters = @("hciboxcluster")
+    # Import Configuration data file
+    $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+
+    $VMs = $HCIBoxConfig.NodeHostConfig.Hostname
+    $clusters = @($HCIBoxConfig.ClusterName)
 
     # Login to Azure PowerShell with service principal provided by user
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
@@ -11,22 +14,24 @@ BeforeDiscovery {
 
 }
 
-Describe "<cluster>" -ForEach $clusters {
-    BeforeAll {
-        $cluster = $_
-        $clusterObject = Get-AzStackHciCluster -ResourceGroupName $env:resourceGroup -Name $cluster
+if ("True" -eq $env:autoDeployClusterResource) {
+    Describe "<cluster>" -ForEach $clusters {
+        BeforeAll {
+            $cluster = $_
+            $clusterObject = Get-AzStackHciCluster -ResourceGroupName $env:resourceGroup -Name $cluster
+        }
+        It "Cluster exists" {
+            $clusterObject | Should -Not -BeNullOrEmpty
+        }
+        It "Azure Arc Connected cluster is successfully provisioned" {
+            $clusterObject.ProvisioningState | Should -Be "Succeeded"
+        }
+        It "Azure Arc Connected cluster is connected" {
+            $clusterObject.ConnectivityStatus | Should -Be "Connected"
+        }
     }
-    It "Cluster exists" {        
-        $clusterObject | Should -Not -BeNullOrEmpty
-    }
-    It "Azure Arc Connected cluster is successfully provisioned" {
-        $clusterObject.ProvisioningState | Should -Be "Succeeded"
-    }
-    It "Azure Arc Connected cluster is connected" {
-        $clusterObject.ConnectivityStatus | Should -Be "Connected"
-    }
-}
 
+}
 
 Describe "<vm>" -ForEach $VMs {
     BeforeAll {

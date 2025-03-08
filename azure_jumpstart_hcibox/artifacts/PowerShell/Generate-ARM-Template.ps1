@@ -15,7 +15,7 @@ Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Generate-ARM-Template.log
 # $ErrorActionPreference = "Stop"
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
-$arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
+$arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json -AsArray
 
 # foreach ($machine in $arcNodes) {
 #     $ErrorActionPreference = "Continue"

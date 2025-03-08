@@ -32,7 +32,7 @@
   "resources": [
     {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2021-12-01-preview",
+      "apiVersion": "2023-09-01",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",      

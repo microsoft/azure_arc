@@ -1,0 +1,71 @@
+name: Bug Report
+description: File a bug report or an issue
+title: "[Bug / Issue]: "
+labels: ["Bug-Issue", "Needs-Triage"]
+projects: ["microsoft/162"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this issue!
+
+        If your bug report is related to documentation, we kindly ask you to open an issue in our [documentation repository](https://github.com/Azure/arc_jumpstart_docs).
+
+        The intent of this "Bug report" template is to address issues related to the various Arc Jumpstart solutions. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com).
+  - type: checkboxes
+    id: solution
+    attributes:
+      label: Jumpstart Solution
+      description: What Jumpstart solution you are running?
+      options:
+        - label: Jumpstart ArcBox
+        - label: Jumpstart HCIBox
+        - label: Jumpstart Agora
+        - label: A specific Jumpstart scenario
+        - label: Jumpstart Drops
+        - label: Something else
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen and how to reproduce?
+      placeholder: Tell us what you see! If applicable, add screenshots to help explain your problem.
+    validations:
+      required: true
+  - type: input
+    id: solution-url
+    attributes:
+      label: We need a URL from you
+      description: Share with us the URL to the Jumpstart solution you are having issues with.
+      placeholder: ex. https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro
+    validations:
+      required: true      
+  - type: dropdown
+    id: deployment-method
+    attributes:
+      label: Deployment Method
+      multiple: true
+      description: What deployment method you are using?
+      options:
+        - Azure Portal
+        - Azure CLI
+        - PowerShell
+        - Bicep
+        - ARM Template
+        - Other
+    validations:
+      required: true          
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output.
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. Make sure to NOT INCLUDE any sensitive information or passwords.
+      render: shell      
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct and Licensing
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Azure/arc_jumpstart_docs/blob/main/CODE_OF_CONDUCT.md) and the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE).
+      options:
+        - label: I agree to follow this project's Code of Conduct and Licensing terms.
+          required: true

@@ -238,7 +238,7 @@ if ($null -eq $lbrule -or $lbrule.Count -le 0)
 }
 
 $frontendIpConfId = $lbrule.frontendIpConfiguration.id
-$pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIpAddress.id}") | ConvertFrom-Json
+$pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIPAddress.id}") | ConvertFrom-Json
 $publicIp =  (az network public-ip show --ids $pubipid.id --query "ipAddress").trim('"')
 Write-Host "SQLMI public ip address $publicIp"
 
@@ -295,6 +295,20 @@ ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $
 
 Write-Host "Created Azure Data Studio connections settings template file."
 
+# Unzip SqlQueryStress
+Expand-Archive -Path $Env:TempDir\SqlQueryStress.zip -DestinationPath $Env:TempDir\SqlQueryStress
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "$Env:TempDir\SqlQueryStress\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
 Write-Host "`n"
 Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
 Write-Host "`n"
@@ -309,7 +323,7 @@ $Shortcut.Save()
 Write-Host "`n"
 Write-Host "Creating SQL Server Management Studio Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\Ssms.exe"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 20\Common7\IDE\Ssms.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio.lnk"
 
 # Verify if shortcut already exists

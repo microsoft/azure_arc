@@ -6,30 +6,34 @@ sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --d
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Injecting environment variables
-echo '#!/bin/bash' >> vars.sh
-echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
-echo $subscriptionId:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $vmName:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $location:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
-echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
-echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $resourceGroup:$10| awk '{print substr($1,2); }' >> vars.sh
-echo $deployGPUNodes:$11| awk '{print substr($1,2); }' >> vars.sh
 
-sed -i '2s/^/export adminUsername=/' vars.sh
-sed -i '3s/^/export subscriptionId=/' vars.sh
-sed -i '4s/^/export vmName=/' vars.sh
-sed -i '5s/^/export location=/' vars.sh
-sed -i '6s/^/export stagingStorageAccountName=/' vars.sh
-sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
-sed -i '8s/^/export templateBaseUrl=/' vars.sh
-sed -i '9s/^/export storageContainerName=/' vars.sh
-sed -i '10s/^/export k3sControlPlane=/' vars.sh
-sed -i '11s/^/export resourceGroup=/' vars.sh
-sed -i '12s/^/export deployGPUNodes=/' vars.sh
+echo '#!/bin/bash' > vars.sh
+
+adminUsername=$1
+subscriptionId=$2
+vmName=$3
+location=$4
+stagingStorageAccountName=$5
+logAnalyticsWorkspace=$6
+templateBaseUrl=$7
+storageContainerName=$8
+k3sControlPlane=$9
+resourceGroup=${10}
+scenario=${11}
+influxdbPassword=${12}
+
+echo "export adminUsername=$adminUsername" >> vars.sh
+echo "export subscriptionId=$subscriptionId" >> vars.sh
+echo "export vmName=$vmName" >> vars.sh
+echo "export location=$location" >> vars.sh
+echo "export stagingStorageAccountName=$stagingStorageAccountName" >> vars.sh
+echo "export logAnalyticsWorkspace=$logAnalyticsWorkspace" >> vars.sh
+echo "export templateBaseUrl=$templateBaseUrl" >> vars.sh
+echo "export storageContainerName=$storageContainerName" >> vars.sh
+echo "export k3sControlPlane=$k3sControlPlane" >> vars.sh
+echo "export resourceGroup=$resourceGroup" >> vars.sh
+echo "export scenario=$scenario" >> vars.sh
+echo "export influxdbPassword=$influxdbPassword" >> vars.sh
 
 export vmName=$3
 
@@ -78,8 +82,7 @@ sudo chmod +x /usr/local/bin/azcopy
 
 # Authorize azcopy by using a system-wide managed identity
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
-
-# Run the lock check before attempting the installation
+d devthe lock check before attempting the installation
 check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
@@ -309,6 +312,29 @@ fi
 
     # Installing NVIDIA container toolkit
 
+
+
+# check the scenario and run the curl command if scenario is contoso-motors
+if [ "$scenario" == "contoso_motors" ]; then
+    echo "Running curl command to install OpenVINO Toolkit Operator"
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
+    sleep 10
+    echo "Installing operator via kubectl"
+    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+
+    sleep 10
+
+    kubectl create ns contoso-motors
+
+    kubectl create secret generic influxdb-pass -n contoso-motors --from-literal=password=$influxdbPassword
+
+    echo "Installing OVMS and InfluxDB Helm charts"
+    helm install ovms -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.0
+    sleep 10
+    helm install influxdb -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/influxdb --version 0.1.1
+fi
+
 # Uploading this script log to staging storage for ease of troubleshooting
 echo ""
 echo "Uploading the script logs to staging storage"
@@ -317,5 +343,6 @@ exec 1>&3 2>&4 # Further commands will now output to the original stdout and std
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
+
 
 exit 0

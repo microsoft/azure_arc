@@ -199,10 +199,13 @@ function Deploy-AIO-M3 {
         Write-Host "`n"
         $schemaName = "${clusterName}-$($Env:namingGuid)-schema"
         $schemaId = $(az iot ops schema registry create --name $schemaName `
-                --resource-group $resourceGroup `
+                --resource-group $Env:resourceGroup `
                 --registry-namespace "$clusterName-$($Env:namingGuid)-namespace" `
-                --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
+                --sa-resource-id $(az storage account show --name $Env:aioStorageAccountName --resource-group $Env:resourceGroup -o tsv --query id) `
                 --query id -o tsv)
+
+        Write-Host "[$(Get-Date -Format t)] INFO: The aio storage account name is: $aioStorageAccountName" -ForegroundColor DarkGray
+        Write-Host "[$(Get-Date -Format t)] INFO: the schemaId is '$schemaId' - verify this" -ForegroundColor DarkGray
 
         $customLocationName = $arcClusterName.toLower() + "-cl"
 
@@ -220,8 +223,8 @@ function Deploy-AIO-M3 {
                 Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
                 Write-Host "`n"
                 az iot ops init --cluster $arcClusterName.toLower() `
-                    --resource-group $resourceGroup `
-                    --subscription $subscriptionId `
+                    --resource-group $Env:resourceGroup `
+                    --subscription $Env:subscriptionId `
                     --only-show-errors
                 $retryCount++
             }
@@ -238,8 +241,8 @@ function Deploy-AIO-M3 {
         do {
             az iot ops create --name $arcClusterName.toLower() `
                 --cluster $arcClusterName.toLower() `
-                --resource-group $resourceGroup `
-                --subscription $subscriptionId `
+                --resource-group $Env:resourceGroup `
+                --subscription $Env:subscriptionId `
                 --custom-location $customLocationName `
                 --sr-resource-id $schemaId `
                 --enable-rsync true `

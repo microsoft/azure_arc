@@ -11,7 +11,7 @@ param windowsAdminUsername string = 'arcdemo'
 param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
-param windowsOSVersion string = '2022-datacenter-g2'
+param windowsOSVersion string = '2025-datacenter-g2'
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -19,9 +19,7 @@ param location string = resourceGroup().location
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-param resourceTags object = {
-  Project: 'jumpstart_HCIBox'
-}
+param resourceTags object
 
 @description('Client id of the service principal')
 param spnClientId string
@@ -69,6 +67,9 @@ param autoDeployClusterResource bool = false
 @description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
 param autoUpgradeClusterResource bool = false
 
+@description('Enable automatic logon into HCIBox Virtual Machine')
+param vmAutologon bool = false
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'HCIBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -95,6 +96,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
       }
     ]
   }
+  tags: resourceTags
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
@@ -108,12 +110,16 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   sku: {
     name: 'Basic'
   }
+  tags: resourceTags
 }
 
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
   tags: resourceTags
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     hardwareProfile: {
       vmSize: 'Standard_E32s_v5'
@@ -257,8 +263,19 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
     }
+  }
+}
+
+// Add role assignment for the VM: Owner role
+resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
   }
 }
 

@@ -141,6 +141,20 @@ foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 }
 
+Connect-AzAccount -Identity
+
+$DeploymentProgressString = "Started bootstrap-script..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+
 ##############################################################
 # Installing PowerShell 7
 ##############################################################
@@ -183,6 +197,18 @@ Write-Host "Enabling CredSSP."
 Enable-WSManCredSSP -Role Server -Force | Out-Null
 Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null
 
+$DeploymentProgressString = "Restarting and installing WinGet packages..."
+
+$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
+
+if ($null -ne $tags) {
+    $tags["DeploymentProgress"] = $DeploymentProgressString
+} else {
+    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
+}
+
+$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
+
 $ScheduledTaskExecutable = "pwsh.exe"
 
 # Creating scheduled task for WinGet.ps1
@@ -209,6 +235,30 @@ if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
 
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+
+# Set Diagnostic Data settings
+
+$telemetryPath = "HKLM:\Software\Policies\Microsoft\Windows\DataCollection"
+$telemetryProperty = "AllowTelemetry"
+$telemetryValue = 3
+
+$oobePath = "HKLM:\Software\Policies\Microsoft\Windows\OOBE"
+$oobeProperty = "DisablePrivacyExperience"
+$oobeValue = 1
+
+# Create the registry key and set the value for AllowTelemetry
+if (-not (Test-Path $telemetryPath)) {
+    New-Item -Path $telemetryPath -Force | Out-Null
+}
+Set-ItemProperty -Path $telemetryPath -Name $telemetryProperty -Value $telemetryValue
+
+# Create the registry key and set the value for DisablePrivacyExperience
+if (-not (Test-Path $oobePath)) {
+    New-Item -Path $oobePath -Force | Out-Null
+}
+Set-ItemProperty -Path $oobePath -Name $oobeProperty -Value $oobeValue
+
+Write-Host "Registry keys and values for Diagnostic Data settings have been set successfully."
 
 # Change RDP Port
 Write-Host "Updating RDP Port - RDP port number from configuration is $rdpPort"
@@ -239,11 +289,74 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+# Workaround for https://github.com/microsoft/azure_arc/issues/3035
+
+# Define firewall rule name
+$ruleName = "Block RDP UDP 3389"
+
+# Check if the rule already exists
+$existingRule = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
+
+if ($existingRule) {
+    Write-Host "Firewall rule '$ruleName' already exists. No changes made."
+} else {
+    # Create a new firewall rule to block UDP traffic on port 3389
+    New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -Protocol UDP -LocalPort 3389 -Action Block -Enabled True
+    Write-Host "Firewall rule '$ruleName' created successfully. RDP UDP is now blocked."
+}
+
+# Define the registry path
+$registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+
+# Define the registry key name
+$registryName = "fClientDisableUDP"
+
+# Define the value (1 = Disable Connect Time Detect and Continuous Network Detect)
+$registryValue = 1
+
+# Check if the registry path exists, if not, create it
+if (-not (Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+
+# Set the registry key
+Set-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -Type DWord
+
+# Confirm the change
+Write-Host "Registry setting applied successfully. fClientDisableUDP set to $registryValue"
+
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V."
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+Write-Header "Configuring Windows Defender exclusions for Hyper-V."
+
+Add-MpPreference -ExclusionExtension ".vhd"
+Add-MpPreference -ExclusionExtension ".vhdx"
+Add-MpPreference -ExclusionExtension ".avhd"
+Add-MpPreference -ExclusionExtension ".avhdx"
+Add-MpPreference -ExclusionExtension ".vhds"
+Add-MpPreference -ExclusionExtension ".vhdpmem"
+Add-MpPreference -ExclusionExtension ".iso"
+Add-MpPreference -ExclusionExtension ".rct"
+Add-MpPreference -ExclusionExtension ".mrt"
+Add-MpPreference -ExclusionExtension ".vsv"
+Add-MpPreference -ExclusionExtension ".bin"
+Add-MpPreference -ExclusionExtension ".xml"
+Add-MpPreference -ExclusionExtension ".vmcx"
+Add-MpPreference -ExclusionExtension ".vmrs"
+Add-MpPreference -ExclusionExtension ".vmgs"
+Add-MpPreference -ExclusionPath "%ProgramData%\Microsoft\Windows\Hyper-V"
+Add-MpPreference -ExclusionPath "%Public%\Documents\Hyper-V\Virtual Hard Disks"
+Add-MpPreference -ExclusionPath "%SystemDrive%\ProgramData\Microsoft\Windows\Hyper-V\Snapshots"
+Add-MpPreference -ExclusionPath "C:\HCIBox\VHD"
+Add-MpPreference -ExclusionPath "V:\VMs"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmms.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmwp.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmsp.exe"
+Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmcompute.exe"
 
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."

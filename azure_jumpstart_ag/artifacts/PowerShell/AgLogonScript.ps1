@@ -45,13 +45,16 @@ if ($scenario -eq "contoso_supermarket") {
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-apps"
 }elseif ($scenario -eq "contoso_motors") {
-    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+    $global:appUpstreamRepo = "https://github.com/azure/jumpstart-apps"
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
+    $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
+    $global:k3sArcClusterName = $Env:k3sArcClusterName
+    $global:tenantId = $Env:tenantId
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:appUpstreamRepo = "https://github.com/Azure/jumpstart-apps"
     $global:tenantId = $Env:tenantId
@@ -77,7 +80,9 @@ Import-Module "$AgPowerShellDir\contoso_motors.psm1" -Force -DisableNameChecking
 Import-Module "$AgPowerShellDir\contoso_hypermarket.psm1" -Force -DisableNameChecking
 
 Start-Transcript -Path ($AgLogsDir + "\AgLogonScript.log")
-Write-Host "Executing Jumpstart Agora automation scripts"
+Write-Host "Executing Jumpstart Agora automation scripts..."
+Write-Host "Selected global scenario:" $global:scenario
+Write-Host "Selected scenario:" $scenario
 $startTime = Get-Date
 
 # Remove registry keys that are used to automatically logon the user (only used for first-time setup)
@@ -108,7 +113,7 @@ $global:Credentials = New-Object System.Management.Automation.PSCredential($AgCo
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI" -ForegroundColor Gray
-if($scenario -eq "contoso_hypermarket"){
+if($scenario -eq "contoso_hypermarket" -or $scenario -eq "contoso_motors"){
     az login --identity | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 }else{
     az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
@@ -149,7 +154,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
-if ($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
     Deploy-VirtualizationInfrastructure
 }
@@ -164,6 +169,12 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Get clusters config files
 #####################################################################
+if($scenario -eq "contoso_motors"){
+    Get-K3sConfigFileContosoMotors 
+    Merge-K3sConfigFilesContosoMotors
+    Set-K3sClusters
+}
+
 if($scenario -eq "contoso_hypermarket"){
     Get-K3sConfigFile
     Merge-K3sConfigFiles
@@ -194,7 +205,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+if($scenario -eq "contoso_supermarket"){
     Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
     Deploy-AzArcK8sAKSEE
 }
@@ -234,11 +245,10 @@ if ($scenario -eq "contoso_supermarket") {
 }
 
 if ($scenario -eq "contoso_motors") {
-    Update-AzureIoTOpsExtension
-    Deploy-AIO
-    Deploy-MotorsConfigs
+    Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    Deploy-MotorsConfigs
 }elseif($scenario -eq "contoso_hypermarket"){
     Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
