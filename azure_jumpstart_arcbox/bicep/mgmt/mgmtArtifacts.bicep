@@ -138,7 +138,7 @@ var dataOpsSubnets = [
   }
 ]
 
-resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   name: virtualNetworkName
   location: location
   dependsOn: [
@@ -157,7 +157,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   }
 }
 
-resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (flavor == 'DataOps') {
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = if (flavor == 'DataOps') {
   name: drVirtualNetworkName
   location: location
   dependsOn: [
@@ -186,7 +186,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (f
   }
 }
 
-resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
+resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = if (flavor == 'DataOps') {
   parent: arcVirtualNetwork
   name: 'peering-to-DR-vnet'
   dependsOn: [
@@ -203,7 +203,7 @@ resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetwork
   }
 }
 
-resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
+resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = if (flavor == 'DataOps') {
   parent: drVirtualNetwork
   name: 'peering-to-primary-vnet'
   dependsOn: [
@@ -220,7 +220,7 @@ resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtual
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: networkSecurityGroupName
   location: location
   dependsOn: [
@@ -336,7 +336,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-0
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = if (deployBastion == true) {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
   dependsOn: [
@@ -465,7 +465,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
 }
 
 
-resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: workspaceName
   location: location
   tags: resourceTags
@@ -490,7 +490,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (deployBastion == true) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-05-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
   location: location
   dependsOn: [
@@ -506,7 +506,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2024-05-01' = if (deployBastion == true) {
   name: bastionName
   location: location
   dependsOn: [
@@ -558,14 +558,14 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
   }
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: keyVaultName
   dependsOn: [
     keyVault
   ]
 }
 
-resource windowsAdminPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(windowsAdminPassword)) {
+resource windowsAdminPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' = if (!empty(windowsAdminPassword)) {
   name: 'windowsAdminPassword'
   parent: kv
   properties: {
@@ -576,7 +576,7 @@ resource windowsAdminPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2023-
   ]
 }
 
-resource registryPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(registryPassword)) {
+resource registryPassword_kv_secret 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' = if (!empty(registryPassword)) {
   name: 'registryPassword'
   parent: kv
   properties: {

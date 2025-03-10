@@ -49,7 +49,7 @@ var osDiskType = 'Premium_LRS'
 var vmSize = (flavor == 'DevOps') ? 'Standard_B2ms' : 'Standard_B8ms'
 var diskSize = (flavor == 'DataOps') ? 512 : 64
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -67,7 +67,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: vmName
   location: azureLocation
   identity: {
@@ -141,7 +141,7 @@ resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = {
   parent: vm
   name: 'installscript_k3s'
   location: azureLocation

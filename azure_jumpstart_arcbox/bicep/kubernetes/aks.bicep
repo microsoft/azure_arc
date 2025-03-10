@@ -58,7 +58,7 @@ var aksSubnetName = '${namingPrefix}-AKS-Subnet'
 var drVirtualNetworkName = '${namingPrefix}-DR-VNet'
 var drSubnetName = '${namingPrefix}-DR-Subnet'
 
-resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2024-04-02-preview' = {
+resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2024-09-02-preview' = {
   location: location
   name: aksClusterName
   identity: {
@@ -110,7 +110,7 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
   }
 }
 
-resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2024-04-02-preview' = {
+resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2024-09-02-preview' = {
   location: location
   name: drClusterName
   identity: {
