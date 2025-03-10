@@ -1,4 +1,4 @@
-[![Stale Issues and PRs](https://github.com/microsoft/azure_arc/actions/workflows/stale-issues-pr.yml/badge.svg?branch=main)](https://github.com/microsoft/azure_arc/actions/workflows/stale-issues-pr.yml) [![Stale Branches](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml/badge.svg)](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml)
+[![Stale Branches](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml/badge.svg)](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml)
 
 # Arc Jumpstart source code
 
