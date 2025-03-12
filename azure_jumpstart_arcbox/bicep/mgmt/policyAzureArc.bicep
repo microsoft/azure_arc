@@ -4,7 +4,7 @@ param azureLocation string
 @description('Name of your log analytics workspace')
 param logAnalyticsWorkspaceId string
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'DataOps\', \'DevOps\', \'ITPro\'')
 param flavor string
 
 @description('Tags to assign for all ArcBox resources')
@@ -23,7 +23,6 @@ var policies = [
     name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
     definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0'
     flavors: [
-      'Full'
       'ITPro'
     ]
     roleDefinition:  [
@@ -36,7 +35,7 @@ var policies = [
         value: logAnalyticsWorkspaceId
       }
       enableProcessesAndDependencies: {
-        value: true
+        value: false
       }
     }
   }
@@ -44,7 +43,6 @@ var policies = [
     name: '(ArcBox) Enable Microsoft Defender on Kubernetes clusters'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c'
     flavors: [
-      'Full'
       'DevOps'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'

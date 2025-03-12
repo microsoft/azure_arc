@@ -74,24 +74,24 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading GitHub artifacts for DataServicesLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "${tempDir}\settingsTemplate.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "${tempDir}\DataServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "${tempDir}\DeploySQLMI.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "${tempDir}\DeployPostgreSQL.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "${tempDir}\dataController.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "${tempDir}\dataController.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "${tempDir}\SQLMI.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "${tempDir}\SQLMI.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "${tempDir}\postgreSQL.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "${tempDir}\postgreSQL.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "${tempDir}\SQLMIEndpoints.ps1"
-Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "${tempDir}\SqlQueryStress.zip"
-Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "${tempDir}\wallpaper.png"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "${tempDir}\adConnector.yaml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "${tempDir}\adConnectorCMK.yaml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "${tempDir}\SQLMIADAuthCMK.yaml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMIADAuth.ps1") -OutFile "${tempDir}\DeploySQLMIADAuth.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterClientVMADJoin.ps1") -OutFile "${tempDir}\RunAfterClientVMADJoin.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "$tempDir\settingsTemplate.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "$tempDir\DataServicesLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "$tempDir\DeploySQLMI.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "$tempDir\DeployPostgreSQL.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "$tempDir\dataController.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "$tempDir\dataController.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "$tempDir\SQLMI.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "$tempDir\SQLMI.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "$tempDir\postgreSQL.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "$tempDir\postgreSQL.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "$tempDir\SQLMIEndpoints.ps1"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.8.9/SqlQueryStress-0.9.8.9.zip" -OutFile "$tempDir\SqlQueryStress.zip"
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "$tempDir\wallpaper.png"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "$tempDir\adConnector.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "$tempDir\adConnectorCMK.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "$tempDir\SQLMIADAuthCMK.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMIADAuth.ps1") -OutFile "$tempDir\DeploySQLMIADAuth.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterClientVMADJoin.ps1") -OutFile "$tempDir\RunAfterClientVMADJoin.ps1"
 
 
 # Installing tools
@@ -126,8 +126,8 @@ workflow ClientTools_01
                             }
                         }
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "${tempDir}\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "${tempDir}\AZDataCLI.msi"
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
+                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
                 }
         }
 
@@ -139,8 +139,8 @@ workflow ClientTools_02
             Parallel
             {
                 InlineScript {
-                    Expand-Archive '${tempDir}\azuredatastudio.zip' -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I ${tempDir}\AZDataCLI.msi /quiet'
+                    Expand-Archive "C:\Temp\azuredatastudio.zip" -DestinationPath "C:\Program Files\Azure Data Studio"
+                    Start-Process msiexec.exe -Wait -ArgumentList "/I C:\Temp\AZDataCLI.msi /quiet"
                 }
             }
         }

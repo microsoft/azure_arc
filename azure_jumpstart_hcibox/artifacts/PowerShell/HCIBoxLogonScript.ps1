@@ -77,17 +77,6 @@ foreach ($key in $keys) {
 }
 
 #############################################################
-# Create Windows Terminal desktop shortcut
-#############################################################
-
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
-#############################################################
 # Create desktop shortcut for Logs-folder
 #############################################################
 

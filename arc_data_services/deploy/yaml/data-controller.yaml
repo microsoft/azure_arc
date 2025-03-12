@@ -30,7 +30,7 @@ spec:
     serviceAccount: sa-arc-controller
   docker:
     imagePullPolicy: Always
-    imageTag: v1.34.0_2024-10-08
+    imageTag: v1.36.0_2025-02-11
     registry: mcr.microsoft.com
     repository: arcdata
   infrastructure: other # Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]

@@ -1,0 +1,148 @@
+id: 
+name: GitOps.PullRequestIssueManagement
+description: Handlers for when an issue is first opened
+owner:
+resource: repository
+disabled: false
+where:
+configuration:
+  resourceManagementConfiguration:
+    eventResponderTasks:
+      - description: >-
+          When a PR is opened/updated, if no files are modified
+          * Close the issue
+          * Add a comment
+        if:
+          - payloadType: Pull_Request
+          - isOpen
+          - or:
+              - isAction:
+                  action: Opened
+              - isAction:
+                  action: Synchronize
+          - filesMatchPattern:
+                pattern: ^$
+        then:
+          - addReply:
+              reply: >-
+                Hello @${issueAuthor},
+
+                This pull request does not update any files. Please review your commit history and resubmit.
+
+                We will be closing this pull request now!
+
+          - closePullRequest
+
+      - description: Add Needs-Triage to new issues
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+        then:
+          - addLabel:
+              label: Needs-Triage
+
+      - description: When an issue is opened, post a message to the author
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+        then:
+          - addReply:
+              reply: >-
+                Hello @${issueAuthor},
+
+                Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
+                By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+      - description: When a PR is opened, post a message to the author
+        if:
+          - payloadType: Pull_Request
+          - isAction:
+              action: Opened
+        then:
+          - addReply:
+              reply: >-
+                Hello @${issueAuthor},
+
+                Thank you for your pull request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
+                By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+      - description: Clear labels when an issue is closed
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Closed
+        then:
+        - removeLabel:
+            label: Needs-Triage
+        - removeLabel:
+            label: Needs-Attention          
+        - addLabel:
+            label: Issue-Addressed
+
+      - description: Add needs attention label to reopened issues
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Reopened
+        then:
+        - removeLabel:
+            label: Issue-Addressed        
+        - addLabel:
+            label: Needs-Attention
+
+    scheduledSearches:
+    - description: Close stale issues
+      frequencies:
+      - daily:
+          time: 1:0
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Needs-Author-Feedback
+      - hasLabel:
+          label: No-Recent-Activity
+      - noActivitySince:
+          days: 21
+      actions:
+      - closeIssue
+    - description: Add no recent activity label to issues
+      frequencies:
+      - hourly:
+          hour: 6
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Needs-Author-Feedback
+      - noActivitySince:
+          days: 7
+      - isNotLabeledWith:
+          label: No-Recent-Activity
+      actions:
+      - addLabel:
+          label: No-Recent-Activity
+      - addReply:
+          reply: Hi, we're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **14 days** of this comment the issue will be automatically closed. Thank you!
+    - description: '[Resolve Workflow] Close Addressed Issues'
+      frequencies:
+      - hourly:
+          hour: 6
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Issue-Addressed
+      - noActivitySince:
+          days: 7
+      actions:
+      - addReply:
+          reply: Hi @${issueAuthor}, since you haven’t asked that we “`/unresolve`” the issue, we’ll close this out. If you believe further discussion is needed, please add a comment “`/unresolve`” to reopen the issue.
+      - closeIssue
+
+onFailure:
+onSuccess:

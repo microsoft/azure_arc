@@ -43,7 +43,7 @@ param enableRBAC bool = true
 param osType string = 'Linux'
 
 @description('The version of Kubernetes')
-param kubernetesVersion string = '1.28.9'
+param kubernetesVersion string = '1.31.3'
 
 @maxLength(7)
 @description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
