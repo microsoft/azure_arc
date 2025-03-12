@@ -46,9 +46,6 @@ param templateBaseUrl string
 @description('Option to disable automatic cluster registration. Setting this to false will also disable deploying AKS and Resource bridge')
 param registerCluster bool = true
 
-@description('Enable automatic logon into HCIBox Client Virtual Machine')
-param vmAutologon bool = true
-
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
