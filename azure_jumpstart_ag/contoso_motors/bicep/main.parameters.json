@@ -25,6 +25,9 @@
     },
     "customLocationRPOID": {
       "value": ""
+    },
+    "sshRSAPublicKey": {
+      "value": ""
     }
   }
 }
