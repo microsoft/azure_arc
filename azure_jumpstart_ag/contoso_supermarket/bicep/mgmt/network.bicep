@@ -110,7 +110,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_80'
         properties: {
-          priority: 1003
+          priority: 2003
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -123,7 +123,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_8080'
         properties: {
-          priority: 1004
+          priority: 2004
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -136,7 +136,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_443'
         properties: {
-          priority: 1005
+          priority: 2005
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -149,7 +149,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_pos_5000'
         properties: {
-          priority: 1006
+          priority: 2006
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -162,7 +162,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_pos_81'
         properties: {
-          priority: 1007
+          priority: 2007
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -175,7 +175,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_prometheus_9090'
         properties: {
-          priority: 1008
+          priority: 2008
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -184,7 +184,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationAddressPrefix: '*'
           destinationPortRange: '9090'
         }
-      }       
+      }
     ]
   }
 }
@@ -198,7 +198,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_https_inbound'
         properties: {
-          priority: 1010
+          priority: 2010
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -211,7 +211,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_gateway_manager_inbound'
         properties: {
-          priority: 1011
+          priority: 2011
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -224,7 +224,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_load_balancer_inbound'
         properties: {
-          priority: 1012
+          priority: 2012
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -237,7 +237,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_host_comms'
         properties: {
-          priority: 1013
+          priority: 2013
           protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
@@ -253,7 +253,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_ssh_rdp_outbound'
         properties: {
-          priority: 1014
+          priority: 2014
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -269,7 +269,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
-          priority: 1015
+          priority: 2015
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Outbound'
@@ -282,7 +282,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_bastion_comms'
         properties: {
-          priority: 1016
+          priority: 2016
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -298,7 +298,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_get_session_info'
         properties: {
-          priority: 1017
+          priority: 2017
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
