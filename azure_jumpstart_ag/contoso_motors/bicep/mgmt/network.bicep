@@ -111,110 +111,85 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
   tags: resourceTags
   properties: {
     securityRules: [
+      // Updated security rules from March 2025
       {
-        name: 'allow_k8s_80'
+        name: 'VirtualNetwork'
         properties: {
-          priority: 1003
-          protocol: 'TCP'
+          priority: 1000
+          protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: 'VirtualNetwork'
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '80'
+          destinationPortRange: '*'
         }
       }
       {
-        name: 'allow_k8s_8080'
-        properties: {
-          priority: 1004
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '8080'
-        }
-      }
-      {
-        name: 'allow_k8s_443'
-        properties: {
-          priority: 1005
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '443'
-        }
-      }
-      {
-        name: 'allow_pos_5000'
+        name: 'AllowAzureLoadBalancer'
         properties: {
           priority: 1006
-          protocol: 'TCP'
+          protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: 'AzureLoadBalancer'
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '5000'
+          destinationPortRange: '*'
         }
       }
       {
-        name: 'allow_pos_81'
-        properties: {
-          priority: 1007
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '81'
-        }
-      }
-      {
-        name: 'allow_prometheus_9090'
+        name: 'AllowAllOutbound'
         properties: {
           priority: 1008
-          protocol: 'TCP'
+          protocol: '*'
           access: 'Allow'
-          direction: 'Inbound'
+          direction: 'Outbound'
           sourceAddressPrefix: '*'
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '9090'
+          destinationPortRange: '*'
         }
       }
       {
-        name: 'allow_MQ_8883'
-        properties: {
-          priority: 1009
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '8883'
-        }
-      }
-      {
-        name: 'allow_MQ_1883'
+        name: 'AllowSAW'
         properties: {
           priority: 1010
-          protocol: 'TCP'
+          protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: 'CorpNETSaw'
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '1883'
+          destinationPortRange: '*'
         }
       }
+      {
+        name: 'AllowCorpnetForNonProd'
+        properties: {
+          priority: 1009
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'CorpNetPublic'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'BlockInternetNonProd'
+        properties: {
+          priority: 1017
+          protocol: '*'
+          access: 'Deny'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'Internet'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      
     ]
   }
 }
