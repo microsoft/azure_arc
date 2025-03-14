@@ -203,7 +203,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_https_inbound'
         properties: {
-          priority: 1010
+          priority: 210
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -216,7 +216,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_gateway_manager_inbound'
         properties: {
-          priority: 1011
+          priority: 211
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -229,7 +229,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_load_balancer_inbound'
         properties: {
-          priority: 1012
+          priority: 212
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -242,7 +242,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_host_comms'
         properties: {
-          priority: 1013
+          priority: 213
           protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
@@ -258,7 +258,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_ssh_rdp_outbound'
         properties: {
-          priority: 1014
+          priority: 214
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -274,7 +274,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
-          priority: 1015
+          priority: 215
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Outbound'
@@ -287,7 +287,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_bastion_comms'
         properties: {
-          priority: 1016
+          priority: 216
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -303,7 +303,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_get_session_info'
         properties: {
-          priority: 1017
+          priority: 217
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -314,6 +314,84 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
             '80'
             '443'
           ]
+        }
+      },
+      {
+        name: 'VirtualNetwork'
+        properties: {
+          priority: 1000
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'VirtualNetwork'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'AllowAzureLoadBalancer'
+        properties: {
+          priority: 1006
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'AllowAllOutbound'
+        properties: {
+          priority: 1008
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Outbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'AllowSAW'
+        properties: {
+          priority: 1010
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'CorpNETSaw'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'AllowCorpnetForNonProd'
+        properties: {
+          priority: 1009
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'CorpNetPublic'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+      {
+        name: 'BlockInternetNonProd'
+        properties: {
+          priority: 1017
+          protocol: '*'
+          access: 'Deny'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'Internet'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
         }
       }
     ]
