@@ -189,7 +189,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationAddressPrefix: '*'
           destinationPortRange: '*'
         }
-      
+      }
     ]
   }
 }
