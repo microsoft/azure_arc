@@ -315,7 +315,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
             '443'
           ]
         }
-      },
+      }
       {
         name: 'VirtualNetwork'
         properties: {
