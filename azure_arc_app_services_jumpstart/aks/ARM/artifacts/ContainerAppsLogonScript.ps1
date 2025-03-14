@@ -155,6 +155,8 @@ $customLocationId = $(az customlocation create `
     --query id `
     --output tsv)
 
+az resource wait --ids $customLocationId --created
+
 # Deploying Connected Environment
 Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
