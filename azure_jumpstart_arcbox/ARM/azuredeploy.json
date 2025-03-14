@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.32.4.45862",
-      "templateHash": "11114503493889055176"
+      "version": "0.33.93.31351",
+      "templateHash": "3553902083110538921"
     }
   },
   "parameters": {
@@ -272,8 +272,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "2610071627031689606"
+              "version": "0.33.93.31351",
+              "templateHash": "9281349970705010044"
             }
           },
           "parameters": {
@@ -595,8 +595,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "439311248032936140"
+              "version": "0.33.93.31351",
+              "templateHash": "1750374630715767561"
             }
           },
           "parameters": {
@@ -877,8 +877,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "2610071627031689606"
+              "version": "0.33.93.31351",
+              "templateHash": "9281349970705010044"
             }
           },
           "parameters": {
@@ -1200,8 +1200,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "439311248032936140"
+              "version": "0.33.93.31351",
+              "templateHash": "1750374630715767561"
             }
           },
           "parameters": {
@@ -1536,8 +1536,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "16893232953418081903"
+              "version": "0.33.93.31351",
+              "templateHash": "8154565818556360808"
             }
           },
           "parameters": {
@@ -2003,7 +2003,7 @@
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(deployer().objectId, 'Microsoft.Authorization/roleAssignments', 'Key Vault Administrator')]",
+              "name": "[guid(resourceGroup().id, deployer().objectId, resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483'))]",
               "properties": {
                 "principalId": "[deployer().objectId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')]"
@@ -2105,8 +2105,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "16555076902768051082"
+              "version": "0.33.93.31351",
+              "templateHash": "16939699517418067039"
             }
           },
           "parameters": {
@@ -2213,8 +2213,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "12707130817207447691"
+              "version": "0.33.93.31351",
+              "templateHash": "5934559035055027743"
             }
           },
           "parameters": {
@@ -2523,7 +2523,7 @@
                   {
                     "name": "allow_k8s_80",
                     "properties": {
-                      "priority": 1003,
+                      "priority": 200,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2536,7 +2536,7 @@
                   {
                     "name": "allow_k8s_8080",
                     "properties": {
-                      "priority": 1004,
+                      "priority": 201,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2549,7 +2549,7 @@
                   {
                     "name": "allow_k8s_443",
                     "properties": {
-                      "priority": 1005,
+                      "priority": 202,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2562,7 +2562,7 @@
                   {
                     "name": "allow_k8s_kubelet",
                     "properties": {
-                      "priority": 1006,
+                      "priority": 203,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2575,7 +2575,7 @@
                   {
                     "name": "allow_traefik_lb_external",
                     "properties": {
-                      "priority": 1007,
+                      "priority": 204,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2588,7 +2588,7 @@
                   {
                     "name": "allow_SQLMI_traffic",
                     "properties": {
-                      "priority": 1008,
+                      "priority": 205,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2601,7 +2601,7 @@
                   {
                     "name": "allow_Postgresql_traffic",
                     "properties": {
-                      "priority": 1009,
+                      "priority": 206,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2614,7 +2614,7 @@
                   {
                     "name": "allow_SQLMI_mirroring_traffic",
                     "properties": {
-                      "priority": 1012,
+                      "priority": 207,
                       "protocol": "TCP",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2641,7 +2641,7 @@
                   {
                     "name": "bastion_allow_https_inbound",
                     "properties": {
-                      "priority": 1010,
+                      "priority": 200,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2654,7 +2654,7 @@
                   {
                     "name": "bastion_allow_gateway_manager_inbound",
                     "properties": {
-                      "priority": 1011,
+                      "priority": 201,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2667,7 +2667,7 @@
                   {
                     "name": "bastion_allow_load_balancer_inbound",
                     "properties": {
-                      "priority": 1012,
+                      "priority": 202,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2680,7 +2680,7 @@
                   {
                     "name": "bastion_allow_host_comms",
                     "properties": {
-                      "priority": 1013,
+                      "priority": 203,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -2696,7 +2696,7 @@
                   {
                     "name": "bastion_allow_ssh_rdp_outbound",
                     "properties": {
-                      "priority": 1014,
+                      "priority": 204,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -2712,7 +2712,7 @@
                   {
                     "name": "bastion_allow_azure_cloud_outbound",
                     "properties": {
-                      "priority": 1015,
+                      "priority": 205,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -2725,7 +2725,7 @@
                   {
                     "name": "bastion_allow_bastion_comms",
                     "properties": {
-                      "priority": 1016,
+                      "priority": 206,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -2741,7 +2741,7 @@
                   {
                     "name": "bastion_allow_get_session_info",
                     "properties": {
-                      "priority": 1017,
+                      "priority": 207,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -2889,8 +2889,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.32.4.45862",
-                      "templateHash": "1912011565831162458"
+                      "version": "0.33.93.31351",
+                      "templateHash": "16011455853867165840"
                     }
                   },
                   "parameters": {
@@ -2909,7 +2909,7 @@
                     "flavor": {
                       "type": "string",
                       "metadata": {
-                        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+                        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'DataOps', 'DevOps', 'ITPro'"
                       }
                     },
                     "resourceTags": {
@@ -2944,7 +2944,6 @@
                         "name": "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA",
                         "definitionId": "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0",
                         "flavors": [
-                          "Full",
                           "ITPro"
                         ],
                         "roleDefinition": [
@@ -2957,7 +2956,7 @@
                             "value": "[parameters('logAnalyticsWorkspaceId')]"
                           },
                           "enableProcessesAndDependencies": {
-                            "value": true
+                            "value": false
                           }
                         }
                       },
@@ -2965,7 +2964,6 @@
                         "name": "(ArcBox) Enable Microsoft Defender on Kubernetes clusters",
                         "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
                         "flavors": [
-                          "Full",
                           "DevOps"
                         ],
                         "roleDefinition": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293', subscription().subscriptionId)]",
@@ -5704,8 +5702,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "8144821245242671317"
+              "version": "0.33.93.31351",
+              "templateHash": "5870458532522851268"
             }
           },
           "parameters": {
@@ -5740,7 +5738,7 @@
             },
             "windowsOSVersion": {
               "type": "string",
-              "defaultValue": "2022-datacenter-g2",
+              "defaultValue": "2025-datacenter-g2",
               "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
               }
@@ -5842,9 +5840,6 @@
               "apiVersion": "2022-03-01",
               "name": "[parameters('clientVMName')]",
               "location": "[parameters('azureLocation')]",
-              "identity": {
-                "type": "SystemAssigned"
-              },
               "properties": {
                 "hardwareProfile": {
                   "vmSize": "[parameters('vmSize')]"
@@ -5883,6 +5878,9 @@
                   }
                 }
               },
+              "identity": {
+                "type": "SystemAssigned"
+              },
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
               ]
@@ -5901,7 +5899,7 @@
                   "fileUris": [
                     "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
                   ],
-                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName {0} -domainAdminUsername {1} -domainAdminPassword {2} -templateBaseUrl {3}', parameters('addsDomainName'), parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('templateBaseUrl'))]"
+                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName {0} -domainAdminUsername {1} -templateBaseUrl {2}', parameters('addsDomainName'), parameters('windowsAdminUsername'), parameters('templateBaseUrl'))]"
                 }
               },
               "dependsOn": [
@@ -5910,12 +5908,11 @@
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'Microsoft.Authorization/roleAssignments', 'Reader')]",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'reader')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]",
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-                "principalType": "ServicePrincipal"
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
@@ -5923,17 +5920,16 @@
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'Microsoft.Authorization/roleAssignments', 'keyVaultSecretReader')]",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), 'keyVaultSecretReader')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]",
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
-                "principalType": "ServicePrincipal"
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName')), '2022-03-01', 'full').identity.principalId]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('clientVMName'))]"
               ]
-            }            
+            }
           ],
           "outputs": {
             "scriptfile": {
@@ -5987,8 +5983,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "12707130817207447691"
+              "version": "0.33.93.31351",
+              "templateHash": "5934559035055027743"
             }
           },
           "parameters": {
@@ -6297,7 +6293,7 @@
                   {
                     "name": "allow_k8s_80",
                     "properties": {
-                      "priority": 1003,
+                      "priority": 200,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6310,7 +6306,7 @@
                   {
                     "name": "allow_k8s_8080",
                     "properties": {
-                      "priority": 1004,
+                      "priority": 201,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6323,7 +6319,7 @@
                   {
                     "name": "allow_k8s_443",
                     "properties": {
-                      "priority": 1005,
+                      "priority": 202,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6336,7 +6332,7 @@
                   {
                     "name": "allow_k8s_kubelet",
                     "properties": {
-                      "priority": 1006,
+                      "priority": 203,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6349,7 +6345,7 @@
                   {
                     "name": "allow_traefik_lb_external",
                     "properties": {
-                      "priority": 1007,
+                      "priority": 204,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6362,7 +6358,7 @@
                   {
                     "name": "allow_SQLMI_traffic",
                     "properties": {
-                      "priority": 1008,
+                      "priority": 205,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6375,7 +6371,7 @@
                   {
                     "name": "allow_Postgresql_traffic",
                     "properties": {
-                      "priority": 1009,
+                      "priority": 206,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6388,7 +6384,7 @@
                   {
                     "name": "allow_SQLMI_mirroring_traffic",
                     "properties": {
-                      "priority": 1012,
+                      "priority": 207,
                       "protocol": "TCP",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6415,7 +6411,7 @@
                   {
                     "name": "bastion_allow_https_inbound",
                     "properties": {
-                      "priority": 1010,
+                      "priority": 200,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6428,7 +6424,7 @@
                   {
                     "name": "bastion_allow_gateway_manager_inbound",
                     "properties": {
-                      "priority": 1011,
+                      "priority": 201,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6441,7 +6437,7 @@
                   {
                     "name": "bastion_allow_load_balancer_inbound",
                     "properties": {
-                      "priority": 1012,
+                      "priority": 202,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6454,7 +6450,7 @@
                   {
                     "name": "bastion_allow_host_comms",
                     "properties": {
-                      "priority": 1013,
+                      "priority": 203,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Inbound",
@@ -6470,7 +6466,7 @@
                   {
                     "name": "bastion_allow_ssh_rdp_outbound",
                     "properties": {
-                      "priority": 1014,
+                      "priority": 204,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -6486,7 +6482,7 @@
                   {
                     "name": "bastion_allow_azure_cloud_outbound",
                     "properties": {
-                      "priority": 1015,
+                      "priority": 205,
                       "protocol": "Tcp",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -6499,7 +6495,7 @@
                   {
                     "name": "bastion_allow_bastion_comms",
                     "properties": {
-                      "priority": 1016,
+                      "priority": 206,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -6515,7 +6511,7 @@
                   {
                     "name": "bastion_allow_get_session_info",
                     "properties": {
-                      "priority": 1017,
+                      "priority": 207,
                       "protocol": "*",
                       "access": "Allow",
                       "direction": "Outbound",
@@ -6663,8 +6659,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.32.4.45862",
-                      "templateHash": "1912011565831162458"
+                      "version": "0.33.93.31351",
+                      "templateHash": "16011455853867165840"
                     }
                   },
                   "parameters": {
@@ -6683,7 +6679,7 @@
                     "flavor": {
                       "type": "string",
                       "metadata": {
-                        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+                        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'DataOps', 'DevOps', 'ITPro'"
                       }
                     },
                     "resourceTags": {
@@ -6718,7 +6714,6 @@
                         "name": "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA",
                         "definitionId": "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0",
                         "flavors": [
-                          "Full",
                           "ITPro"
                         ],
                         "roleDefinition": [
@@ -6731,7 +6726,7 @@
                             "value": "[parameters('logAnalyticsWorkspaceId')]"
                           },
                           "enableProcessesAndDependencies": {
-                            "value": true
+                            "value": false
                           }
                         }
                       },
@@ -6739,7 +6734,6 @@
                         "name": "(ArcBox) Enable Microsoft Defender on Kubernetes clusters",
                         "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
                         "flavors": [
-                          "Full",
                           "DevOps"
                         ],
                         "roleDefinition": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293', subscription().subscriptionId)]",
@@ -9476,8 +9470,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "15103003561479579430"
+              "version": "0.33.93.31351",
+              "templateHash": "14488372126411967371"
             }
           },
           "parameters": {
