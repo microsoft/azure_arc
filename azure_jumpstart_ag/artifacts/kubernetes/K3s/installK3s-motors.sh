@@ -1,5 +1,7 @@
 #!/bin/bash
-sudo apt-get update
+
+# always return zero regardless of an error since we're not apt installing anything
+sudo apt-get update || true
 
 sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
@@ -326,7 +328,7 @@ fi
 
 
 # check the scenario and run the curl command if scenario is contoso-motors
-if [ "$scenario" == "contoso_motors" ]; then
+if [ "$k3sControlPlane" == "true" ]; then
     echo "Running curl command to install OpenVINO Toolkit Operator"
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.31.0/install.sh | bash -s v0.31.0
@@ -334,7 +336,7 @@ if [ "$scenario" == "contoso_motors" ]; then
     echo "Installing operator via kubectl"
     kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
 
-    sleep 10
+    sleep 120
 
     kubectl create ns contoso-motors
 
@@ -343,6 +345,10 @@ if [ "$scenario" == "contoso_motors" ]; then
     echo "Installing OVMS and InfluxDB Helm charts"
     # TODO: replace the OVMS chart with the MCR one after testing the service type change
     helm install ovms -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/ovms --version 0.1.1
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR: Failed to install OVMS Helm chart" >> /home/$adminUsername/jumpstart_logs/installK3s-$vmName.log
+        exit 1
+    fi
     sleep 10
     helm install influxdb -n contoso-motors oci://mcr.microsoft.com/jumpstart/agora/helm/influxdb --version 0.1.1
 fi
