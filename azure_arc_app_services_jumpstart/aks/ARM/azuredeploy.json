@@ -74,27 +74,6 @@
                 "description": "Azure Container Apps deployment"
             }
         },
-        "deployAppService": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Web App deployment"
-            }
-        },
-        "deployFunction": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Function deployment"
-            }
-        },
-        "deployLogicApp": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Logic App deployment"
-            }
-        },
         "adminEmail": {
             "type": "string",
             "metadata": {
@@ -273,15 +252,6 @@
                     },
                     "deployContainerApps": {
                         "value": "[parameters('deployContainerApps')]"
-                    },
-                    "deployAppService": {
-                        "value": "[parameters('deployAppService')]"
-                    },
-                    "deployFunction": {
-                        "value": "[parameters('deployFunction')]"
-                    },
-                    "deployLogicApp": {
-                        "value": "[parameters('deployLogicApp')]"
                     },
                     "adminEmail": {
                         "value": "[parameters('adminEmail')]"

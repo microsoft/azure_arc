@@ -153,22 +153,6 @@ Do {
    $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $Env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
    } while ($kubeEnvironmentNameStatus -eq "Nope")
 
-if ( $Env:deployAppService -eq $true )
-{
-    & "C:\Temp\deployAppService.ps1"
-}
-
-if ( $Env:deployFunction -eq $true )
-{
-    & "C:\Temp\deployFunction.ps1"
-}
-
-
-if ( $Env:deployLogicApp -eq $true )
-{
-    & "C:\Temp\deployLogicApp.ps1"
-}
-
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
 $code = @' 
