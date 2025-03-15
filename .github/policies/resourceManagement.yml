@@ -101,15 +101,15 @@ configuration:
         - isAction:
             action: Closed
         then:
-        - if:
-            - bodyContains:
-                pattern: "(?i)duplicate"
-                regex: true
-          then:
-            - addLabel:
-                label: Duplicate
-        - addLabel:
-            label: Issue-Addressed
+            - if:
+                - bodyContains:
+                        pattern: "(?i)duplicate"
+                        regex: true
+              then:
+                - addLabel:
+                    label: Duplicate
+                - addLabel:
+                    label: Issue-Addressed
 
     scheduledSearches:
     - description: Close stale issues
