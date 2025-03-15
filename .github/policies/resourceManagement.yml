@@ -68,9 +68,9 @@ configuration:
             then:
                 - addReply:
                     reply: >-
-                        Hello @${issueAuthor},
+                      Hello @${issueAuthor},
 
-                        TEST BUG
+                      TEST BUG
             #   if:
             #     titleContains:
             #       pattern: "(?i)feature"
