@@ -102,7 +102,7 @@ configuration:
         - payloadType: Issue_Comment
         - and:
             - commentContains:
-                pattern: 'Duplicate\s+of\s+\#?\s*\d+'
+                pattern: "(?i)duplicate"
                 isRegex: True
         then:
         - addReply:
