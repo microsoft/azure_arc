@@ -92,7 +92,9 @@ configuration:
             action: Reopened
         then:
         - removeLabel:
-            label: Issue-Addressed        
+            label: Issue-Addressed
+        - removeLabel:
+            label: Needs-Attention            
         - addLabel:
             label: Needs-Attention
 
