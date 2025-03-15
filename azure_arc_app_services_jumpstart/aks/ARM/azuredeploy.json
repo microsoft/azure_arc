@@ -88,13 +88,6 @@
                 "description": "Azure Function deployment"
             }
         },
-        "deployApiMgmt": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure API Management deployment"
-            }
-        },
         "deployLogicApp": {
             "type": "bool",
             "defaultValue": false,
@@ -286,9 +279,6 @@
                     },
                     "deployFunction": {
                         "value": "[parameters('deployFunction')]"
-                    },
-                    "deployApiMgmt": {
-                        "value": "[parameters('deployApiMgmt')]"
                     },
                     "deployLogicApp": {
                         "value": "[parameters('deployLogicApp')]"

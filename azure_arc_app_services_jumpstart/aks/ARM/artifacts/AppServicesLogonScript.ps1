@@ -164,11 +164,6 @@ if ( $Env:deployFunction -eq $true )
 }
 
 
-if ( $Env:deployApiMgmt -eq $true )
-{
-    & "C:\Temp\deployApiMgmt.ps1"
-}
-
 if ( $Env:deployLogicApp -eq $true )
 {
     & "C:\Temp\deployLogicApp.ps1"

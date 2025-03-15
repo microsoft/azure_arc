@@ -12,7 +12,6 @@ param (
     [string]$deployContainerApps,
     [string]$deployAppService,
     [string]$deployFunction,
-    [string]$deployApiMgmt,
     [string]$deployLogicApp,
     [string]$adminEmail,
     [string]$templateBaseUrl,
@@ -33,7 +32,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('connectedClusterName', $connectedClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployApiMgmt', $deployApiMgmt,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
@@ -74,11 +72,10 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1
-if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
+if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployLogicApp -eq $true) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1"
 }
 
@@ -154,7 +151,7 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
-if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
+if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployLogicApp -eq $true) {
 # Creating scheduled task for AppServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AppServicesLogonScript.ps1'
