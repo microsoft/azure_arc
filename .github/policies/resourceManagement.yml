@@ -27,11 +27,10 @@ configuration:
               reply: >-
                 Hello @${issueAuthor},
 
-
                 This pull request does not update any files. Please review your commit history and resubmit.
 
+                We will be closing this pull request now!
 
-                Template: msftbot/validationError/pullRequest/noContent
           - closePullRequest
 
       - description: Add Needs-Triage to new issues
@@ -94,6 +93,23 @@ configuration:
             label: Issue-Addressed        
         - addLabel:
             label: Needs-Attention
+
+      - description: Add duplicate label to closed as duplicate issues
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Closed
+        then:
+        - if:
+            - bodyContains:
+                pattern: "(?i)duplicate"
+                regex: true
+          then:
+          - addLabel:
+              label: Duplicate
+        - addLabel:
+            label: Issue-Addressed
 
     scheduledSearches:
     - description: Close stale issues
