@@ -65,12 +65,12 @@ configuration:
               - titleContains:
                 pattern: "(?i)bug"
                 isRegex: true
-                then:
-                    - addReply:
-                        reply: >-
-                            Hello @${issueAuthor},
+            then:
+                - addReply:
+                    reply: >-
+                        Hello @${issueAuthor},
 
-                            TEST BUG
+                        TEST BUG
             #   if:
             #     titleContains:
             #       pattern: "(?i)feature"
