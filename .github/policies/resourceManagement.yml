@@ -96,17 +96,14 @@ configuration:
         - addLabel:
             label: Needs-Attention
 
-      - description: Add duplicate label to closed as duplicate issues or PRs
-        triggerOnOwnActions: false
-          # If the payload is an issue_Comment or a Pull_Request_Review_Comment
+      - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
         if:
-        - payloadType: Issue_Comment
+            - or:
+                - payloadType: Issue_Comment
+                - payloadType: Pull_Request_Review_Comment
+            # Remove the Needs-Triage label
+            # Take different actions based on the comment pattern
         then:
-        - if:
-            - commentContains:
-                pattern: Duplicate\s+of\s+\#?\s*\d+
-                isRegex: True
-          then:
             - addReply:
                 reply: >-
                     Hello @${issueAuthor},
@@ -118,6 +115,8 @@ configuration:
                 label: Needs-Triage
             - removeLabel:
                 label: Needs-Attention
+            - removeLabel:
+                label: Needs-Feedback-Hub
             - removeLabel:
                 label: Needs-Author-Feedback
             - addLabel:
