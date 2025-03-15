@@ -103,8 +103,8 @@ configuration:
         then:
         - if:
             - commentContains:
-                pattern: "duplicate"
-                isRegex: false
+                pattern: "(?i)duplicate"
+                isRegex: true
           then:
           - addLabel:
               label: Duplicate
