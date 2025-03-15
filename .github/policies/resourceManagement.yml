@@ -42,18 +42,45 @@ configuration:
           - addLabel:
               label: Needs-Triage
 
-      - description: When an issue is opened, post a message to the author
+    #   - description: When an issue is opened, post a message to the author
+    #     if:
+    #       - payloadType: Issues
+    #       - isAction:
+    #           action: Opened
+    #     then:
+    #       - addReply:
+    #           reply: >-
+    #             Hello @${issueAuthor},
+
+    #             Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
+    #             By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+      - description: When an issue is opened
         if:
           - payloadType: Issues
           - isAction:
               action: Opened
         then:
-          - addReply:
-              reply: >-
-                Hello @${issueAuthor},
+          - if: 
+              titleContains:
+                pattern: "(?i)bug"
+                isRegex: true
+              then:
+                - addReply:
+                    reply: >-
+                        Hello @${issueAuthor},
 
-                Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
-                By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+                        TEST BUG
+              if:
+                titleContains:
+                  pattern: "(?i)feature"
+                  isRegex: true
+                then:
+                  - addReply:
+                      reply: >-
+                          Hello @${issueAuthor},
+
+                          TEST FEATURE
 
       - description: When a PR is opened, post a message to the author
         if:
@@ -67,8 +94,6 @@ configuration:
 
                 Thank you for your pull request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                 By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
-
-      
       
       - description: Clear labels when an issue is closed
         triggerOnOwnActions: false
