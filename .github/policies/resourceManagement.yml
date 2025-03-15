@@ -100,9 +100,10 @@ configuration:
         triggerOnOwnActions: false
         if:
         - payloadType: Issue_Comment
-        - commentContains:
-            pattern: Duplicate\s+of\s+\#?\s*\d+
-            isRegex: True
+        - and:
+            - commentContains:
+                pattern: Duplicate\s+of\s+\#?\s*\d+
+                isRegex: True
         then:
         - addReply:
             reply: >-
