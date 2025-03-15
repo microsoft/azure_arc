@@ -99,7 +99,7 @@ configuration:
         if:
         - payloadType: Issues
         - isAction:
-            action: Closed
+            action: Issue_Comment
         then:
         - if:
             - bodyContains:
@@ -107,8 +107,7 @@ configuration:
           then:
           - addLabel:
               label: Duplicate
-          - addLabel:
-              label: Issue-Addressed    
+            
  
     scheduledSearches:
     - description: Close stale issues
