@@ -62,6 +62,7 @@ configuration:
               action: Opened
         then:
           - if: 
+              # Identifiy if the issue title contains the word "bug"
               - titleContains:
                     pattern: "(?i)bug"
                     isRegex: true
@@ -71,16 +72,18 @@ configuration:
                       Hello @${issueAuthor},
 
                       TEST BUG
-            #   if:
-            #     titleContains:
-            #       pattern: "(?i)feature"
-            #       isRegex: true
-            #     then:
-            #       - addReply:
-            #           reply: >-
-            #               Hello @${issueAuthor},
+                                  
+          - if:
+                # Identifiy if the issue title contains the word "feature"
+              - titleContains:
+                    pattern: "(?i)feature"
+                    isRegex: true
+            then:
+                - addReply:
+                    reply: >-
+                      Hello @${issueAuthor},
 
-            #               TEST FEATURE
+                      TEST FEATURE
 
       - description: When a PR is opened, post a message to the author
         if:
