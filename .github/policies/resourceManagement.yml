@@ -102,7 +102,7 @@ configuration:
         - payloadType: Issue_Comment
         - and:
             - commentContains:
-                pattern: "(?i)duplicate"
+                pattern: "(?i)duplicat(e|ed|ing)?"
                 isRegex: True
         then:
         - addReply:
