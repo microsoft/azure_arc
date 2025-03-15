@@ -103,7 +103,8 @@ configuration:
         then:
         - if:
             - bodyContains:
-                pattern: 'This issue is a duplicate of #\d+'
+                pattern: "(?i)duplicate"
+                isRegex: true
           then:
           - addLabel:
               label: Duplicate
