@@ -63,8 +63,8 @@ configuration:
         then:
           - if: 
               - titleContains:
-                pattern: "(?i)bug"
-                isRegex: true
+                    pattern: "(?i)bug"
+                    isRegex: true
             then:
                 - addReply:
                     reply: >-
