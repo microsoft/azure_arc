@@ -106,8 +106,8 @@ configuration:
                 pattern: "(?i)duplicate"
                 regex: true
           then:
-          - addLabel:
-              label: Duplicate
+            - addLabel:
+                label: Duplicate
         - addLabel:
             label: Issue-Addressed
 
