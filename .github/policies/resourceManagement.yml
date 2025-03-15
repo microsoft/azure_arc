@@ -97,14 +97,13 @@ configuration:
             label: Needs-Attention
 
       - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
+        triggerOnOwnActions: false
         if:
-            - or:
-                - payloadType: Issue_Comment
-                - payloadType: Pull_Request_Review_Comment
-            - and:
-                - commentContains:
-                    pattern: Duplicate\s+of\s+\#?\s*\d+
-                    isRegex: True
+          - payloadType: Issue_Comment
+          - and:
+              - commentContains:
+                  pattern: Duplicate\s+of\s+\#?\s*\d+
+                  isRegex: True
         then:
             - addReply:
                 reply: >-
