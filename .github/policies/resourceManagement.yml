@@ -100,15 +100,16 @@ configuration:
         - payloadType: Issues
         - isAction:
             action: Closed
-            and:
+        then:
+          - if:
               - bodyContains:
                   pattern: "(?i)duplicate"
-                  regex: true
-        then:
-        - addLabel:
-            label: Duplicate
-        - addLabel:
-            label: Issue-Addressed
+                  isRegEx: true
+            then:
+              - addLabel:
+                  label: Duplicate
+              - addLabel:
+                  label: Issue-Addressed
 
     scheduledSearches:
     - description: Close stale issues
