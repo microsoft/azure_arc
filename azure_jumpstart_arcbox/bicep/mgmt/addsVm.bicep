@@ -45,7 +45,7 @@ var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -65,7 +65,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (!deployBastion) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-05-01' = if (!deployBastion) {
   name: publicIpAddressName
   location: azureLocation
   properties: {
@@ -79,7 +79,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (
   }
 }
 
-resource clientVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource clientVM 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: clientVMName
   location: azureLocation
   properties: {
@@ -125,7 +125,7 @@ resource clientVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
 }
 
-resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = {
   parent: clientVM
   name: 'DeployADDS'
   location: azureLocation
@@ -144,7 +144,7 @@ resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03
 }
 
 // Role assignment for Reader
-resource vmReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource vmReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(clientVM.id, 'reader')
   scope: resourceGroup()
   properties: {
@@ -154,7 +154,7 @@ resource vmReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04
 }
 
 // Role assignment for Key Vault Secret Reader
-resource vmKeyVaultSecretReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource vmKeyVaultSecretReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(clientVM.id, 'keyVaultSecretReader')
   scope: resourceGroup()
   properties: {

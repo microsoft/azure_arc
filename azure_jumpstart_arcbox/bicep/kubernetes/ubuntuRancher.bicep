@@ -55,7 +55,7 @@ var diskSize = (flavor == 'DataOps') ? 512 : 64
 var numberOfIPAddresses = (flavor == 'DataOps') ? 8 : 5 // The number of IP addresses to create
 
 // Create multiple public IP addresses if deployBastion is false
-resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
+resource publicIpAddresses 'Microsoft.Network/publicIPAddresses@2024-05-01' = [for i in range(1, numberOfIPAddresses): {
   name: '${publicIpAddressName}${i}'
   location: azureLocation
   properties: {
@@ -69,7 +69,7 @@ resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [f
 }]
 
 // Create multiple NIC IP configurations and assign the public IP to the IP configuration if deployBastion is false
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -89,7 +89,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: vmName
   location: azureLocation
   identity: {
@@ -163,7 +163,7 @@ resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = {
   parent: vm
   name: 'installscript_k3s'
   location: azureLocation

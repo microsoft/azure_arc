@@ -16,7 +16,7 @@ param namingPrefix string = 'ArcBox'
 
 var storageAccountName = '${namingPrefix}${uniqueString(resourceGroup().id)}'
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: toLower(storageAccountName)
   location: location
   sku: {
