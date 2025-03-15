@@ -106,8 +106,8 @@ configuration:
                 pattern: "(?i)duplicate"
                 isRegex: true
           then:
-          - addLabel:
-              label: Duplicate
+            - addLabel:
+                label: Duplicate
 
  
     scheduledSearches:
