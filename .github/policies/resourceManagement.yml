@@ -99,29 +99,29 @@ configuration:
       - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
         triggerOnOwnActions: false
         if:
-          - payloadType: Issue_Comment
-          - and:
-              - commentContains:
-                  pattern: Duplicate\s+of\s+\#?\s*\d+
-                  isRegex: True
+        - payloadType: Issue_Comment
+        - and:
+            - commentContains:
+                pattern: Duplicate\s+of\s+\#?\s*\d+
+                isRegex: True
         then:
-            - addReply:
-                reply: >-
-                    Hello @${issueAuthor},
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
 
-                    We've identified this as a duplicate of another issue or PR that already exists. This specific instance is being closed in favor of the linked issue. Please add your 👍 to the other issue to raise its priority. Thanks for your contribution!
+                We've identified this as a duplicate of another issue or PR that already exists. This specific instance is being closed in favor of the linked issue. Please add your 👍 to the other issue to raise its priority. Thanks for your contribution!
 
-            - closeIssue
-            - removeLabel:
-                label: Needs-Triage
-            - removeLabel:
-                label: Needs-Attention
-            - removeLabel:
-                label: Needs-Feedback-Hub
-            - removeLabel:
-                label: Needs-Author-Feedback
-            - addLabel:
-                label: Resolution-Duplicate
+        - closeIssue
+        - removeLabel:
+            label: Needs-Triage
+        - removeLabel:
+            label: Needs-Attention
+        - removeLabel:
+            label: Needs-Feedback-Hub
+        - removeLabel:
+            label: Needs-Author-Feedback
+        - addLabel:
+            label: Resolution-Duplicate
  
     scheduledSearches:
     - description: Close stale issues
