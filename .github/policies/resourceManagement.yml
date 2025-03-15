@@ -104,13 +104,13 @@ configuration:
         - if:
             - bodyContains:
                 pattern: "(?i)duplicate"
-                regex: true
+                isRegex: true
           then:
           - addLabel:
               label: Duplicate
-        - addLabel:
-            label: Issue-Addressed
-
+          - addLabel:
+              label: Issue-Addressed    
+ 
     scheduledSearches:
     - description: Close stale issues
       frequencies:
