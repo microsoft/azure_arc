@@ -98,6 +98,8 @@ configuration:
         triggerOnOwnActions: false
         if:
         - payloadType: Issues
+        - and: 
+            - isOpen
         - isAction:
             action: Issue_Comment
         then:
