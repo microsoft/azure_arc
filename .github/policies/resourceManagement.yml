@@ -42,48 +42,48 @@ configuration:
           - addLabel:
               label: Needs-Triage
 
-    #   - description: When an issue is opened, post a message to the author
-    #     if:
-    #       - payloadType: Issues
-    #       - isAction:
-    #           action: Opened
-    #     then:
-    #       - addReply:
-    #           reply: >-
-    #             Hello @${issueAuthor},
-
-    #             Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
-    #             By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
-
-      - description: When an issue is opened
+      - description: When an issue is opened, post a message to the author
         if:
           - payloadType: Issues
           - isAction:
               action: Opened
         then:
-          - if: 
-              # Identifiy if the issue title contains the word "bug"
-              - titleContains:
-                    pattern: "(?i)bug"
-                    isRegex: true
-            then:
-                - addReply:
-                    reply: >-
-                      Hello @${issueAuthor},
+          - addReply:
+              reply: >-
+                Hello @${issueAuthor},
 
-                      TEST BUG
+                Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
+                By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+    #   - description: When an issue is opened
+    #     if:
+    #       - payloadType: Issues
+    #       - isAction:
+    #           action: Opened
+    #     then:
+    #       - if: 
+    #           # Identifiy if the issue title contains the word "bug"
+    #           - titleContains:
+    #                 pattern: "(?i)bug"
+    #                 isRegex: true
+    #         then:
+    #             - addReply:
+    #                 reply: >-
+    #                   Hello @${issueAuthor},
+
+    #                   TEST BUG
                                   
-          - if:
-                # Identifiy if the issue title contains the word "feature"
-              - titleContains:
-                    pattern: "(?i)feature"
-                    isRegex: true
-            then:
-                - addReply:
-                    reply: >-
-                      Hello @${issueAuthor},
+    #       - if:
+    #             # Identifiy if the issue title contains the word "feature"
+    #           - titleContains:
+    #                 pattern: "(?i)feature"
+    #                 isRegex: true
+    #         then:
+    #             - addReply:
+    #                 reply: >-
+    #                   Hello @${issueAuthor},
 
-                      TEST FEATURE
+    #                   TEST FEATURE
 
       - description: When a PR is opened, post a message to the author
         if:
