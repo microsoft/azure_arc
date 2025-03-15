@@ -102,7 +102,7 @@ configuration:
             action: Issue_Comment
         then:
         - if:
-            - bodyContains:
+            - commentContains:
                 pattern: "duplicate"
                 isRegex: false
           then:
