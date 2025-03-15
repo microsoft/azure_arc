@@ -104,10 +104,11 @@ configuration:
         - if:
             - bodyContains:
                 pattern: "duplicate"
+                isRegex: false
           then:
           - addLabel:
               label: Duplicate
-            
+
  
     scheduledSearches:
     - description: Close stale issues
