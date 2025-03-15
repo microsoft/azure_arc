@@ -94,7 +94,7 @@ configuration:
         - removeLabel:
             label: Issue-Addressed
         - removeLabel:
-            label: Needs-Attention            
+            label: Resolution-Duplicate            
         - addLabel:
             label: Needs-Attention
 
