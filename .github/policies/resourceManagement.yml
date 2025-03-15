@@ -96,9 +96,11 @@ configuration:
 
       - description: Add duplicate label to closed as duplicate issues or PRs
         triggerOnOwnActions: false
+          # If the payload is an issue_Comment or a Pull_Request_Review_Comment
         if:
-        - payloadType: Issue_Comment
-        - payloadType: Pull_Request_Review_Comment
+          - or:
+              - payloadType: Issue_Comment
+              - payloadType: Pull_Request_Review_Comment
         then:
         - if:
             - commentContains:
