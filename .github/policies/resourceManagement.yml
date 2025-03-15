@@ -68,6 +68,8 @@ configuration:
                 Thank you for your pull request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                 By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
+      
+      
       - description: Clear labels when an issue is closed
         triggerOnOwnActions: false
         if:
@@ -98,9 +100,7 @@ configuration:
         triggerOnOwnActions: false
           # If the payload is an issue_Comment or a Pull_Request_Review_Comment
         if:
-          - or:
-              - payloadType: Issue_Comment
-              - payloadType: Pull_Request_Review_Comment
+        - payloadType: Issue_Comment
         then:
         - if:
             - commentContains:
