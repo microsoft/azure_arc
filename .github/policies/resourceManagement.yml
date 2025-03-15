@@ -103,8 +103,7 @@ configuration:
         then:
         - if:
             - bodyContains:
-                pattern: "(?i)duplicate"
-                isRegex: true
+                pattern: "duplicate"
           then:
           - addLabel:
               label: Duplicate
