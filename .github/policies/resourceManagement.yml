@@ -62,25 +62,25 @@ configuration:
               action: Opened
         then:
           - if: 
-              titleContains:
+              - titleContains:
                 pattern: "(?i)bug"
                 isRegex: true
-              then:
-                - addReply:
-                    reply: >-
-                        Hello @${issueAuthor},
-
-                        TEST BUG
-              if:
-                titleContains:
-                  pattern: "(?i)feature"
-                  isRegex: true
                 then:
-                  - addReply:
-                      reply: >-
-                          Hello @${issueAuthor},
+                    - addReply:
+                        reply: >-
+                            Hello @${issueAuthor},
 
-                          TEST FEATURE
+                            TEST BUG
+            #   if:
+            #     titleContains:
+            #       pattern: "(?i)feature"
+            #       isRegex: true
+            #     then:
+            #       - addReply:
+            #           reply: >-
+            #               Hello @${issueAuthor},
+
+            #               TEST FEATURE
 
       - description: When a PR is opened, post a message to the author
         if:
