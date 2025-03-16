@@ -1,3 +1,6 @@
+# ===========================================================================
+# GitHub Repository Issue and Pull Request Management Policy
+# ===========================================================================
 id: 
 name: GitOps.PullRequestIssueManagement
 description: Handlers for when an issue is first opened
@@ -7,11 +10,15 @@ disabled: false
 where:
 configuration:
   resourceManagementConfiguration:
-    # ===========================================
+    # ===========================================================================
     # EVENT RESPONDER TASKS
-    # ===========================================
+    # Defines automated actions triggered by specific GitHub events
+    # ===========================================================================
     eventResponderTasks:
-      # --- PULL REQUEST MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # PULL REQUEST MANAGEMENT
+      # Handles PR creation, updates, and empty PRs
+      # ---------------------------------------------------------------------------
       - description: >-
           When a PR is opened/updated, if no files are modified
           * Close the issue
@@ -50,7 +57,10 @@ configuration:
                 Thank you for your pull request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                 By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
-      # --- NEW ISSUE MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # NEW ISSUE MANAGEMENT
+      # Handles initial triage and labeling of new issues
+      # ---------------------------------------------------------------------------
       - description: When an issue is opened, Identifiy if the issue title contains the word "bug" or "feature" and post a message to the author
         if:
           - payloadType: Issues
@@ -59,7 +69,7 @@ configuration:
         then:
           # Add Needs-Triage label to new issues
           - addLabel:
-              label: Needs-Triage
+              label: Needs-TriageE
           - if:
               # Identifiy if the issue title contains the word "arcbox"
               - titleContains:
@@ -118,7 +128,10 @@ configuration:
                       Thank you for your feature request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
-      # --- ISSUE LIFECYCLE MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # ISSUE LIFECYCLE MANAGEMENT
+      # Handles issue closing, reopening, and duplicate detection
+      # ---------------------------------------------------------------------------
       - description: Clear labels when an issue is closed
         triggerOnOwnActions: false
         if:
@@ -209,14 +222,15 @@ configuration:
         - addLabel:
             label: Resolution-Duplicate
  
-    # ===========================================
+    # ===========================================================================
     # SCHEDULED SEARCHES
-    # ===========================================
+    # Periodic tasks that run on defined schedules
+    # ===========================================================================
     scheduledSearches:
     - description: Close stale issues
       frequencies:
       - daily:
-          time: 1:0
+          time: 1:0      # Runs at 1:00 AM daily
       filters:
       - isIssue
       - isOpen
@@ -225,21 +239,21 @@ configuration:
       - hasLabel:
           label: No-Recent-Activity
       - noActivitySince:
-          days: 21
+          days: 21       # 3 weeks of inactivity
       actions:
       - closeIssue
       
     - description: Add no recent activity label to issues
       frequencies:
       - hourly:
-          hour: 6
+          hour: 6        # Runs at 6:00 every hour
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Needs-Author-Feedback
       - noActivitySince:
-          days: 7
+          days: 7        # 1 week of inactivity
       - isNotLabeledWith:
           label: No-Recent-Activity
       actions:
@@ -251,18 +265,19 @@ configuration:
     - description: '[Resolve Workflow] Close Addressed Issues'
       frequencies:
       - hourly:
-          hour: 6
+          hour: 6        # Runs at 6:00 every hour
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Issue-Addressed
       - noActivitySince:
-          days: 7
+          days: 7        # 1 week of inactivity
       actions:
       - addReply:
           reply: Hi @${issueAuthor}, since you haven't asked that we "`/unresolve`" the issue, we'll close this out. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
       - closeIssue
 
+# Configuration for handling failures or success events
 onFailure:
 onSuccess:
