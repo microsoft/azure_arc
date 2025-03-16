@@ -167,7 +167,7 @@ configuration:
         - removeLabel:
             label: No-Recent-Activity
         - addLabel:
-            label: Needs-Attention
+            label: Needs-Author-Feedback
         - addReply:
             reply: >-
                 Hello @${issueAuthor},
