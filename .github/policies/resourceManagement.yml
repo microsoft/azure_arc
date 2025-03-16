@@ -33,57 +33,62 @@ configuration:
 
           - closePullRequest
 
-      - description: Add Needs-Triage to new issues
-        if:
-          - payloadType: Issues
-          - isAction:
-              action: Opened
-        then:
-          - addLabel:
-              label: Needs-Triage
-
-      - description: When an issue is opened, post a message to the author
-        if:
-          - payloadType: Issues
-          - isAction:
-              action: Opened
-        then:
-          - addReply:
-              reply: >-
-                Hello @${issueAuthor},
-
-                Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
-                By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
-
-    #   - description: When an issue is opened
+    #   - description: Add Needs-Triage to new issues
     #     if:
     #       - payloadType: Issues
     #       - isAction:
     #           action: Opened
     #     then:
-    #       - if: 
-    #           # Identifiy if the issue title contains the word "bug"
-    #           - titleContains:
-    #                 pattern: "(?i)bug"
-    #                 isRegex: true
-    #         then:
-    #             - addReply:
-    #                 reply: >-
-    #                   Hello @${issueAuthor},
+    #       - addLabel:
+    #           label: Needs-Triage
 
-    #                   TEST BUG
+    #   - description: When an issue is opened, post a message to the author
+    #     if:
+    #       - payloadType: Issues
+    #       - isAction:
+    #           action: Opened
+    #     then:
+    #       - addReply:
+    #           reply: >-
+    #             Hello @${issueAuthor},
+
+    #             Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
+    #             By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+      - description: When an issue is opened, Identifiy if the issue title contains the word "bug" or "feature" and post a message to the author
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+        then:
+          # Add Needs-Triage label to new issues
+          - addLabel:
+              label: Needs-Triage
+          - if: 
+              # Identifiy if the issue title contains the word "bug"
+              - titleContains:
+                    pattern: "(?i)bug"
+                    isRegex: true
+            then:
+                - addReply:
+                    reply: >-
+                      Hello @${issueAuthor},
+
+                      Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
+                      By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
                                   
-    #       - if:
-    #             # Identifiy if the issue title contains the word "feature"
-    #           - titleContains:
-    #                 pattern: "(?i)feature"
-    #                 isRegex: true
-    #         then:
-    #             - addReply:
-    #                 reply: >-
-    #                   Hello @${issueAuthor},
+          - if:
+                # Identifiy if the issue title contains the word "feature"
+              - titleContains:
+                    pattern: "(?i)feature"
+                    isRegex: true
+            then:
+                - addReply:
+                    reply: >-
+                      Hello @${issueAuthor},
 
-    #                   TEST FEATURE
+                      Thank you for your feature request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
+                      By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
       - description: When a PR is opened, post a message to the author
         if:
