@@ -69,7 +69,7 @@ configuration:
         then:
           # Add Needs-Triage label to new issues
           - addLabel:
-              label: Needs-TriageE
+              label: Needs-Triage
           - if:
               # Identifiy if the issue title contains the word "arcbox"
               - titleContains:
