@@ -66,17 +66,20 @@ configuration:
               label: Needs-Triage
           - if:
               # Identifiy if the issue title contains the word "arcbox"
-              - or:
-                - titleContains:
-                        pattern: "(?i)arcbox"
-                        isRegex: true
-                - bodyContains:
-                        pattern: "(?i)arcbox"
-                        isRegex: true      
+              - titleContains:
+                    pattern: "(?i)arcbox"
+                    isRegex: true
             then:
                 - addLabel:
                     label: ArcBox
-
+          - if:
+              # Identifiy if the issue title contains the word "hcibox"
+              - titleContains:
+                    pattern: "(?i)hcibox"
+                    isRegex: true
+            then:
+                - addLabel:
+                    label: hcibox
 
           
           - if: 
