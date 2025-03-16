@@ -70,19 +70,26 @@ configuration:
                     pattern: "(?i)bug"
                     isRegex: true
             then:
+                # Add Bug-Issue label to issues with the word "bug" in the title
+                - addLabel:
+                    label: Bug-Issue
+                # Add a reply to the issue author
                 - addReply:
                     reply: >-
                       Hello @${issueAuthor},
 
                       Thank you for reporting this issue, A team member will review and triage it soon. All issues are evaluated by the Arc Jumpstart team to determine next steps.
-                      By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
-                                  
+                      By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).          
           - if:
-                # Identifiy if the issue title contains the word "feature"
+              # Identifiy if the issue title contains the word "feature"
               - titleContains:
                     pattern: "(?i)feature"
                     isRegex: true
             then:
+                # Add Feature-Request label to issues with the word "feature" in the title
+                - addLabel:
+                    label: Feature-Request
+                # Add a reply to the feature request author    
                 - addReply:
                     reply: >-
                       Hello @${issueAuthor},
