@@ -80,7 +80,14 @@ configuration:
             then:
                 - addLabel:
                     label: hcibox
-
+          - if:
+              # Identifiy if the issue title contains the word "agora"
+              - titleContains:
+                    pattern: "(?i)agora"
+                    isRegex: true
+            then:
+                - addLabel:
+                    label: agora
           
           - if: 
               # Identifiy if the issue title contains the word "bug"
