@@ -142,7 +142,9 @@ configuration:
         - removeLabel:
             label: Needs-Triage
         - removeLabel:
-            label: Needs-Attention          
+            label: Needs-Attention
+        - removeLabel: 
+            label: Needs-Author-Feedback    
         - addLabel:
             label: Issue-Addressed
         - addReply:
