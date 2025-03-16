@@ -231,7 +231,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_k8s_80'
         properties: {
-          priority: 1003
+          priority: 200
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -244,7 +244,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_k8s_8080'
         properties: {
-          priority: 1004
+          priority: 201
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -257,7 +257,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_k8s_443'
         properties: {
-          priority: 1005
+          priority: 202
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -270,7 +270,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_k8s_kubelet'
         properties: {
-          priority: 1006
+          priority: 203
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -283,7 +283,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_traefik_lb_external'
         properties: {
-          priority: 1007
+          priority: 204
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -296,7 +296,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_SQLMI_traffic'
         properties: {
-          priority: 1008
+          priority: 205
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -309,7 +309,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_Postgresql_traffic'
         properties: {
-          priority: 1009
+          priority: 206
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -322,7 +322,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-05-0
       {
         name: 'allow_SQLMI_mirroring_traffic'
         properties: {
-          priority: 1012
+          priority: 207
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -347,7 +347,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_https_inbound'
         properties: {
-          priority: 1010
+          priority: 200
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -360,7 +360,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_gateway_manager_inbound'
         properties: {
-          priority: 1011
+          priority: 201
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -373,7 +373,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_load_balancer_inbound'
         properties: {
-          priority: 1012
+          priority: 202
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -386,7 +386,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_host_comms'
         properties: {
-          priority: 1013
+          priority: 203
           protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
@@ -402,7 +402,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_ssh_rdp_outbound'
         properties: {
-          priority: 1014
+          priority: 204
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -418,7 +418,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
-          priority: 1015
+          priority: 205
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Outbound'
@@ -431,7 +431,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_bastion_comms'
         properties: {
-          priority: 1016
+          priority: 206
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -447,7 +447,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_get_session_info'
         properties: {
-          priority: 1017
+          priority: 207
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'

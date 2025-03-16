@@ -47,7 +47,7 @@ Write-Host "`n"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
-az extension add --source https://download.microsoft.com/download/5/c/2/5c2ec3fc-bd2a-4615-a574-a1b7c8e22f40/containerapp-0.0.1-py2.py3-none-any.whl --yes
+az extension add --name "containerapp" -y
 
 Write-Host "`n"
 az -v
@@ -71,6 +71,17 @@ Write-Host "`n"
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+Start-Sleep -Seconds 10
+
+# Copying kubectl to kubectl-client location
+$Env:KUBECLIENTFOLDER = "C:\Users\$Env:adminUsername\.azure\kubectl-client"
+if (-not (Test-Path -Path $Env:KUBECLIENTFOLDER)) {
+    New-Item -ItemType Directory -Path $Env:KUBECLIENTFOLDER
+    Write-Host "Created folder: $Env:KUBECLIENTFOLDER"
+}
+Write-Host "Copying kubectl.exe"
+Copy-Item -Path "$Env:ChocolateyInstall\bin\kubectl.exe" -Destination "$Env:KUBECLIENTFOLDER\kubectl.exe"
+Write-Host "Copied kubectl.exe"
 Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
