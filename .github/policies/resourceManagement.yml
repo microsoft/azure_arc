@@ -69,6 +69,10 @@ configuration:
               - titleContains:
                     pattern: "(?i)arcbox"
                     isRegex: true
+              - or: 
+                  - bodyContains:
+                      pattern: "(?i)arcbox"
+                      isRegex: true      
             then:
                 - addLabel:
                     label: ArcBox
