@@ -34,6 +34,7 @@ configuration:
                 This pull request does not update any files. Please review your commit history and resubmit.
 
                 We will be closing this pull request now!
+
           - closePullRequest
 
       - description: When a PR is opened, post a message to the author
@@ -137,7 +138,7 @@ configuration:
 
                 We've closed this issue because it has been addressed. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.    
 
-      - description: Reopen issues that are identified as unresolved
+      - description: Reopen unresolved issues
         triggerOnOwnActions: false
         if:
         - payloadType: Issue_Comment
@@ -158,7 +159,9 @@ configuration:
             reply: >-
                 Hello @${issueAuthor},
 
-                We've reopened this issue because we need more information from you or we identified it is not completely resolved.
+                We've reopened this issue because you marked it as unresolved. We need more information from you or we identified it is not completely resolved. 
+
+        - reopenIssue
 
       - description: Add needs attention label to reopened issues
         triggerOnOwnActions: false
