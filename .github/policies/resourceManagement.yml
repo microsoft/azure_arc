@@ -74,7 +74,7 @@ configuration:
                     isRegex: true
             then:
                 - addLabel:
-                    label: hcibox
+                    label: HCIBox
           - if:
               # Identifiy if the issue title contains the word "agora"
               - titleContains:
@@ -82,7 +82,7 @@ configuration:
                     isRegex: true
             then:
                 - addLabel:
-                    label: agora
+                    label: Agora
           
           - if: 
               # Identifiy if the issue title contains the word "bug"
@@ -131,6 +131,34 @@ configuration:
             label: Needs-Attention          
         - addLabel:
             label: Issue-Addressed
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've closed this issue because it has been addressed. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.    
+
+      - description: Reopen issues that are identified as unresolved
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issue_Comment
+        - and:
+            - commentContains:
+                pattern: "(?i)unresolve"
+                isRegex: True
+        then:
+        - removeLabel:
+            label: Issue-Addressed
+        - removeLabel:
+            label: Resolution-Duplicate
+        - removeLabel:
+            label: No-Recent-Activity
+        - addLabel:
+            label: Needs-Attention
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've reopened this issue because we need more information from you or we identified it is not completely resolved.
 
       - description: Add needs attention label to reopened issues
         triggerOnOwnActions: false
@@ -145,6 +173,11 @@ configuration:
             label: Resolution-Duplicate            
         - addLabel:
             label: Needs-Attention
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've reopened this issue because we need more information from you or we identified it is not completely resolved.
 
       - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
         triggerOnOwnActions: false
