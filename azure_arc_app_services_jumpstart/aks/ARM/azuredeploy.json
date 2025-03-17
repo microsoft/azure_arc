@@ -114,20 +114,6 @@
             "metadata": {
                 "description": "Products API Image"
             }
-        },
-        "inventoryImage": {
-            "type": "string",
-            "defaultValue": "mcr.microsoft.com/k8se/quickstart:latest",
-            "metadata": {
-                "description": "Inventory API Image"
-            }
-        },
-        "storeImage": {
-            "type": "string",
-            "defaultValue": "mcr.microsoft.com/k8se/quickstart:latest",
-            "metadata": {
-                "description": "Store API Image"
-            }
         }
 
     },
@@ -273,12 +259,6 @@
                     },
                     "helloworldImage": {
                         "value": "[parameters('helloworldImage')]"
-                    },
-                    "inventoryImage": {
-                        "value": "[parameters('inventoryImage')]"
-                    },
-                    "storeImage": {
-                        "value": "[parameters('storeImage')]"
                     }
                 }
             }
