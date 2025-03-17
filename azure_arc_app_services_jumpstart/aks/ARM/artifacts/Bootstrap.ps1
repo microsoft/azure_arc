@@ -12,9 +12,7 @@ param (
     [string]$deployContainerApps,
     [string]$adminEmail,
     [string]$templateBaseUrl,
-    [string]$productsImage,
-    [string]$inventoryImage,
-    [string]$storeImage
+    [string]$helloworldImage
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -29,9 +27,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('connectedClusterName', $connectedClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('productsImage', $productsImage,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('inventoryImage', $inventoryImage,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('storeImage', $storeImage,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('helloworldImage', $helloworldImage,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path
