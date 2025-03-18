@@ -1,5 +1,5 @@
 $WarningPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop" 
+$ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 # Set paths
@@ -21,7 +21,7 @@ $location = $env:azureLocation
 $customLocName = $HCIBoxConfig.rbCustomLocationName
 
 # Create logical networks
-Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Credential $domainCred -Authentication CredSSP -ArgumentList $HCIBoxConfig -ScriptBlock {
+Invoke-Command -VMName "$($HCIBoxConfig.NodeHostConfig[0].Hostname)" -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
     $HCIBoxConfig = $args[0]
     az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
     az config set extension.use_dynamic_install=yes_without_prompt
