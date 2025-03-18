@@ -7,11 +7,14 @@ $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
 function Wait-AzDeployment {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$ResourceGroupName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$DeploymentName,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ClusterName,
 
         [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
     )
@@ -19,32 +22,39 @@ function Wait-AzDeployment {
     $startTime = Get-Date
     $endTime = $startTime.AddMinutes($TimeoutMinutes)
 
-    Write-Host "Waiting for deployment '$DeploymentName' in resource group '$ResourceGroupName' to complete..."
+    $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
 
-    while ($true) {
-        $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName
+    if ($clusterObject) {
 
-        if ($deployment.ProvisioningState -ne "InProgress") {
-            Write-Host "Deployment completed with state: $($deployment.ProvisioningState)"
-            return $deployment.ProvisioningState
+        Write-Host "Waiting for deployment '$DeploymentName' in resource group '$ResourceGroupName' to complete..."
+
+        while ($true) {
+            $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName
+
+            if ($deployment.ProvisioningState -ne 'InProgress') {
+                Write-Host "Deployment completed with state: $($deployment.ProvisioningState)"
+                return $deployment.ProvisioningState
+            }
+
+            if (Get-Date -gt $endTime) {
+                Write-Host 'Timeout reached. Deployment still in progress.'
+                return 'Timeout'
+            }
+
+            Write-Host 'Deployment still in progress. Checking again in 1 minute...'
+            Start-Sleep -Seconds 60
         }
-
-        if (Get-Date -gt $endTime) {
-            Write-Host "Timeout reached. Deployment still in progress."
-            return "Timeout"
-        }
-
-        Write-Host "Deployment still in progress. Checking again in 1 minute..."
-        Start-Sleep -Seconds 60
+    } else {
+        Write-Host "Cluster '$ClusterName' does not exist - skipping deployment status check..."
     }
 }
 
 function Wait-AzLocalClusterConnectivity {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$ResourceGroupName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$ClusterName,
 
         [int]$TimeoutMinutes = 60  # Default timeout of 60 minutes
@@ -53,31 +63,42 @@ function Wait-AzLocalClusterConnectivity {
     $startTime = Get-Date
     $endTime = $startTime.AddMinutes($TimeoutMinutes)
 
-    Write-Host "Waiting for cluster '$ClusterName' in resource group '$ResourceGroupName' to be 'Connected'..."
+    $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
 
-    while ($true) {
-        $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName
+    if ($clusterObject) {
 
-        if ($clusterObject -and $clusterObject.ConnectivityStatus -eq "Connected") {
-            Write-Host "Cluster '$ClusterName' is now Connected."
-            return $true
+        Write-Host "Waiting for cluster '$ClusterName' in resource group '$ResourceGroupName' to be 'Connected'..."
+
+        while ($true) {
+            $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
+
+            if ($clusterObject -and $clusterObject.ConnectivityStatus -eq 'Connected') {
+                Write-Host "Cluster '$ClusterName' is now Connected."
+                return $true
+            }
+
+            if ([DateTime]::Now -gt $endTime) {
+                Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected."
+                return $false
+            }
+
+            Write-Host "Cluster '$ClusterName' is still not Connected. Checking again in 30 seconds..."
+            Start-Sleep -Seconds 30
         }
-
-        if ([DateTime]::Now -gt $endTime) {
-            Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected."
-            return $false
-        }
-
-        Write-Host "Cluster '$ClusterName' is still not Connected. Checking again in 30 seconds..."
-        Start-Sleep -Seconds 30
+    } else {
+        Write-Host "Cluster '$ClusterName' does not exist - skipping connectivity check..."
     }
 }
 
-# Wait for the deployment to complete
-Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy
+if ('True' -eq $env:autoDeployClusterResource) {
 
-# Wait for the cluster to be connected
-Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
+    # Wait for the deployment to complete
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy -ClusterName $HCIBoxConfig.ClusterName
+
+    # Wait for the cluster to be connected
+    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
+
+}
 
 Invoke-Pester -Path "$Env:HCIBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
@@ -92,7 +113,7 @@ $tests_failed = $tests_failed + $tests_hci.Failed.Count
 Write-Output "Tests succeeded: $tests_passed"
 Write-Output "Tests failed: $tests_failed"
 
-Write-Output "Exporting deployment test results to resource group tag DeploymentStatus"
+Write-Output 'Exporting deployment test results to resource group tag DeploymentStatus'
 
 $DeploymentStatusString = "Tests succeeded: $tests_passed Tests failed: $tests_failed"
 
@@ -115,9 +136,9 @@ if ($null -ne $tags) {
 }
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-Write-Header "Adding deployment test results to wallpaper using BGInfo"
+Write-Header 'Adding deployment test results to wallpaper using BGInfo'
 
 Set-Content "$Env:windir\TEMP\hcibox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\hcibox-tests-failed.txt" $tests_failed
@@ -125,18 +146,18 @@ Set-Content "$Env:windir\TEMP\hcibox-tests-failed.txt" $tests_failed
 bginfo.exe $Env:HCIBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 # Setup scheduled task for running tests on each logon
-$TaskName = "Pester tests"
-$ActionScript = "C:\HCIBox\Tests\Invoke-Test.ps1"
+$TaskName = 'Pester tests'
+$ActionScript = 'C:\HCIBox\Tests\Invoke-Test.ps1'
 
 # Check if the scheduled task exists
-if (Get-ScheduledTask | Where-Object {$_.TaskName -eq $TaskName}) {
+if (Get-ScheduledTask | Where-Object { $_.TaskName -eq $TaskName }) {
     Write-Host "Scheduled task '$TaskName' already exists."
 } else {
     # Create the task trigger
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
 
     # Create the task action to use pwsh.exe
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ActionScript"
+    $Action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ActionScript"
 
     $UserName = $Env:UserName
 

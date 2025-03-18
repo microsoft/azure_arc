@@ -1,7 +1,7 @@
 name: Feature Request
 description: Suggest an idea or enhancement for Arc Jumpstart
 title: "[Feature Request]: "
-labels: ["feature", "triage needed"]
+labels: ["Feature-Request", "Needs-Triage"]
 projects: ["microsoft/162"]
 body:
   - type: markdown
@@ -23,13 +23,13 @@ body:
         - label: Jumpstart Agora
         - label: A specific Jumpstart scenario
         - label: Jumpstart Drops
-        - label: Other
+        - label: Something else
   - type: textarea
     id: feature-description
     attributes:
       label: Feature Description
-      description: Describe the feature you'd like to see
-      placeholder: A clear and concise description of what you want to happen
+      description: Describe the feature you'd like to see.
+      placeholder: A clear and concise description of what you want to happen.
     validations:
       required: true
   - type: textarea
@@ -37,7 +37,7 @@ body:
     attributes:
       label: Motivation
       description: What problem does this feature solve? Why is it needed?
-      placeholder: Describe the use case and value this feature would bring
+      placeholder: Describe the use case and value this feature would bring.
     validations:
       required: true
   - type: textarea
@@ -45,7 +45,7 @@ body:
     attributes:
       label: Proposed Solution
       description: How do you think this should be implemented?
-      placeholder: Describe your suggested approach to implementing this feature
+      placeholder: Describe your suggested approach to implementing this feature.
     validations:
       required: false
   - type: input
@@ -60,13 +60,13 @@ body:
     id: additional-context
     attributes:
       label: Additional Context
-      description: Add any other context or screenshots about the feature request here
-      placeholder: Any other information that might help us understand your request
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: Any other information that might help us understand your request.
   - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Azure/arc_jumpstart_docs/blob/main/CODE_OF_CONDUCT.md)
+      description: By submitting this feature request, you agree to follow our [Code of Conduct](https://github.com/Azure/arc_jumpstart_docs/blob/main/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
