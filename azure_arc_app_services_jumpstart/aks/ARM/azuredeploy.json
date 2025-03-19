@@ -72,14 +72,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "nabeelmsft"
+            "defaultValue": "microsoft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "fix-2906-branch"
+            "defaultValue": "main"
         },
         "deployBastion": {
             "type": "bool",
