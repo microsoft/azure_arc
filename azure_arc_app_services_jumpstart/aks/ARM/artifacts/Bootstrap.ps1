@@ -10,7 +10,6 @@ param (
     [string]$clusterName,
     [string]$connectedClusterName,
     [string]$deployContainerApps,
-    [string]$adminEmail,
     [string]$templateBaseUrl,
     [string]$helloworldImage
 )
@@ -25,7 +24,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('connectedClusterName', $connectedClusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('helloworldImage', $helloworldImage,[System.EnvironmentVariableTarget]::Machine)
 

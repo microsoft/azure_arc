@@ -26,9 +26,6 @@
         "deployContainerApps": {
             "value": true
         },
-        "adminEmail": {
-            "value": "youremail@email.com"
-        },
         "deployBastion": {
             "value": false
         },

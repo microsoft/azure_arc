@@ -74,12 +74,6 @@
                 "description": "Azure Container Apps deployment"
             }
         },
-        "adminEmail": {
-            "type": "string",
-            "metadata": {
-                "description": "Email address used on the Azure API Management deployment to receive all system notifications"
-            }
-        },
         "githubAccount": {
             "type": "string",
             "metadata": {
@@ -238,9 +232,6 @@
                     },
                     "deployContainerApps": {
                         "value": "[parameters('deployContainerApps')]"
-                    },
-                    "adminEmail": {
-                        "value": "[parameters('adminEmail')]"
                     },
                     "templateBaseUrl": {
                         "value": "[variables('templateBaseUrl')]"

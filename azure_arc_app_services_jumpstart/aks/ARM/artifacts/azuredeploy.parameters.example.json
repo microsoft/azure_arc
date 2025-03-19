@@ -28,9 +28,6 @@
         },
         "deployContainerApps": {
             "value": true
-        },
-        "adminEmail": {
-            "value": "youremail@yourdomain.com"
         }
     }
 }
