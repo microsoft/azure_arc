@@ -9,7 +9,6 @@ param (
     [string]$workspaceName,
     [string]$clusterName,
     [string]$connectedClusterName,
-    [string]$deployContainerApps,
     [string]$templateBaseUrl,
     [string]$helloworldImage
 )
@@ -60,9 +59,7 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Downloading GitHub artifacts for ContainerAppsLogonScript.ps1
-if ($deployContainerApps -eq $true) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") -OutFile "C:\Temp\ContainerAppsLogonScript.ps1"
-}
 
 # Installing tools
 workflow ClientTools_01
@@ -131,12 +128,11 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
-if ($deployContainerApps -eq $true) {
+
 # Creating scheduled task for ContainerAppsLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\ContainerAppsLogonScript.ps1'
 Register-ScheduledTask -TaskName "ContainerAppsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-}
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

@@ -67,13 +67,6 @@
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
             }
         },
-        "deployContainerApps": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Container Apps deployment"
-            }
-        },
         "githubAccount": {
             "type": "string",
             "metadata": {
@@ -229,9 +222,6 @@
                     },
                     "subnetName": {
                         "value": "[variables('subnetName')]"
-                    },
-                    "deployContainerApps": {
-                        "value": "[parameters('deployContainerApps')]"
                     },
                     "templateBaseUrl": {
                         "value": "[variables('templateBaseUrl')]"
