@@ -25,24 +25,6 @@
         },
         "logAnalyticsWorkspaceName": {
             "value": "Arc-AppSvc-LA"
-        },
-        "deployContainerApps": {
-            "value": true
-        },
-        "deployAppService": {
-            "value": false
-        },
-        "deployFunction": {
-            "value": false
-        },
-        "deployApiMgmt": {
-            "value": false
-        },
-        "deployLogicApp": {
-            "value": false
-        },
-        "adminEmail": {
-            "value": "youremail@yourdomain.com"
         }
     }
 }

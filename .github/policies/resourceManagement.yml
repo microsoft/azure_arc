@@ -1,3 +1,6 @@
+# ===========================================================================
+# GitHub Repository Issue and Pull Request Management Policy
+# ===========================================================================
 id: 
 name: GitOps.PullRequestIssueManagement
 description: Handlers for when an issue is first opened
@@ -7,11 +10,15 @@ disabled: false
 where:
 configuration:
   resourceManagementConfiguration:
-    # ===========================================
+    # ===========================================================================
     # EVENT RESPONDER TASKS
-    # ===========================================
+    # Defines automated actions triggered by specific GitHub events
+    # ===========================================================================
     eventResponderTasks:
-      # --- PULL REQUEST MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # PULL REQUEST MANAGEMENT
+      # Handles PR creation, updates, and empty PRs
+      # ---------------------------------------------------------------------------
       - description: >-
           When a PR is opened/updated, if no files are modified
           * Close the issue
@@ -34,6 +41,7 @@ configuration:
                 This pull request does not update any files. Please review your commit history and resubmit.
 
                 We will be closing this pull request now!
+
           - closePullRequest
 
       - description: When a PR is opened, post a message to the author
@@ -49,7 +57,10 @@ configuration:
                 Thank you for your pull request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                 By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
-      # --- NEW ISSUE MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # NEW ISSUE MANAGEMENT
+      # Handles initial triage and labeling of new issues
+      # ---------------------------------------------------------------------------
       - description: When an issue is opened, Identifiy if the issue title contains the word "bug" or "feature" and post a message to the author
         if:
           - payloadType: Issues
@@ -74,7 +85,7 @@ configuration:
                     isRegex: true
             then:
                 - addLabel:
-                    label: hcibox
+                    label: HCIBox
           - if:
               # Identifiy if the issue title contains the word "agora"
               - titleContains:
@@ -82,7 +93,7 @@ configuration:
                     isRegex: true
             then:
                 - addLabel:
-                    label: agora
+                    label: Agora
           
           - if: 
               # Identifiy if the issue title contains the word "bug"
@@ -117,7 +128,10 @@ configuration:
                       Thank you for your feature request, A team member will review it soon. All pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
-      # --- ISSUE LIFECYCLE MANAGEMENT ---
+      # ---------------------------------------------------------------------------
+      # ISSUE LIFECYCLE MANAGEMENT
+      # Handles issue closing, reopening, and duplicate detection
+      # ---------------------------------------------------------------------------
       - description: Clear labels when an issue is closed
         triggerOnOwnActions: false
         if:
@@ -128,9 +142,41 @@ configuration:
         - removeLabel:
             label: Needs-Triage
         - removeLabel:
-            label: Needs-Attention          
+            label: Needs-Attention
+        - removeLabel: 
+            label: Needs-Author-Feedback    
         - addLabel:
             label: Issue-Addressed
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've closed this issue because it has been addressed. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.    
+
+      - description: Reopen unresolved issues
+        triggerOnOwnActions: false
+        if:
+        - payloadType: Issue_Comment
+        - and:
+            - commentContains:
+                pattern: "(?i)unresolve"
+                isRegex: True
+        then:
+        - removeLabel:
+            label: Issue-Addressed
+        - removeLabel:
+            label: Resolution-Duplicate
+        - removeLabel:
+            label: No-Recent-Activity
+        - addLabel:
+            label: Needs-Author-Feedback
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've reopened this issue because you marked it as unresolved. We need more information from you or we identified it is not completely resolved. 
+
+        - reopenIssue
 
       - description: Add needs attention label to reopened issues
         triggerOnOwnActions: false
@@ -145,6 +191,11 @@ configuration:
             label: Resolution-Duplicate            
         - addLabel:
             label: Needs-Attention
+        - addReply:
+            reply: >-
+                Hello @${issueAuthor},
+
+                We've reopened this issue because we need more information from you or we identified it is not completely resolved.
 
       - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
         triggerOnOwnActions: false
@@ -173,14 +224,15 @@ configuration:
         - addLabel:
             label: Resolution-Duplicate
  
-    # ===========================================
+    # ===========================================================================
     # SCHEDULED SEARCHES
-    # ===========================================
+    # Periodic tasks that run on defined schedules
+    # ===========================================================================
     scheduledSearches:
     - description: Close stale issues
       frequencies:
       - daily:
-          time: 1:0
+          time: 1:0      # Runs at 1:00 AM daily
       filters:
       - isIssue
       - isOpen
@@ -189,44 +241,53 @@ configuration:
       - hasLabel:
           label: No-Recent-Activity
       - noActivitySince:
-          days: 21
+          days: 21       # 3 weeks of inactivity
       actions:
       - closeIssue
       
     - description: Add no recent activity label to issues
       frequencies:
       - hourly:
-          hour: 6
+          hour: 6        # Runs at 6:00 every hour
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Needs-Author-Feedback
       - noActivitySince:
-          days: 7
+          days: 7        # 1 week of inactivity
       - isNotLabeledWith:
           label: No-Recent-Activity
       actions:
       - addLabel:
           label: No-Recent-Activity
       - addReply:
-          reply: Hi, we're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **14 days** of this comment the issue will be automatically closed. Thank you!
+          reply: >-
+            Hello @${issueAuthor}, 
+            
+            We're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **14 days** of this comment the issue will be automatically closed. Thank you!
           
     - description: '[Resolve Workflow] Close Addressed Issues'
       frequencies:
       - hourly:
-          hour: 6
+          hour: 6        # Runs at 6:00 every hour
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Issue-Addressed
       - noActivitySince:
-          days: 7
+          days: 7        # 1 week of inactivity
       actions:
-      - addReply:
-          reply: Hi @${issueAuthor}, since you haven't asked that we "`/unresolve`" the issue, we'll close this out. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
+      - addReply: 
+          reply: >-
+          
+            Hello @${issueAuthor}, 
+            
+            Since you haven't asked that we "`/unresolve`" the issue, we'll close this out. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
+
       - closeIssue
 
+# Configuration for handling failures or success events
 onFailure:
 onSuccess:
