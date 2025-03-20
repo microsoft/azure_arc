@@ -23,9 +23,6 @@
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
-        "deployContainerApps": {
-            "value": true
-        },
         "deployBastion": {
             "value": false
         },
