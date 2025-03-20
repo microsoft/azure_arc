@@ -227,7 +227,7 @@
     {
       "condition": "[or(equals(parameters('flavor'), 'DevOps'), equals(parameters('flavor'), 'DataOps'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "ubuntuRancherK3sDataSvcDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -387,7 +387,7 @@
                 "count": "[length(range(1, variables('numberOfIPAddresses')))]"
               },
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}{1}', variables('publicIpAddressName'), range(1, variables('numberOfIPAddresses'))[copyIndex()])]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -401,7 +401,7 @@
             },
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -431,7 +431,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('azureLocation')]",
               "identity": {
@@ -513,7 +513,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -550,7 +550,7 @@
       },
       "condition": "[or(equals(parameters('flavor'), 'DataOps'), equals(parameters('flavor'), 'DevOps'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "[format('ubuntuRancherK3sDataSvcNodesDeployment-{0}', range(0, variables('k3sClusterNodesCount'))[copyIndex()])]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -697,7 +697,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -716,7 +716,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('azureLocation')]",
               "identity": {
@@ -798,7 +798,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -832,7 +832,7 @@
     {
       "condition": "[equals(parameters('flavor'), 'DevOps')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "ubuntuRancherK3sDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -992,7 +992,7 @@
                 "count": "[length(range(1, variables('numberOfIPAddresses')))]"
               },
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}{1}', variables('publicIpAddressName'), range(1, variables('numberOfIPAddresses'))[copyIndex()])]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -1006,7 +1006,7 @@
             },
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -1036,7 +1036,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('azureLocation')]",
               "identity": {
@@ -1118,7 +1118,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -1155,7 +1155,7 @@
       },
       "condition": "[equals(parameters('flavor'), 'DevOps')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "[format('ubuntuRancherK3sNodesDeployment-{0}', range(0, variables('k3sClusterNodesCount'))[copyIndex()])]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1302,7 +1302,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -1321,7 +1321,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('azureLocation')]",
               "identity": {
@@ -1403,7 +1403,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'installscript_k3s')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -1436,7 +1436,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "clientVmDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1837,7 +1837,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -1861,7 +1861,7 @@
             {
               "condition": "[equals(parameters('deployBastion'), false())]",
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('publicIpAddressName')]",
               "location": "[parameters('location')]",
               "zones": [
@@ -1878,7 +1878,7 @@
             },
             {
               "type": "Microsoft.Compute/disks",
-              "apiVersion": "2023-04-02",
+              "apiVersion": "2024-03-02",
               "name": "[format('{0}-VMsDisk', parameters('vmName'))]",
               "location": "[parameters('location')]",
               "zones": [
@@ -1899,7 +1899,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('vmName')]",
               "location": "[parameters('location')]",
               "zones": [
@@ -1965,7 +1965,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'Bootstrap')]",
               "location": "[parameters('location')]",
               "tags": {
@@ -2084,7 +2084,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "stagingStorageAccountDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -2145,7 +2145,7 @@
           "resources": [
             {
               "type": "Microsoft.Storage/storageAccounts",
-              "apiVersion": "2022-05-01",
+              "apiVersion": "2024-01-01",
               "name": "[toLower(variables('storageAccountName'))]",
               "location": "[parameters('location')]",
               "sku": {
@@ -2170,7 +2170,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "mgmtArtifactsAndPolicyDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -2421,7 +2421,7 @@
           "resources": {
             "arcVirtualNetwork": {
               "type": "Microsoft.Network/virtualNetworks",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('virtualNetworkName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -2444,7 +2444,7 @@
             "drVirtualNetwork": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('drVirtualNetworkName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -2476,7 +2476,7 @@
             "virtualNetworkName_peering_to_DR_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}/{1}', parameters('virtualNetworkName'), 'peering-to-DR-vnet')]",
               "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -2496,7 +2496,7 @@
             "drVirtualNetworkName_peering_to_primary_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}/{1}', parameters('drVirtualNetworkName'), 'peering-to-primary-vnet')]",
               "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -2515,7 +2515,7 @@
             },
             "networkSecurityGroup": {
               "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('networkSecurityGroupName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -2633,7 +2633,7 @@
             "bastionNetworkSecurityGroup": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('bastionNetworkSecurityGroupName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -2762,7 +2762,7 @@
             },
             "workspace": {
               "type": "Microsoft.OperationalInsights/workspaces",
-              "apiVersion": "2021-06-01",
+              "apiVersion": "2023-09-01",
               "name": "[parameters('workspaceName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('resourceTags')]",
@@ -2793,7 +2793,7 @@
             "publicIpAddress": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('bastionPublicIpAddressName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -2811,7 +2811,7 @@
             "bastionHost": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/bastionHosts",
-              "apiVersion": "2023-11-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('bastionName')]",
               "location": "[parameters('location')]",
               "sku": {
@@ -2862,7 +2862,7 @@
             },
             "policyDeployment": {
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2024-11-01",
               "name": "policyDeployment",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -2979,7 +2979,7 @@
                       },
                       "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
                       "type": "Microsoft.Authorization/policyAssignments",
-                      "apiVersion": "2021-06-01",
+                      "apiVersion": "2025-01-01",
                       "name": "[variables('policies')[copyIndex()].name]",
                       "location": "[parameters('azureLocation')]",
                       "identity": {
@@ -3052,7 +3052,7 @@
                         "count": "[length(items(parameters('resourceTags')))]"
                       },
                       "type": "Microsoft.Authorization/policyAssignments",
-                      "apiVersion": "2021-06-01",
+                      "apiVersion": "2025-01-01",
                       "name": "[format('(ArcBox) Tag resources-{0}', items(parameters('resourceTags'))[copyIndex()].key)]",
                       "location": "[parameters('azureLocation')]",
                       "identity": {
@@ -3189,7 +3189,7 @@
             },
             "keyVault": {
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2024-11-01",
               "name": "keyVaultDeployment",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -3983,7 +3983,7 @@
                     },
                     "keyVault": {
                       "type": "Microsoft.KeyVault/vaults",
-                      "apiVersion": "2022-07-01",
+                      "apiVersion": "2024-12-01-preview",
                       "name": "[parameters('name')]",
                       "location": "[parameters('location')]",
                       "tags": "[parameters('tags')]",
@@ -4086,7 +4086,7 @@
                     "keyVault_accessPolicies": {
                       "condition": "[not(empty(parameters('accessPolicies')))]",
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-AccessPolicies', uniqueString(deployment().name, parameters('location')))]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -4284,12 +4284,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "policies": {
                               "type": "Microsoft.KeyVault/vaults/accessPolicies",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), 'add')]",
                               "properties": {
                                 "accessPolicies": "[variables('formattedAccessPolicies')]"
@@ -4334,7 +4334,7 @@
                         "count": "[length(variables('secretList'))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-Secret-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -4535,12 +4535,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "secret": {
                               "type": "Microsoft.KeyVault/vaults/secrets",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('name'))]",
                               "tags": "[parameters('tags')]",
                               "properties": {
@@ -4614,7 +4614,7 @@
                         "count": "[length(coalesce(parameters('keys'), createArray()))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-Key-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -4867,12 +4867,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "key": {
                               "type": "Microsoft.KeyVault/vaults/keys",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('name'))]",
                               "tags": "[parameters('tags')]",
                               "properties": {
@@ -4949,7 +4949,7 @@
                         "count": "[length(coalesce(parameters('privateEndpoints'), createArray()))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-keyVault-PrivateEndpoint-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "resourceGroup": "[coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupName'), '')]",
                       "properties": {
@@ -5391,7 +5391,7 @@
                             },
                             "privateEndpoint": {
                               "type": "Microsoft.Network/privateEndpoints",
-                              "apiVersion": "2023-04-01",
+                              "apiVersion": "2024-05-01",
                               "name": "[parameters('name')]",
                               "location": "[parameters('location')]",
                               "tags": "[parameters('tags')]",
@@ -5454,7 +5454,7 @@
                             "privateEndpoint_privateDnsZoneGroup": {
                               "condition": "[not(empty(parameters('privateDnsZoneResourceIds')))]",
                               "type": "Microsoft.Resources/deployments",
-                              "apiVersion": "2022-09-01",
+                              "apiVersion": "2024-11-01",
                               "name": "[format('{0}-PrivateEndpoint-PrivateDnsZoneGroup', uniqueString(deployment().name))]",
                               "properties": {
                                 "expressionEvaluationOptions": {
@@ -5525,7 +5525,7 @@
                                   "resources": [
                                     {
                                       "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                                      "apiVersion": "2023-04-01",
+                                      "apiVersion": "2024-05-01",
                                       "name": "[format('{0}/{1}', parameters('privateEndpointName'), parameters('name'))]",
                                       "properties": {
                                         "privateDnsZoneConfigs": "[variables('privateDnsZoneConfigs')]"
@@ -5666,7 +5666,7 @@
     {
       "condition": "[equals(parameters('flavor'), 'DataOps')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "addsVmDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -5797,7 +5797,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/networkInterfaces",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('networkInterfaceName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -5822,7 +5822,7 @@
             {
               "condition": "[not(parameters('deployBastion'))]",
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('publicIpAddressName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -5837,7 +5837,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[parameters('clientVMName')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -5887,7 +5887,7 @@
             },
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2024-07-01",
               "name": "[format('{0}/{1}', parameters('clientVMName'), 'DeployADDS')]",
               "location": "[parameters('azureLocation')]",
               "properties": {
@@ -5946,7 +5946,7 @@
     {
       "condition": "[equals(parameters('flavor'), 'DataOps')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "updateVNetDNSServers",
       "properties": {
         "expressionEvaluationOptions": {
@@ -6191,7 +6191,7 @@
           "resources": {
             "arcVirtualNetwork": {
               "type": "Microsoft.Network/virtualNetworks",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('virtualNetworkName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -6214,7 +6214,7 @@
             "drVirtualNetwork": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('drVirtualNetworkName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -6246,7 +6246,7 @@
             "virtualNetworkName_peering_to_DR_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}/{1}', parameters('virtualNetworkName'), 'peering-to-DR-vnet')]",
               "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -6266,7 +6266,7 @@
             "drVirtualNetworkName_peering_to_primary_vnet": {
               "condition": "[equals(parameters('flavor'), 'DataOps')]",
               "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[format('{0}/{1}', parameters('drVirtualNetworkName'), 'peering-to-primary-vnet')]",
               "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -6285,7 +6285,7 @@
             },
             "networkSecurityGroup": {
               "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('networkSecurityGroupName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -6403,7 +6403,7 @@
             "bastionNetworkSecurityGroup": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[parameters('bastionNetworkSecurityGroupName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -6532,7 +6532,7 @@
             },
             "workspace": {
               "type": "Microsoft.OperationalInsights/workspaces",
-              "apiVersion": "2021-06-01",
+              "apiVersion": "2023-09-01",
               "name": "[parameters('workspaceName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('resourceTags')]",
@@ -6563,7 +6563,7 @@
             "publicIpAddress": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/publicIPAddresses",
-              "apiVersion": "2022-01-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('bastionPublicIpAddressName')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -6581,7 +6581,7 @@
             "bastionHost": {
               "condition": "[equals(parameters('deployBastion'), true())]",
               "type": "Microsoft.Network/bastionHosts",
-              "apiVersion": "2023-11-01",
+              "apiVersion": "2024-05-01",
               "name": "[variables('bastionName')]",
               "location": "[parameters('location')]",
               "sku": {
@@ -6632,7 +6632,7 @@
             },
             "policyDeployment": {
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2024-11-01",
               "name": "policyDeployment",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -6749,7 +6749,7 @@
                       },
                       "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
                       "type": "Microsoft.Authorization/policyAssignments",
-                      "apiVersion": "2021-06-01",
+                      "apiVersion": "2025-01-01",
                       "name": "[variables('policies')[copyIndex()].name]",
                       "location": "[parameters('azureLocation')]",
                       "identity": {
@@ -6822,7 +6822,7 @@
                         "count": "[length(items(parameters('resourceTags')))]"
                       },
                       "type": "Microsoft.Authorization/policyAssignments",
-                      "apiVersion": "2021-06-01",
+                      "apiVersion": "2025-01-01",
                       "name": "[format('(ArcBox) Tag resources-{0}', items(parameters('resourceTags'))[copyIndex()].key)]",
                       "location": "[parameters('azureLocation')]",
                       "identity": {
@@ -6959,7 +6959,7 @@
             },
             "keyVault": {
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2024-11-01",
               "name": "keyVaultDeployment",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -7753,7 +7753,7 @@
                     },
                     "keyVault": {
                       "type": "Microsoft.KeyVault/vaults",
-                      "apiVersion": "2022-07-01",
+                      "apiVersion": "2024-12-01-preview",
                       "name": "[parameters('name')]",
                       "location": "[parameters('location')]",
                       "tags": "[parameters('tags')]",
@@ -7856,7 +7856,7 @@
                     "keyVault_accessPolicies": {
                       "condition": "[not(empty(parameters('accessPolicies')))]",
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-AccessPolicies', uniqueString(deployment().name, parameters('location')))]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -8054,12 +8054,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "policies": {
                               "type": "Microsoft.KeyVault/vaults/accessPolicies",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), 'add')]",
                               "properties": {
                                 "accessPolicies": "[variables('formattedAccessPolicies')]"
@@ -8104,7 +8104,7 @@
                         "count": "[length(variables('secretList'))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-Secret-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -8305,12 +8305,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "secret": {
                               "type": "Microsoft.KeyVault/vaults/secrets",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('name'))]",
                               "tags": "[parameters('tags')]",
                               "properties": {
@@ -8384,7 +8384,7 @@
                         "count": "[length(coalesce(parameters('keys'), createArray()))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-KeyVault-Key-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -8637,12 +8637,12 @@
                             "keyVault": {
                               "existing": true,
                               "type": "Microsoft.KeyVault/vaults",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[parameters('keyVaultName')]"
                             },
                             "key": {
                               "type": "Microsoft.KeyVault/vaults/keys",
-                              "apiVersion": "2022-07-01",
+                              "apiVersion": "2024-12-01-preview",
                               "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('name'))]",
                               "tags": "[parameters('tags')]",
                               "properties": {
@@ -8719,7 +8719,7 @@
                         "count": "[length(coalesce(parameters('privateEndpoints'), createArray()))]"
                       },
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2024-11-01",
                       "name": "[format('{0}-keyVault-PrivateEndpoint-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
                       "resourceGroup": "[coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupName'), '')]",
                       "properties": {
@@ -9161,7 +9161,7 @@
                             },
                             "privateEndpoint": {
                               "type": "Microsoft.Network/privateEndpoints",
-                              "apiVersion": "2023-04-01",
+                              "apiVersion": "2024-05-01",
                               "name": "[parameters('name')]",
                               "location": "[parameters('location')]",
                               "tags": "[parameters('tags')]",
@@ -9224,7 +9224,7 @@
                             "privateEndpoint_privateDnsZoneGroup": {
                               "condition": "[not(empty(parameters('privateDnsZoneResourceIds')))]",
                               "type": "Microsoft.Resources/deployments",
-                              "apiVersion": "2022-09-01",
+                              "apiVersion": "2024-11-01",
                               "name": "[format('{0}-PrivateEndpoint-PrivateDnsZoneGroup', uniqueString(deployment().name))]",
                               "properties": {
                                 "expressionEvaluationOptions": {
@@ -9295,7 +9295,7 @@
                                   "resources": [
                                     {
                                       "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                                      "apiVersion": "2023-04-01",
+                                      "apiVersion": "2024-05-01",
                                       "name": "[format('{0}/{1}', parameters('privateEndpointName'), parameters('name'))]",
                                       "properties": {
                                         "privateDnsZoneConfigs": "[variables('privateDnsZoneConfigs')]"
@@ -9440,7 +9440,7 @@
     {
       "condition": "[equals(parameters('flavor'), 'DataOps')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2024-11-01",
       "name": "aksDeployment",
       "properties": {
         "expressionEvaluationOptions": {
@@ -9595,7 +9595,7 @@
           "resources": [
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-04-02-preview",
+              "apiVersion": "2024-10-01",
               "name": "[parameters('aksClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9648,7 +9648,7 @@
             },
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2024-04-02-preview",
+              "apiVersion": "2024-10-01",
               "name": "[parameters('drClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
