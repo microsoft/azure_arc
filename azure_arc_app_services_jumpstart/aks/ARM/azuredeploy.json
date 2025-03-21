@@ -72,14 +72,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "microsoft"
+            "defaultValue": "nabeelmsft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "main"
+            "defaultValue": "fix-2906-branch"
         },
         "deployBastion": {
             "type": "bool",
@@ -99,7 +99,7 @@
             "type": "string",
             "defaultValue": "mcr.microsoft.com/k8se/quickstart:latest",
             "metadata": {
-                "description": "Products API Image"
+                "description": "Hello World Image"
             }
         }
 
