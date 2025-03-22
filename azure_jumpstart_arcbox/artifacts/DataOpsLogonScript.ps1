@@ -418,6 +418,15 @@ $clusters | Foreach-Object {
             $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             Start-Sleep -Seconds 30
 
+            # Verify data services extension is created
+            if ($extensionId -ne '') {
+              Write-Host "Data services extension created sucussfully on $clusterName. Extension Id: $extensionId"
+            }
+            else {
+                Write-Error "Failed to create data services extension on $clusterName. Extension Id: $extensionId"
+                Exit 1
+            }            
+
             Write-Host "Creating custom location on $clusterName"
 
             if ($context -ne 'k3s') {
