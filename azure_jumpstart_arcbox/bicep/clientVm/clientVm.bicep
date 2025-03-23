@@ -139,7 +139,7 @@ var osDiskType = 'Premium_LRS'
 var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -158,7 +158,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-05-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
   zones: [zones]
@@ -172,7 +172,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (
   }
 }
 
-resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
+resource vmDisk 'Microsoft.Compute/disks@2024-03-02' = {
   location: location
   name: '${vmName}-VMsDisk'
   zones: [zones]
@@ -190,7 +190,7 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: vmName
   location: location
   zones: [zones]
@@ -251,7 +251,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
 }
 
-resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
