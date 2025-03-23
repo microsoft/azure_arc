@@ -190,7 +190,7 @@ az containerapp create `
     --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
     --image $Env:helloworldImage `
-    --ingress 'internal' `
+    --ingress 'external' `
     --target-port 80 `
     --transport 'http' `
     --min-replicas 1 `
