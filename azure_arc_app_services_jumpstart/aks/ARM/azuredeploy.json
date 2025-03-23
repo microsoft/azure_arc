@@ -99,7 +99,7 @@
             "type": "string",
             "defaultValue": "mcr.microsoft.com/k8se/quickstart:latest",
             "metadata": {
-                "description": "Products API Image"
+                "description": "Hello World Image"
             }
         }
 
