@@ -97,8 +97,8 @@ configuration:
     scheduledSearches:
     - description: Close stale issues
       frequencies:
-      - daily:
-          time: 1:0
+      - hourly::
+          hour: 6
       filters:
       - isIssue
       - isOpen
@@ -106,10 +106,15 @@ configuration:
           label: Needs-Author-Feedback
       - hasLabel:
           label: No-Recent-Activity
+      - isNotLabeledWith:
+          label: Feature-Request
+      - isNotLabeledWith:
+          label: Upstream-Bug-Issue             
       - noActivitySince:
-          days: 21
+          days: 7
       actions:
       - closeIssue
+
     - description: Add no recent activity label to issues
       frequencies:
       - hourly:
@@ -127,7 +132,11 @@ configuration:
       - addLabel:
           label: No-Recent-Activity
       - addReply:
-          reply: Hi, we're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **14 days** of this comment the issue will be automatically closed. Thank you!
+          reply: >-
+                Hello @${issueAuthor},
+
+                we're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **7 days** of this comment the issue will be automatically closed. Thank you!
+
     - description: '[Resolve Workflow] Close Addressed Issues'
       frequencies:
       - hourly:
@@ -141,7 +150,9 @@ configuration:
           days: 7
       actions:
       - addReply:
-          reply: Hi @${issueAuthor}, since you haven’t asked that we “`/unresolve`” the issue, we’ll close this out. If you believe further discussion is needed, please add a comment “`/unresolve`” to reopen the issue.
+          reply: >-
+                Hello @${issueAuthor}, since you haven’t asked that we “`/unresolve`” the issue, we’ll close this out. If you believe further discussion is needed, please add a comment “`/unresolve`” to reopen the issue.
+
       - closeIssue
 
 onFailure:
