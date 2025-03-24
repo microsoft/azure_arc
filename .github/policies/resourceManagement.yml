@@ -185,10 +185,12 @@ configuration:
         - isAction:
             action: Reopened
         then:
+        # Clear resolution labels when an issue is reopened
         - removeLabel:
             label: Issue-Addressed
         - removeLabel:
             label: Resolution-Duplicate            
+        # Mark for team attention
         - addLabel:
             label: Needs-Attention
         - addReply:
@@ -197,11 +199,16 @@ configuration:
 
                 We've reopened this issue because we need more information from you or we identified it is not completely resolved.
 
+      # ---------------------------------------------------------------------------
+      # DUPLICATE ISSUE HANDLING
+      # Manages issues identified as duplicates in comments
+      # ---------------------------------------------------------------------------
       - description: Add Resolution-Duplicate label to issues or PRs that are identified as duplicates
         triggerOnOwnActions: false
         if:
         - payloadType: Issue_Comment
         - and:
+            # Look for various forms of "duplicate" in comments
             - commentContains:
                 pattern: "(?i)duplicat(e|ed|ing)?"
                 isRegex: True
@@ -213,6 +220,7 @@ configuration:
                 We've identified this as a duplicate of another issue or PR that already exists. This specific instance is being closed in favor of the linked issue. Please add your 👍 to the other issue to raise its priority. Thanks for your contribution!
 
         - closeIssue
+        # Remove all working labels
         - removeLabel:
             label: Needs-Triage
         - removeLabel:
@@ -221,18 +229,23 @@ configuration:
             label: Needs-Feedback-Hub
         - removeLabel:
             label: Needs-Author-Feedback
+        # Add resolution label
         - addLabel:
             label: Resolution-Duplicate
  
     # ===========================================================================
     # SCHEDULED SEARCHES
-    # Periodic tasks that run on defined schedules
+    # Periodic tasks that run on defined schedules to maintain repository hygiene
     # ===========================================================================
     scheduledSearches:
-    - description: Close stale issues
+    # ---------------------------------------------------------------------------
+    # STALE ISSUE MANAGEMENT
+    # Automatically closes issues that need feedback but have no activity
+    # ---------------------------------------------------------------------------
+    - description: Close stale issues. Issues that have not had any activity for 7 days and are labeled with Needs-Author-Feedback and No-Recent-Activity will be closed.
       frequencies:
-      - daily:
-          time: 1:0      # Runs at 1:00 AM daily
+      - hourly:
+          hour: 6
       filters:
       - isIssue
       - isOpen
@@ -240,22 +253,27 @@ configuration:
           label: Needs-Author-Feedback
       - hasLabel:
           label: No-Recent-Activity
+      # Exclude issues that may need longer response times
+      - isNotLabeledWith:
+          label: Feature-Request
+      - isNotLabeledWith:
+          label: Upstream-Bug-Issue             
       - noActivitySince:
-          days: 21       # 3 weeks of inactivity
+          days: 7
       actions:
       - closeIssue
-      
-    - description: Add no recent activity label to issues
+
+    - description: Add No-Recent-Activity label to issues that have not had any activity for 7 days
       frequencies:
       - hourly:
-          hour: 6        # Runs at 6:00 every hour
+          hour: 6
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Needs-Author-Feedback
       - noActivitySince:
-          days: 7        # 1 week of inactivity
+          days: 7
       - isNotLabeledWith:
           label: No-Recent-Activity
       actions:
@@ -263,28 +281,25 @@ configuration:
           label: No-Recent-Activity
       - addReply:
           reply: >-
-            Hello @${issueAuthor}, 
-            
-            We're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **14 days** of this comment the issue will be automatically closed. Thank you!
-          
-    - description: '[Resolve Workflow] Close Addressed Issues'
+                Hello @${issueAuthor},
+
+                we're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **7 days** of this comment the issue will be automatically closed. Thank you!
+
+    - description: Close issues that have not had any activity for 7 days and are labeled with Issue-Addressed
       frequencies:
       - hourly:
-          hour: 6        # Runs at 6:00 every hour
+          hour: 6
       filters:
       - isIssue
       - isOpen
       - hasLabel:
           label: Issue-Addressed
       - noActivitySince:
-          days: 7        # 1 week of inactivity
+          days: 7
       actions:
-      - addReply: 
+      - addReply:
           reply: >-
-          
-            Hello @${issueAuthor}, 
-            
-            Since you haven't asked that we "`/unresolve`" the issue, we'll close this out. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
+                Hello @${issueAuthor}, since you haven’t asked that we “`/unresolve`” the issue, we’ll close this out. If you believe further discussion is needed, please add a comment “`/unresolve`” to reopen the issue.
 
       - closeIssue
 
