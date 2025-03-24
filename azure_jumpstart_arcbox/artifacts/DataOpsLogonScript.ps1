@@ -398,7 +398,7 @@ $clusters | Foreach-Object {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.36.0 `
+            --version 1.37.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"
@@ -417,6 +417,15 @@ $clusters | Foreach-Object {
             $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             Start-Sleep -Seconds 30
+
+            # Verify data services extension is created
+            if ($extensionId -ne '') {
+              Write-Host "Data services extension created sucussfully on $clusterName. Extension Id: $extensionId"
+            }
+            else {
+                Write-Error "Failed to create data services extension on $clusterName. Extension Id: $extensionId"
+                Exit 1
+            }            
 
             Write-Host "Creating custom location on $clusterName"
 
