@@ -250,6 +250,9 @@ configuration:
       frequencies:
       - hourly:
           hour: 6
+      filters:
+      # Only target issues that are open and need author feedback
+      # Exclude issues that are labeled with Feature-Request or Upstream-Bug-Issue    
       - isIssue
       - isOpen
       - hasLabel:
