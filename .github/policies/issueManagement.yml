@@ -75,6 +75,7 @@ configuration:
                       👋 Hello ${issueAuthor},
 
                       Thank you for reporting this issue, a team member will review and triage it soon. All issues and pull requests are evaluated by the Arc Jumpstart team to determine next steps.
+
                       By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).          
           - if:
               # Identifiy if the issue title contains the word "feature" (not case insensitive)
@@ -92,6 +93,7 @@ configuration:
                       👋 Hello ${issueAuthor},
 
                       Thank you for your feature request, a team member will review it soon. All issues and pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
+                      
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
       # ---------------------------------------------------------------------------
