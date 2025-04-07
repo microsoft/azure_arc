@@ -122,8 +122,14 @@ configuration:
                 This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
 
                 Thank you for your collaboration!
-                
+
         - closeIssue
+        # Remove all working labels
+        - removeLabel:
+            label: Needs-Triage
+        # Add abandoned label to track automatically closed non-form GitHub issues
+        - addLabel:
+            label: Abandoned
 
       # ---------------------------------------------------------------------------
       # ISSUE LIFECYCLE MANAGEMENT
