@@ -103,7 +103,7 @@ configuration:
         - isAction:
             action: Opened
         - and:
-            - or:
+            or:
                 - isNotLabeledWith:
                     label: Bug-Issue
                 - isNotLabeledWith:
