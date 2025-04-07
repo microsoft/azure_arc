@@ -1,9 +1,9 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.6.0"}
 
-$Env:HCIBoxTestsDir = "$Env:HCIBoxDir\Tests"
+$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
 
 # Import Configuration data file
-$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+$LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 
 function Wait-AzDeployment {
     param(
@@ -93,19 +93,19 @@ function Wait-AzLocalClusterConnectivity {
 if ('True' -eq $env:autoDeployClusterResource) {
 
     # Wait for the deployment to complete
-    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy -ClusterName $HCIBoxConfig.ClusterName
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy -ClusterName $LocalBoxConfig.ClusterName
 
     # Wait for the cluster to be connected
-    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $HCIBoxConfig.ClusterName
+    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName
 
 }
 
-Invoke-Pester -Path "$Env:HCIBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
+Invoke-Pester -Path "$Env:LocalBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
 $tests_failed = $tests_common.Failed.Count
 
 
-Invoke-Pester -Path "$Env:HCIBoxTestsDir\hci.tests.ps1" -Output Detailed -PassThru -OutVariable tests_hci
+Invoke-Pester -Path "$Env:LocalBoxTestsDir\hci.tests.ps1" -Output Detailed -PassThru -OutVariable tests_hci
 $tests_passed = $tests_passed + $tests_hci.Passed.Count
 $tests_failed = $tests_failed + $tests_hci.Failed.Count
 
@@ -140,14 +140,14 @@ $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:r
 
 Write-Header 'Adding deployment test results to wallpaper using BGInfo'
 
-Set-Content "$Env:windir\TEMP\hcibox-tests-succeeded.txt" $tests_passed
-Set-Content "$Env:windir\TEMP\hcibox-tests-failed.txt" $tests_failed
+Set-Content "$Env:windir\TEMP\localbox-tests-succeeded.txt" $tests_passed
+Set-Content "$Env:windir\TEMP\localbox-tests-failed.txt" $tests_failed
 
-bginfo.exe $Env:HCIBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
+bginfo.exe $Env:LocalBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 # Setup scheduled task for running tests on each logon
 $TaskName = 'Pester tests'
-$ActionScript = 'C:\HCIBox\Tests\Invoke-Test.ps1'
+$ActionScript = 'C:\LocalBox\Tests\Invoke-Test.ps1'
 
 # Check if the scheduled task exists
 if (Get-ScheduledTask | Where-Object { $_.TaskName -eq $TaskName }) {

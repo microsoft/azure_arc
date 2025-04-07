@@ -7,10 +7,10 @@ Set-PSDebug -Strict
 #####################################################################
 
 # Load config file
-$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
-$Env:HCIBoxTestsDir = "$Env:HCIBoxDir\Tests"
+$LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
+$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
 
-Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
+Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 
 #####################################################################
 # Setup Azure CLI and Azure PowerShell
@@ -82,7 +82,7 @@ foreach ($key in $keys) {
 #############################################################
 
 $WshShell = New-Object -comObject WScript.Shell
-$LogsPath = "C:\HCIBox\Logs"
+$LogsPath = "C:\LocalBox\Logs"
 $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
 $Shortcut.TargetPath = $LogsPath
 $shortcut.WindowStyle = 3
@@ -107,10 +107,10 @@ if (Test-Path $registryPath) {
 # Install VSCode extensions
 #############################################################
 
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($HCIBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-foreach ($extension in $HCIBoxConfig.VSCodeExtensions) {
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($LocalBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+foreach ($extension in $LocalBoxConfig.VSCodeExtensions) {
     $WarningPreference = "SilentlyContinue"
-    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.Paths.LogsDir + "\Tools.log")
+    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($LocalBoxConfig.Paths.LogsDir + "\Tools.log")
     $WarningPreference = "Continue"
 }
 
@@ -126,35 +126,35 @@ $diskNum = $disks.Count
 New-VirtualDisk -StoragePoolFriendlyName AsHciPool -FriendlyName AsHciDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
 $vDisk = Get-VirtualDisk -FriendlyName AsHciDisk
 if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
-    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $HCIBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
-    $vDisk | Get-Disk | New-Partition -DriveLetter $HCIBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 
 Stop-Transcript
 
 # Build HCI cluster
-& "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
+& "$Env:LocalBoxDir\New-LocalBoxCluster.ps1"
 
-Start-Transcript -Append -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
+Start-Transcript -Append -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "HCIBoxLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "LocalBoxLogonScript" -Confirm:$false
 
-#Changing to Jumpstart HCIBox wallpaper
+#Changing to Jumpstart LocalBox wallpaper
 
 Write-Header "Changing wallpaper"
 
 # bmp file is required for BGInfo
-Convert-JSImageToBitMap -SourceFilePath "$Env:HCIBoxDir\wallpaper.png" -DestinationFilePath "$Env:HCIBoxDir\wallpaper.bmp"
+Convert-JSImageToBitMap -SourceFilePath "$Env:LocalBoxDir\wallpaper.png" -DestinationFilePath "$Env:LocalBoxDir\wallpaper.bmp"
 
-Set-JSDesktopBackground -ImagePath "$Env:HCIBoxDir\wallpaper.bmp"
+Set-JSDesktopBackground -ImagePath "$Env:LocalBoxDir\wallpaper.bmp"
 
 Write-Header "Running tests to verify infrastructure"
 
-& "$Env:HCIBoxTestsDir\Invoke-Test.ps1"
+& "$Env:LocalBoxTestsDir\Invoke-Test.ps1"
 
 Write-Header "Creating deployment logs bundle"
 
@@ -163,8 +163,8 @@ $LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
 $null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
 
 #required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$($HCIBoxConfig.Paths.LogsDir)\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($HCIBoxConfig.Paths.LogsDir)\LogsBundle-$RandomString.zip" -PassThru
+Copy-Item -Path "$($LocalBoxConfig.Paths.LogsDir)\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($LocalBoxConfig.Paths.LogsDir)\LogsBundle-$RandomString.zip" -PassThru
 
 
 Stop-Transcript

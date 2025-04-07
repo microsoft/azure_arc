@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'HCIBox-Client'
+param vmName string = 'LocalBox-Client'
 
 @description('The size of the Virtual Machine')
 @allowed([
@@ -56,10 +56,10 @@ param registerCluster bool = true
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Option to deploy AKS-HCI with HCIBox')
+@description('Option to deploy AKS-HCI with LocalBox')
 param deployAKSHCI bool = true
 
-@description('Option to deploy Resource Bridge with HCIBox')
+@description('Option to deploy Resource Bridge with LocalBox')
 param deployResourceBridge bool = true
 
 @description('Public DNS to use for the domain')
@@ -74,11 +74,11 @@ param autoDeployClusterResource bool = false
 @description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
 param autoUpgradeClusterResource bool = false
 
-@description('Enable automatic logon into HCIBox Virtual Machine')
+@description('Enable automatic logon into LocalBox Virtual Machine')
 param vmAutologon bool = false
 
 var encodedPassword = base64(windowsAdminPassword)
-var bastionName = 'HCIBox-Bastion'
+var bastionName = 'LocalBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'

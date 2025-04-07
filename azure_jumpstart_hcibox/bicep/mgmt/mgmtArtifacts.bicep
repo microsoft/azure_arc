@@ -9,7 +9,7 @@ param sku string = 'pergb2018'
 
 param resourceTags object
 
-var automationAccountName = 'HCIBox-Automation-${uniqueString(resourceGroup().id)}'
+var automationAccountName = 'LocalBox-Automation-${uniqueString(resourceGroup().id)}'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 
 resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {

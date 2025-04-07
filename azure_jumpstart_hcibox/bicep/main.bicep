@@ -47,7 +47,7 @@ param autoDeployClusterResource bool = true
 @description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
 param autoUpgradeClusterResource bool = false
 
-@description('Enable automatic logon into HCIBox Virtual Machine')
+@description('Enable automatic logon into LocalBox Virtual Machine')
 param vmAutologon bool = true
 
 @description('The size of the Virtual Machine')
@@ -63,7 +63,7 @@ param governResourceTags bool = true
 @description('Tags to be added to all resources')
 
 param tags object = {
-  Project: 'jumpstart_HCIBox'
+  Project: 'jumpstart_LocalBox'
 }
 
 // if governResourceTags is true, add the following tags

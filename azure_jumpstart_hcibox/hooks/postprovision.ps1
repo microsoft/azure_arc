@@ -10,7 +10,7 @@ $rdpPort = $env:JS_RDP_PORT
 If ($rdpPort -ne "3389") {
 
     Write-Host "Configuring NSG Rule for RDP..."
-    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name HCIBox-NSG
+    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name LocalBox-NSG
 
     Add-AzNetworkSecurityRuleConfig `
         -NetworkSecurityGroup $nsg `
@@ -31,7 +31,7 @@ If ($rdpPort -ne "3389") {
 
 
 # Client VM IP address
-$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "HCIBox-Client-PIP" -ErrorAction SilentlyContinue).IpAddress | Out-Null
+$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "LocalBox-Client-PIP" -ErrorAction SilentlyContinue).IpAddress | Out-Null
 if ($null -ne $ip) {
     Write-Host "You can now connect to the client VM using the following command: " -NoNewline
     Write-Host "mstsc /v:$($ip):$($rdpPort)" -ForegroundColor Green -BackgroundColor Black

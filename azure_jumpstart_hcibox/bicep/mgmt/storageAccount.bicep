@@ -12,7 +12,7 @@ param location string = resourceGroup().location
 
 param resourceTags object
 
-var storageAccountName = 'hcibox${uniqueString(resourceGroup().id)}'
+var storageAccountName = 'localbox${uniqueString(resourceGroup().id)}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: storageAccountName
