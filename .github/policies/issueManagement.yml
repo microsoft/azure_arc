@@ -102,11 +102,12 @@ configuration:
         - payloadType: Issues
         - isAction:
             action: Opened
-        - or:
-            - isNotLabeledWith:
-                label: Bug-Issue
-            - isNotLabeledWith:
-                label: Feature-Request
+        - and:
+            - or:
+                - isNotLabeledWith:
+                    label: Bug-Issue
+                - isNotLabeledWith:
+                    label: Feature-Request
         then:
         - addReply:
             reply: |
