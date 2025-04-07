@@ -119,6 +119,7 @@ configuration:
                 This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
 
                 Thank you for your collaboration!
+                
         - closeIssue
 
       # ---------------------------------------------------------------------------
