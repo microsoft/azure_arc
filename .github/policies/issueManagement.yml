@@ -103,11 +103,8 @@ configuration:
         - isAction:
             action: Opened
         - and:
-                or:
-                    - isNotLabeledWith:
-                        label: Bug-Issue
-                    - isNotLabeledWith:
-                        label: Feature-Request
+            - isNotLabeledWith:
+                label: Bug-Issue
         then:
         - addReply:
             reply: |
