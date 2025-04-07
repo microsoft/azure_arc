@@ -93,8 +93,31 @@ configuration:
                       👋 Hello ${issueAuthor},
 
                       Thank you for your feature request, a team member will review it soon. All issues and pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
-                      
+
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+      - description: Auto-close issues without Bug-Issue or Feature-Request labels
+        # Ensures issues opened without proper labels are closed automatically
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Opened
+        - and:
+            - isNotLabeledWith:
+                label: Bug-Issue
+            - isNotLabeledWith:
+                label: Feature-Request
+        then:
+        - addReply:
+            reply: |
+                👋 Hello ${issueAuthor},
+
+                This issue does not meet our repository's requirements for proper labeling. All issues must be submitted using our GitHub Issue Forms to ensure they are categorized correctly.
+
+                This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
+
+                Thank you for your collaboration!
+        - closeIssue
 
       # ---------------------------------------------------------------------------
       # ISSUE LIFECYCLE MANAGEMENT
