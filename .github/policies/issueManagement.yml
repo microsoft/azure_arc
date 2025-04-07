@@ -103,10 +103,12 @@ configuration:
           - isAction:
               action: Opened
           - and:
-             - isNotLabeledWith:
-                label: Bug-Issue
-             - isNotLabeledWith:
-                label: Feature-Request
+               or: 
+                # Check if the issue is not labeled with Bug-Issue or Feature-Request
+                - isNotLabeledWith:
+                    label: Bug-Issue
+                - isNotLabeledWith:
+                    label: Feature-Request
         then:
         - addReply:
             reply: |
