@@ -48,7 +48,7 @@ azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 ########################################################################
 # Use Azure Bastion?
 ########################################################################
-read -p "Configure Azure Bastion for accessing HCIBox host [Y/N]? " promptOutput
+read -p "Configure Azure Bastion for accessing LocalBox host [Y/N]? " promptOutput
 JS_DEPLOY_BASTION=false
 if [[ $promptOutput == "Y" ]] || [[ $promptOutput == "y" ]]; then
     JS_DEPLOY_BASTION=true

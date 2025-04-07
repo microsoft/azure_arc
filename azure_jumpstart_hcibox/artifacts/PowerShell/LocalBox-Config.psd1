@@ -1,19 +1,19 @@
 @{
 
-    # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
+    # This is the PowerShell datafile used to provide configuration information for the LocalBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
 
-    # HCIBox Folders
+    # LocalBox Folders
     Paths = @{
-        DSCDir = "C:\HCIBox\DSC"
-        TestsDir = "C:\HCIBox\Tests"
-        VMDir = "C:\HCIBox\Virtual Machines"
-        LogsDir = "C:\HCIBox\Logs"
-        IconDir = "C:\HCIBox\Icons"
-        VHDDir = "C:\HCIBox\VHD"
-        SDNDir = "C:\HCIBox\SDN"
-        KVDir = "C:\HCIBox\KeyVault"
-        WACDir = "C:\HCIBox\Windows Admin Center"
-        AgentScriptDir = "C:\HCIBox\agentScript"
+        DSCDir = "C:\LocalBox\DSC"
+        TestsDir = "C:\LocalBox\Tests"
+        VMDir = "C:\LocalBox\Virtual Machines"
+        LogsDir = "C:\LocalBox\Logs"
+        IconDir = "C:\LocalBox\Icons"
+        VHDDir = "C:\LocalBox\VHD"
+        SDNDir = "C:\LocalBox\SDN"
+        KVDir = "C:\LocalBox\KeyVault"
+        WACDir = "C:\LocalBox\Windows Admin Center"
+        AgentScriptDir = "C:\LocalBox\agentScript"
         ToolsDir = "C:\Tools"
         TempDir = "C:\Temp"
         VMPath = "C:\VMs"
@@ -37,8 +37,8 @@
 
     HostVMDriveLetter = "V"
     HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
-    guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.
-    azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
+    guiVHDXPath       = "C:\LocalBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.
+    azsHCIVHDXPath    = "C:\LocalBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
 
     MgmtHostConfig = @{
         Hostname = "AzSMGMT"
@@ -67,16 +67,16 @@
     NestedVMMemoryinGB                   = 96GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     AzSMGMTProcCount                     = 20
-    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode.
+    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the LocalBox VMs will use in Single Host mode.
     FabricSwitch                         = "vSwitch-Fabric"
     FabricNIC                            = "FABRIC"
     ClusterVSwitchName                   = "hciSwitch"
-    ClusterName                          = "hciboxcluster"
+    ClusterName                          = "localboxcluster"
     WACVMName                            = "AdminCenter"
     ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
-    LCMDeployUsername                    = "HCIBoxDeployUser"
+    LCMDeployUsername                    = "LocalBoxDeployUser"
     LCMADOUName                          = "hcioudocs"
-    LCMDeploymentPrefix                  = "hcibox"
+    LCMDeploymentPrefix                  = "localbox"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
@@ -160,7 +160,7 @@
 
     # AKS and Resource bridge variables
     rbCustomLocationName                 = "jumpstart"
-    AKSworkloadClusterName               = "hcibox-aks" # lowercase only
+    AKSworkloadClusterName               = "localbox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
     AKSNodeStartIP                       = "10.10.0.101"
     AKSNodeEndIP                         = "10.10.0.199"

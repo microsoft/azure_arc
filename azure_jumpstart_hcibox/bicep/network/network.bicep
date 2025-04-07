@@ -1,8 +1,8 @@
 @description('Name of the VNet')
-param virtualNetworkName string = 'HCIBox-VNet'
+param virtualNetworkName string = 'LocalBox-VNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'HCIBox-Subnet'
+param subnetName string = 'LocalBox-Subnet'
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -11,10 +11,10 @@ param location string = resourceGroup().location
 param deployBastion bool = false
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'HCIBox-NSG'
+param networkSecurityGroupName string = 'LocalBox-NSG'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'HCIBox-Bastion-NSG'
+param bastionNetworkSecurityGroupName string = 'LocalBox-Bastion-NSG'
 
 param resourceTags object
 
@@ -22,7 +22,7 @@ var addressPrefix = '172.16.0.0/16'
 var subnetAddressPrefix = '172.16.1.0/24'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
-var bastionName = 'HCIBox-Bastion'
+var bastionName = 'LocalBox-Bastion'
 var bastionSubnetIpPrefix = '172.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 

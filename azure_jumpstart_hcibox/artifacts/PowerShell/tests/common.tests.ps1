@@ -4,7 +4,7 @@ BeforeDiscovery {
 
 }
 
-Describe "ArcBox resource group" {
+Describe "LocalBox resource group" {
     BeforeAll {
         $ResourceGroupName = $env:resourceGroup
     }

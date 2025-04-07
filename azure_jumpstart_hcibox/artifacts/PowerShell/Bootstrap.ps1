@@ -75,27 +75,27 @@ if ($vmAutologon -eq "true") {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
 
-# Creating HCIBox path
-$HCIPath = "C:\HCIBox"
-[System.Environment]::SetEnvironmentVariable('HCIBoxDir', $HCIPath, [System.EnvironmentVariableTarget]::Machine)
-New-Item -Path $HCIPath -ItemType directory -Force
+# Creating LocalBox path
+$LocalPath = "C:\LocalBox"
+[System.Environment]::SetEnvironmentVariable('LocalBoxDir', $LocalPath, [System.EnvironmentVariableTarget]::Machine)
+New-Item -Path $LocalPath -ItemType directory -Force
 
 # Downloading configuration file
-$ConfigurationDataFile = "$HCIPath\HCIBox-Config.psd1"
-[System.Environment]::SetEnvironmentVariable('HCIBoxConfigFile', $ConfigurationDataFile, [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBox-Config.psd1") -OutFile $ConfigurationDataFile
+$ConfigurationDataFile = "$LocalPath\LocalBox-Config.psd1"
+[System.Environment]::SetEnvironmentVariable('LocalBoxConfigFile', $ConfigurationDataFile, [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBox-Config.psd1") -OutFile $ConfigurationDataFile
 
 # Importing configuration data
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$LocalBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Create paths
-foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
+foreach ($path in $LocalBoxConfig.Paths.GetEnumerator()) {
   Write-Output "Creating path $($path.Value)"
   New-Item -Path $path.Value -ItemType directory -Force | Out-Null
 }
 
 # Begin transcript
-Start-Transcript -Path "$($HCIBoxConfig.Paths["LogsDir"])\Bootstrap.log"
+Start-Transcript -Path "$($LocalBoxConfig.Paths["LogsDir"])\Bootstrap.log"
 
 #################################################################################
 ## Setup host infrastructure and apps
@@ -105,29 +105,29 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
-Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $HCIPath\wallpaper.png
-Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($HCIBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloadCluster.ps1") -OutFile $HCIPath\Configure-AKSWorkloadCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $HCIPath\Configure-VMLogicalNetwork.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $HCIPath\Generate-ARM-Template.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\common.tests.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hci.tests.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\hci.tests.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hcibox-bginfo.bgi") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\hcibox-bginfo.bgi"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\Invoke-Test.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$($HCIBoxConfig.Paths["LogsDir"])\LogInstructions.txt"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $HCIPath\jumpstart-user-secret.yaml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $HCIPath\hci.json
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $HCIPath\hci.parameters.json
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$HCIPath\WinGet.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $LocalPath\wallpaper.png
+Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($LocalBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBoxLogonScript.ps1") -OutFile $LocalPath\LocalBoxLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-LocalBoxCluster.ps1") -OutFile $LocalPath\New-LocalBoxCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloadCluster.ps1") -OutFile $LocalPath\Configure-AKSWorkloadCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $LocalPath\Configure-VMLogicalNetwork.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $LocalPath\Generate-ARM-Template.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\common.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hci.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\hci.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hcibox-bginfo.bgi") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\hcibox-bginfo.bgi"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\Invoke-Test.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$($LocalBoxConfig.Paths["LogsDir"])\LogInstructions.txt"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $LocalPath\jumpstart-user-secret.yaml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $LocalPath\hci.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $LocalPath\hci.parameters.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$LocalPath\WinGet.ps1"
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
-(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $HCIPath\HCIBox-Config.psd1
-(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $HCIPath\HCIBox-Config.psd1
+(Get-Content -Path $LocalPath\LocalBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $LocalPath\LocalBox-Config.psd1
+(Get-Content -Path $LocalPath\LocalBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $LocalPath\LocalBox-Config.psd1
 
 # Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -213,13 +213,13 @@ $ScheduledTaskExecutable = "pwsh.exe"
 
 # Creating scheduled task for WinGet.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $HCIPath\WinGet.ps1
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalPath\WinGet.ps1
 Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
-# Creating scheduled task for HCIBoxLogonScript.ps1
-Write-Host "Creating scheduled task for HCIBoxLogonScript.ps1"
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $HCIPath\HCIBoxLogonScript.ps1
-Register-ScheduledTask -TaskName "HCIBoxLogonScript"  -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+# Creating scheduled task for LocalBoxLogonScript.ps1
+Write-Host "Creating scheduled task for LocalBoxLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalPath\LocalBoxLogonScript.ps1
+Register-ScheduledTask -TaskName "LocalBoxLogonScript"  -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disable Edge 'First Run' Setup
 Write-Host "Configuring Microsoft Edge."
@@ -351,7 +351,7 @@ Add-MpPreference -ExclusionExtension ".vmgs"
 Add-MpPreference -ExclusionPath "%ProgramData%\Microsoft\Windows\Hyper-V"
 Add-MpPreference -ExclusionPath "%Public%\Documents\Hyper-V\Virtual Hard Disks"
 Add-MpPreference -ExclusionPath "%SystemDrive%\ProgramData\Microsoft\Windows\Hyper-V\Snapshots"
-Add-MpPreference -ExclusionPath "C:\HCIBox\VHD"
+Add-MpPreference -ExclusionPath "C:\LocalBox\VHD"
 Add-MpPreference -ExclusionPath "V:\VMs"
 Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmms.exe"
 Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmwp.exe"
@@ -361,5 +361,5 @@ Add-MpPreference -ExclusionProcess  "%systemroot%\System32\Vmcompute.exe"
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
-$logSuppress | Set-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" -Force
+$logSuppress = Get-Content "$($LocalBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
+$logSuppress | Set-Content "$($LocalBoxConfig.Paths.LogsDir)\Bootstrap.log" -Force

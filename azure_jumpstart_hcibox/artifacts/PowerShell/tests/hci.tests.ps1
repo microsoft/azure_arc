@@ -2,10 +2,10 @@
 BeforeDiscovery {
 
     # Import Configuration data file
-    $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+    $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 
-    $VMs = $HCIBoxConfig.NodeHostConfig.Hostname
-    $clusters = @($HCIBoxConfig.ClusterName)
+    $VMs = $LocalBoxConfig.NodeHostConfig.Hostname
+    $clusters = @($LocalBoxConfig.ClusterName)
 
     # Login to Azure PowerShell with service principal provided by user
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force

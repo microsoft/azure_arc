@@ -21,7 +21,7 @@
             "value": "ArcPassword123!!"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "HCIBox-Workspace"
+            "value": "LocalBox-Workspace"
         },
         "deployBastion": {
             "value": false
