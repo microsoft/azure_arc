@@ -99,10 +99,10 @@ configuration:
       - description: Auto-close issues without Bug-Issue or Feature-Request labels
         # Ensures issues opened without proper labels are closed automatically
         if:
-        - payloadType: Issues
-        - isAction:
-            action: Opened
-        - and:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - and:
              - isNotLabeledWith:
                 label: Bug-Issue
              - isNotLabeledWith:
