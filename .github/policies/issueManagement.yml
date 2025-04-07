@@ -102,7 +102,7 @@ configuration:
         - payloadType: Issues
         - isAction:
             action: Opened
-        - and:
+        - or:
             - isNotLabeledWith:
                 label: Bug-Issue
             - isNotLabeledWith:
