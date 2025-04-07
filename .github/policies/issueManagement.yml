@@ -101,20 +101,25 @@ configuration:
         if:
           - payloadType: Issues
           - isAction:
-              action: Opened
-          - isNotLabeledWith:
-              label: Bug-Issue          
+              action: Opened        
         then:
-        - addReply:
-            reply: |
-                👋 Hello ${issueAuthor},
+           if:
+            # Check if the issue is missing both Bug-Issue and Feature-Request labels
+            - or:
+                - isNotLabeledWith:
+                    label: Bug-Issue
+                - isNotLabeledWith:
+                    label: Feature-Request       
+            - addReply:
+                reply: |
+                    👋 Hello ${issueAuthor},
 
-                This issue does not meet our repository's requirements for proper labeling. All issues must be submitted using our GitHub Issue Forms to ensure they are categorized correctly.
+                    This issue does not meet our repository's requirements for proper labeling. All issues must be submitted using our GitHub Issue Forms to ensure they are categorized correctly.
 
-                This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
+                    This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
 
-                Thank you for your collaboration!
-        - closeIssue
+                    Thank you for your collaboration!
+            - closeIssue
 
       # ---------------------------------------------------------------------------
       # ISSUE LIFECYCLE MANAGEMENT
