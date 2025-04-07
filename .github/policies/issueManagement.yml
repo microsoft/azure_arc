@@ -97,15 +97,18 @@ configuration:
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
       - description: Auto-close issues without Bug-Issue or Feature-Request labels
-        # Ensures issues opened without proper labels are closed automatically
+        # This policy ensures that any issue opened without the required labels is automatically closed.
+        # It acts as a fail-safe mechanism to enforce the use of GitHub Issue Forms for proper categorization.
         if:
           - payloadType: Issues
           - isAction:
               action: Opened
           - and:
+              # Check if the issue does not have the 'Bug-Issue' label
               - not:
                   hasLabel:
                       label: Bug-Issue
+              # Check if the issue does not have the 'Feature-Request' label
               - not:
                   hasLabel:
                       label: Feature-Request
