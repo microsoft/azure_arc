@@ -72,7 +72,7 @@ var resourceTags = governResourceTags ? union(tags, {
     SecurityControl: 'Ignore'
 }) : tags
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/ldabas-msft/azure_arc/localbox-namechange/azure_jumpstart_hcibox/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
