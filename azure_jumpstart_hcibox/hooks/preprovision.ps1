@@ -45,6 +45,7 @@ az provider register --namespace Microsoft.OperationsManagement --wait
 az provider register --namespace Microsoft.AzureStackHCI --wait
 az provider register --namespace Microsoft.ResourceConnector --wait
 az provider register --namespace Microsoft.OperationalInsights --wait
+az provider register --namespace Microsoft.Compute --wait
 
 
 ########################################################################

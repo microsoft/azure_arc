@@ -1,0 +1,100 @@
+# ===========================================================================
+# GitHub Repository Pull Request Management Policy
+# ===========================================================================
+# Purpose: Automate PR workflow management for the Arc Jumpstart repository
+# This policy handles PR creation, validation, and provides appropriate guidance to contributors
+id: 
+name: GitOps.PullRequestIssueManagement
+description: Handlers for when a Pull Request is first opened
+owner: Arc Jumpstart
+resource: repository
+disabled: false
+where:
+configuration:
+  resourceManagementConfiguration:
+    # ===========================================================================
+    # EVENT RESPONDER TASKS
+    # Defines automated actions triggered by specific GitHub events
+    # These tasks handle the entire PR lifecycle from creation to resolution
+    # ===========================================================================
+    eventResponderTasks:
+      # ---------------------------------------------------------------------------
+      # EMPTY PR DETECTION
+      # Automatically identifies and closes PRs without file changes
+      # This prevents empty PRs from cluttering the repository
+      # ---------------------------------------------------------------------------
+      - description: >-
+         When a PR is opened/updated, if no files are modified
+          * Close the PR
+          * Add a comment
+        if:
+          # Only process open pull requests
+          - payloadType: Pull_Request
+          - isOpen
+          # Trigger on new PR creation or when commits are pushed
+          # This ensures we catch empty PRs both on creation and after force pushes
+          - or:
+              - isAction:
+                  action: Opened
+              - isAction:
+                  action: Synchronize
+          # Check for empty file patterns
+          # The regex ^$ matches when no files have been changed
+          - filesMatchPattern:
+                pattern: ^$
+        then:
+          # Provide a helpful message explaining why the PR is being closed
+          - addReply:
+              reply: |
+                ⚠️ **WARNING: Empty Pull Request** ⚠️
+                
+                👋 Hello ${issueAuthor},
+
+                This pull request does not update any files. Please review your commit history and resubmit.
+
+                We will be closing this pull request now, thank you for your collaboration!
+
+          # Add abandoned label to track automatically closed empty PRs
+          - addLabel:
+              label: Abandoned
+
+          - closePullRequest
+
+      # ---------------------------------------------------------------------------
+      # WELCOME MESSAGE FOR CONTRIBUTORS
+      # Provides guidance and sets expectations for PR authors
+      # This helps set the tone for collaboration and ensures contributors understand the process
+      # ---------------------------------------------------------------------------
+      - description: 
+         When a PR is opened, post a message to the author
+        if:
+          # Only process new pull requests
+          - payloadType: Pull_Request
+          - isAction:
+              action: Opened
+          # Exclude empty PRs since they're handled by a different rule
+          - not:
+              filesMatchPattern:
+                pattern: ^$
+          # Exclude PRs targeting main branch - these are handled by a separate rule
+          - not:
+              targetsBranch:
+                branch: main
+        then:
+          # Add automated welcome message with contribution guidelines
+          - addReply:
+              reply: |
+                👋 Hello ${issueAuthor},
+
+                Thank you for your pull request, a team member will review it soon. All issues and pull requests are validated by the Arc Jumpstart team and must pass all validation checks before being merged.
+                
+                By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+# ---------------------------------------------------------------------------
+# ERROR HANDLING CONFIGURATION
+# Defines what happens when policy execution succeeds or fails
+# ---------------------------------------------------------------------------
+onFailure:
+  # Can be configured to notify admins or log errors
+onSuccess:
+  # Can be configured to perform actions upon successful execution
