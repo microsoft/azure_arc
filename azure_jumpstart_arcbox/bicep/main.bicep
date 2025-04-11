@@ -108,6 +108,7 @@ var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
 var k3sArcDataClusterName = '${namingPrefix}-K3s-Data-${guid}'
 var k3sArcClusterName = '${namingPrefix}-K3s-${guid}'
 var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
+var customerUsageAttributionDeploymentName = (flavor == 'DevOps' ? '390d1642-349e-43c5-845e-8c7cc0972f22' : flavor == 'DataOps' ? 'a8caf3c1-0980-4e23-8c52-27e5d424dbbd' : 'c4a26bed-72cb-415d-91a3-e2577c7c92f5')
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuRancherK3sDataSvcDeployment'
@@ -291,6 +292,12 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
     stagingStorageAccountDeployment
     mgmtArtifactsAndPolicyDeployment
   ]
+}
+
+module customerUsageAttribution 'mgmt/customerUsageAttribution.bicep' = {
+  name: 'pid-${customerUsageAttributionDeploymentName}'
+  params: {
+  }
 }
 
 output clientVmLogonUserName string = flavor == 'DataOps' ? '${windowsAdminUsername}@${addsDomainName}' : ''
