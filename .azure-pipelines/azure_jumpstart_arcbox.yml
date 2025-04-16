@@ -11,6 +11,10 @@ parameters:
   displayName: 'Resource Group Name'
   type: string
   default: 'arcbox-itpro-integration-tests'
+- name: Location
+  displayName: 'Location'
+  type: string
+  default: 'northeurope'
 - name: AzureSubscription
   displayName: 'Azure Subscription'
   type: string
@@ -38,6 +42,8 @@ variables:
   value: ${{parameters.githubBranch}}
 - name: flavor
   value: ${{parameters.flavor}}
+- name: Location
+  value: ${{parameters.Location}}
 
 stages:
 - stage: 'ArcBox_deployment'
@@ -58,7 +64,8 @@ stages:
         Inline: |
           Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
           $RGname = "$(ResourceGroupName)"
-          New-AzResourceGroup -Name $RGname -Location "eastus"
+          New-AzResourceGroup -Name $RGname -Location "$(Location)" -Force
+          Write-Host "Resource group $RGname created."
 
     - task: AzurePowerShell@5
       displayName: 'Deploy Bicep template'
