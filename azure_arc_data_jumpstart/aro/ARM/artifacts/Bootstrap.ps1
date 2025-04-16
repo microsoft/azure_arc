@@ -78,7 +78,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFil
 Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
-Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.8.9/SqlQueryStress-0.9.8.9.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AROSCC.yaml") -OutFile "C:\Temp\AROSCC.yaml"
 
