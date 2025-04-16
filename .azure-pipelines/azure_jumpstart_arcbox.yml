@@ -29,7 +29,7 @@ parameters:
   default: 'ITPro'
 
 variables:
-- group: 'integration-tests'
+#- group: 'integration-tests'
 - name: ResourceGroupName
   value: ${{parameters.ResourceGroupName}}
 - name: githubAccount
