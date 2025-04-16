@@ -45,8 +45,8 @@ stages:
   - job: Deploy
     timeoutInMinutes: 235 # 5 minutes before the ACA self-hosted runner in order for the runner to gracefully shutdown
     pool:
-      name: 'localbox-pool'
-      #vmImage: 'ubuntu-latest'
+      #name: 'localbox-pool'
+      vmImage: 'ubuntu-latest'
     continueOnError: 'true'
     steps:
     - task: AzurePowerShell@5
