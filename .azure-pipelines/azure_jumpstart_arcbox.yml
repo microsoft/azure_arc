@@ -14,7 +14,7 @@ parameters:
 - name: AzureSubscription
   displayName: 'Azure Subscription'
   type: string
-  default: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+  default: 'HCIBox-ServiceConnection'
 - name: githubAccount
   displayName: 'githubAccount'
   type: string
