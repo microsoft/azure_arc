@@ -69,18 +69,18 @@ Write-Output "Az CLI Login"
 az login --identity
 az account set -s $env:subscriptionId
 
-$ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
+$ClientObjectId = Get-AzContext
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
-if (Get-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
+if (Get-AzRoleAssignment -ObjectId $ClientObjectId.Account.Id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
 
     Write-Output "Role assignment already exists"
 
 } else {
 
     Write-Output "Role assignment does not yet exist"
-    $null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+    $null = New-AzRoleAssignment -ObjectId $ClientObjectId.Account.Id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
 
     Write-Output "Wait for eventual consistency after RBAC assignment"
     Start-Sleep 120
