@@ -7,8 +7,8 @@ trigger:
       - azure_jumpstart_arcbox/*
 
 schedules:
-- cron: "46 19 * * *"
-  displayName: Daily 19:46 UTC
+- cron: "55 19 * * *"
+  displayName: Daily 19:55 UTC
   branches:
     include:
       - arcbox_pipeline
@@ -158,7 +158,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Get approval"
-    #environment: 'teardown_approval'
+    environment: 'arcbox_teardown_approval'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
