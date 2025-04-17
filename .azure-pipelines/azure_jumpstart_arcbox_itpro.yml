@@ -64,6 +64,7 @@ stages:
     continueOnError: 'true'
     steps:
     - task: AzurePowerShell@5
+      name: DeployRG
       displayName: 'Deploy resource group'
       inputs:
         azureSubscription: ${{parameters.AzureSubscription}}
@@ -145,7 +146,7 @@ stages:
   displayName: 'ArcBox_teardown'
   #condition: succeeded('deploy')
   variables:
-    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['SetRG.RGname'] ]
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
   - deployment:
     displayName: "Get approval"
@@ -160,4 +161,4 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deleting resource group $(RGname)"
-          Remove-AzResourceGroup -Name $(RGname) -Force -WhatIf
+          Remove-AzResourceGroup -Name $(RGname) -Force
