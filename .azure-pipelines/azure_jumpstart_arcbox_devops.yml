@@ -85,7 +85,8 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deploying to $(Deploy.RGname)"
+          $rgName = "$(Deploy.RGname)"
+          Write-Host "Deploying to $rgName"
           $githubAccount = "$(githubAccount)"
           $githubBranch = "$(githubBranch)"
           $flavor = "$(flavor)"
@@ -96,7 +97,7 @@ stages:
             git checkout -b $githubBranch upstream/$githubBranch
           }
           New-AzResourceGroupDeployment -Name ArcBox `
-          -ResourceGroupName $(Deploy.RGname) `
+          -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
@@ -171,5 +172,6 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deleting resource group $(Deploy.RGname)"
-          Remove-AzResourceGroup -Name $(Deploy.RGname) -Force
+          $rgName = "$(RGname)"
+          Write-Host "Deleting resource group $rgName"
+          Remove-AzResourceGroup -Name $rgName -Force
