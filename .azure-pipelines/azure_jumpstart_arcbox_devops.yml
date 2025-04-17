@@ -85,7 +85,7 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deploying to $(RGname)"
+          Write-Host "Deploying to $(Deploy.RGname)"
           $githubAccount = "$(githubAccount)"
           $githubBranch = "$(githubBranch)"
           $flavor = "$(flavor)"
@@ -96,7 +96,7 @@ stages:
             git checkout -b $githubBranch upstream/$githubBranch
           }
           New-AzResourceGroupDeployment -Name ArcBox `
-          -ResourceGroupName $(RGname) `
+          -ResourceGroupName $(Deploy.RGname) `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
@@ -118,7 +118,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(Deploy.RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM - 2'
@@ -127,7 +127,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(Deploy.RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM - 3'
@@ -136,7 +136,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(Deploy.RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Download Pester test-results from storage account to pipeline agent'
@@ -145,7 +145,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname)
+        ScriptArguments: -ResourceGroupName $(Deploy.RGname)
 
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
@@ -171,5 +171,5 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deleting resource group $(RGname)"
-          Remove-AzResourceGroup -Name $(RGname) -Force
+          Write-Host "Deleting resource group $(Deploy.RGname)"
+          Remove-AzResourceGroup -Name $(Deploy.RGname) -Force
