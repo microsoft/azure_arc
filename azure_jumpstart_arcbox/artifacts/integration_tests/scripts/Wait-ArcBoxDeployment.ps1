@@ -38,5 +38,5 @@ do {
 
 } while ($job.InstanceView.ExecutionState -eq "Running")
 
-Write-Host "Job completed" -ForegroundColor Green
+Write-Host "Job status:" -ForegroundColor Green
 $job
