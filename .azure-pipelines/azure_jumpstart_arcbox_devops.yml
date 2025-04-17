@@ -7,8 +7,8 @@ trigger:
       - azure_jumpstart_arcbox/*
 
 schedules:
-- cron: "0 19 45 * *"
-  displayName: Daily 19:45 UTC
+- cron: "46 19 * * *"
+  displayName: Daily 19:46 UTC
   branches:
     include:
       - arcbox_pipeline
