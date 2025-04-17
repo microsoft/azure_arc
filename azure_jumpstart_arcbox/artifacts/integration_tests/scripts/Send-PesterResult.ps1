@@ -73,14 +73,23 @@ $ClientObjectId = Get-AzContext
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
-if (Get-AzRoleAssignment -ObjectId $ClientObjectId.Account.Id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
+# Get the VM's resource ID
+$vmResourceId = (Invoke-RestMethod -Headers @{Metadata="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance?api-version=2021-02-01").compute.resourceId
+
+# Get the VM resource
+$vm = Get-AzResource -ResourceId $vmResourceId
+
+# Get the identity objectId
+$vm.Identity.PrincipalId
+
+if (Get-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
 
     Write-Output "Role assignment already exists"
 
 } else {
 
     Write-Output "Role assignment does not yet exist"
-    $null = New-AzRoleAssignment -ObjectId $ClientObjectId.Account.Id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+    $null = New-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
 
     Write-Output "Wait for eventual consistency after RBAC assignment"
     Start-Sleep 120
