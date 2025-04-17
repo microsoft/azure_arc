@@ -6,8 +6,16 @@ trigger:
     include:
       - azure_jumpstart_arcbox/*
 
+schedules:
+- cron: "0 19 45 * *"
+  displayName: Daily 19:45 UTC
+  branches:
+    include:
+      - arcbox_pipeline
+  always: true
+
 parameters:
-- name: ResourceGroupName
+- name: ResourceGroupNamePrefix
   displayName: 'Resource Group Name'
   type: string
   default: 'arcbox-devops-integration-tests'
@@ -34,8 +42,8 @@ parameters:
 
 variables:
 #- group: 'integration-tests'
-- name: ResourceGroupName
-  value: ${{parameters.ResourceGroupName}}
+- name: ResourceGroupNamePrefix
+  value: ${{parameters.ResourceGroupNamePrefix}}
 - name: githubAccount
   value: ${{parameters.githubAccount}}
 - name: githubBranch
@@ -63,7 +71,9 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
-          $RGname = "$(ResourceGroupName)"
+          $dateSuffix = (Get-Date -Format "yyyy-MM-dd-HH-mm")
+          $RGname = "$(ResourceGroupNamePrefix)-$dateSuffix"
+          Write-Host "##vso[task.setvariable variable=RGname]$RGname"
           New-AzResourceGroup -Name $RGname -Location "$(Location)" -Force
           Write-Host "Resource group $RGname created."
 
@@ -74,7 +84,7 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deploying to $(ResourceGroupName)"
+          Write-Host "Deploying to $(RGname)"
           $githubAccount = "$(githubAccount)"
           $githubBranch = "$(githubBranch)"
           $flavor = "$(flavor)"
@@ -85,7 +95,7 @@ stages:
             git checkout -b $githubBranch upstream/$githubBranch
           }
           New-AzResourceGroupDeployment -Name ArcBox `
-          -ResourceGroupName $(ResourceGroupName) `
+          -ResourceGroupName $(RGname) `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
@@ -107,7 +117,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(ResourceGroupName) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM - 2'
@@ -116,7 +126,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(ResourceGroupName) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM - 3'
@@ -125,7 +135,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(ResourceGroupName) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Download Pester test-results from storage account to pipeline agent'
@@ -134,7 +144,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
-        ScriptArguments: -ResourceGroupName $(ResourceGroupName)
+        ScriptArguments: -ResourceGroupName $(RGname)
 
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
@@ -148,7 +158,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Get approval"
-    environment: 'teardown_approval'
+    #environment: 'teardown_approval'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
@@ -158,5 +168,5 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-          Write-Host "Deleting resource group $(ResourceGroupName)"
-          Remove-AzResourceGroup -Name $(ResourceGroupName) -Force -WhatIf
+          Write-Host "Deleting resource group $(RGname)"
+          Remove-AzResourceGroup -Name $(RGname) -Force
