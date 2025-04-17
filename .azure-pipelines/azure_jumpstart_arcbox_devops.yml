@@ -73,7 +73,7 @@ stages:
           Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
           $dateSuffix = (Get-Date -Format "yyyy-MM-dd-HH-mm")
           $RGname = "$(ResourceGroupNamePrefix)-$dateSuffix"
-          Write-Host "##vso[task.setvariable variable=RGname]$RGname"
+          Write-Host "##vso[task.setvariable variable=RGname;isOutput=true]$RGname"
           New-AzResourceGroup -Name $RGname -Location "$(Location)" -Force
           Write-Host "Resource group $RGname created."
 
@@ -155,6 +155,8 @@ stages:
 - stage: destroy
   displayName: 'ArcBox_teardown'
   #condition: succeeded('deploy')
+  variables:
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['SetRG.RGname'] ]
   jobs:
   - deployment:
     displayName: "Get approval"
