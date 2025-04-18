@@ -15,8 +15,8 @@ schedules:
   always: true
 
 parameters:
-- name: ResourceGroupName
-  displayName: 'Resource Group Name'
+- name: ResourceGroupNamePrefix
+  displayName: 'Resource Group Name prefix'
   type: string
   default: 'arcbox-itpro-integration-tests'
 - name: Location
