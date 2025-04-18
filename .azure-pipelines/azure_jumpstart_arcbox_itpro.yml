@@ -42,8 +42,8 @@ parameters:
 
 variables:
 #- group: 'integration-tests'
-- name: ResourceGroupName
-  value: ${{parameters.ResourceGroupName}}
+- name: ResourceGroupNamePrefix
+  value: ${{parameters.ResourceGroupNamePrefix}}
 - name: githubAccount
   value: ${{parameters.githubAccount}}
 - name: githubBranch
