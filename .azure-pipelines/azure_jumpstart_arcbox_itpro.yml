@@ -150,6 +150,8 @@ stages:
 - stage: destroy
   displayName: 'ArcBox_teardown'
   #condition: succeeded('deploy')
+  variables:
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
   - deployment:
     displayName: "Get approval"
