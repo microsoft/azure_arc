@@ -16,7 +16,7 @@ schedules:
 
 parameters:
 - name: ResourceGroupNamePrefix
-  displayName: 'Resource Group Name'
+  displayName: 'Resource Group Name prefix'
   type: string
   default: 'arcbox-devops-integration-tests'
 - name: Location
@@ -162,6 +162,8 @@ stages:
 - stage: destroy
   displayName: 'ArcBox_teardown'
   #condition: succeeded('deploy')
+  variables:
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
   - deployment:
     displayName: "Get approval"
