@@ -7,8 +7,8 @@ trigger:
       - azure_jumpstart_arcbox/*
 
 schedules:
-- cron: "55 19 * * *"
-  displayName: Daily 19:55 UTC
+- cron: "00 18 * * *"
+  displayName: Daily 18:00 UTC
   branches:
     include:
       - arcbox_pipeline
@@ -146,10 +146,20 @@ stages:
       inputs:
         testResultsFormat: NUnit
         testResultsFiles: '$(System.DefaultWorkingDirectory)/testresults/*.xml'
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+            $rgName = "$(RGname)"
+            Write-Host "Deleting resource group $rgName"
+            Remove-AzResourceGroup -Name $rgName -Force
 
 - stage: destroy
   displayName: 'ArcBox_teardown'
-  #condition: succeeded('deploy')
+  dependsOn: ArcBox_deployment
+  condition: failed('ArcBox_deployment')
   variables:
     RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
