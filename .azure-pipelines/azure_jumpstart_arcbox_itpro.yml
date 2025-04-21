@@ -150,7 +150,8 @@ stages:
       displayName: 'Delete resource group'
       inputs:
         azureSubscription: ${{parameters.AzureSubscription}}
-        ScriptType: 'InlineScript'        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
         Inline: |
             $rgName = "$(RGname)"
             Write-Host "Deleting resource group $rgName"
