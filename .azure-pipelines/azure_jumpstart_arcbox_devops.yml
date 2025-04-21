@@ -61,7 +61,7 @@ stages:
     pool:
       name: 'localbox-pool'
       #vmImage: 'ubuntu-latest'
-    continueOnError: 'true'
+    continueOnError: 'false'
     steps:
     - task: AzurePowerShell@5
       name: DeployRG
