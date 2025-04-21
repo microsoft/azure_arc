@@ -1,4 +1,4 @@
-# "azure_arc" GitHub Repository Policies
+# Arc Jumpstart GitHub Repository Policies
 
 This document summarizes the automated policies for managing Pull Requests (PRs) and Issues in the Arc Jumpstart repository. These policies help maintain a high-quality, collaborative, and efficient workflow for contributors and maintainers.
 
