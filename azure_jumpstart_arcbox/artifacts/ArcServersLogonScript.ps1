@@ -486,7 +486,7 @@ if ($Env:flavor -ne 'DevOps') {
         (Get-Content -Path $serversDscConfigurationFile) -replace 'namingPrefixStage', $namingPrefix | Set-Content -Path $serversDscConfigurationFile
         winget configure --file C:\ArcBox\DSC\virtual_machines_itpro.dsc.yml --accept-configuration-agreements --disable-interactivity
 
-    # Avoid issue https://github.com/microsoft/azure_arc/issues/3143
+    # Configure automatic start & stop action for the nested VMs
     Get-VM | Where-Object {$_.State -eq "Running"} |
         ForEach-Object -Parallel {
             Stop-VM -Force -Name $PSItem.Name
