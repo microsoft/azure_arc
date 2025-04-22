@@ -126,12 +126,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -Out
 .$PsHome\Profile.ps1
 
 # Creating LocalBox path
-$LocalPath = "C:\LocalBox"
-[System.Environment]::SetEnvironmentVariable('LocalBoxDir', $LocalPath, [System.EnvironmentVariableTarget]::Machine)
-New-Item -Path $LocalPath -ItemType directory -Force
+$LocalBoxPath = "C:\LocalBox"
+[System.Environment]::SetEnvironmentVariable('LocalBoxDir', $LocalBoxPath, [System.EnvironmentVariableTarget]::Machine)
+New-Item -Path $LocalBoxPath -ItemType directory -Force
 
 # Downloading configuration file
-$ConfigurationDataFile = "$LocalPath\LocalBox-Config.psd1"
+$ConfigurationDataFile = "$LocalBoxPath\LocalBox-Config.psd1"
 [System.Environment]::SetEnvironmentVariable('LocalBoxConfigFile', $ConfigurationDataFile, [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBox-Config.psd1") -OutFile $ConfigurationDataFile
 
@@ -155,29 +155,29 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
-Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $LocalPath\wallpaper.png
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $LocalBoxPath\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($LocalBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBoxLogonScript.ps1") -OutFile $LocalPath\LocalBoxLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-LocalBoxCluster.ps1") -OutFile $LocalPath\New-LocalBoxCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloadCluster.ps1") -OutFile $LocalPath\Configure-AKSWorkloadCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $LocalPath\Configure-VMLogicalNetwork.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $LocalPath\Generate-ARM-Template.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBoxLogonScript.ps1") -OutFile $LocalBoxPath\LocalBoxLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-LocalBoxCluster.ps1") -OutFile $LocalBoxPath\New-LocalBoxCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloadCluster.ps1") -OutFile $LocalBoxPath\Configure-AKSWorkloadCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $LocalBoxPath\Configure-VMLogicalNetwork.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $LocalBoxPath\Generate-ARM-Template.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\common.tests.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hci.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\hci.tests.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hcibox-bginfo.bgi") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\hcibox-bginfo.bgi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\Invoke-Test.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$($LocalBoxConfig.Paths["LogsDir"])\LogInstructions.txt"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $LocalPath\jumpstart-user-secret.yaml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $LocalPath\hci.json
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $LocalPath\hci.parameters.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $LocalBoxPath\jumpstart-user-secret.yaml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $LocalBoxPath\hci.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $LocalBoxPath\hci.parameters.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$LocalPath\WinGet.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$LocalBoxPath\WinGet.ps1"
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
-(Get-Content -Path $LocalPath\LocalBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $LocalPath\LocalBox-Config.psd1
-(Get-Content -Path $LocalPath\LocalBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $LocalPath\LocalBox-Config.psd1
+(Get-Content -Path $LocalBoxPath\LocalBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $LocalBoxPath\LocalBox-Config.psd1
+(Get-Content -Path $LocalBoxPath\LocalBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $LocalBoxPath\LocalBox-Config.psd1
 
 # Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -263,12 +263,12 @@ $ScheduledTaskExecutable = "pwsh.exe"
 
 # Creating scheduled task for WinGet.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalPath\WinGet.ps1
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalBoxPath\WinGet.ps1
 Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Creating scheduled task for LocalBoxLogonScript.ps1
 Write-Host "Creating scheduled task for LocalBoxLogonScript.ps1"
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalPath\LocalBoxLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalBoxPath\LocalBoxLogonScript.ps1
 Register-ScheduledTask -TaskName "LocalBoxLogonScript"  -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disable Edge 'First Run' Setup
