@@ -1,6 +1,13 @@
 @description('The name of your Virtual Machine')
 param vmName string = 'HCIBox-Client'
 
+@description('The size of the Virtual Machine')
+@allowed([
+  'Standard_E32s_v5'
+  'Standard_E32s_v6'
+])
+param vmSize string = 'Standard_E32s_v5'
+
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
 
@@ -122,7 +129,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_E32s_v5'
+      vmSize: vmSize
     }
     storageProfile: {
       osDisk: {

@@ -50,6 +50,13 @@ param autoUpgradeClusterResource bool = false
 @description('Enable automatic logon into HCIBox Virtual Machine')
 param vmAutologon bool = true
 
+@description('The size of the Virtual Machine')
+@allowed([
+  'Standard_E32s_v5'
+  'Standard_E32s_v6'
+])
+param vmSize string = 'Standard_E32s_v6'
+
 @description('Setting this parameter to `true` will add the `CostControl` and `SecurityControl` tags to the provisioned resources. These tags are applicable to ONLY Microsoft-internal Azure lab tenants and designed for managing automated governance processes related to cost optimization and security controls')
 param governResourceTags bool = true
 
@@ -66,6 +73,7 @@ var resourceTags = governResourceTags ? union(tags, {
 }) : tags
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
+var customerUsageAttributionDeploymentName = 'feada075-1961-4b99-829f-fa3828068933'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -96,6 +104,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 module hostDeployment 'host/host.bicep' = {
   name: 'hostVmDeployment'
   params: {
+    vmSize: vmSize
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
@@ -114,5 +123,11 @@ module hostDeployment 'host/host.bicep' = {
     autoUpgradeClusterResource: autoUpgradeClusterResource
     vmAutologon: vmAutologon
     resourceTags: resourceTags
+  }
+}
+
+module customerUsageAttribution 'mgmt/customerUsageAttribution.bicep' = {
+  name: 'pid-${customerUsageAttributionDeploymentName}'
+  params: {
   }
 }

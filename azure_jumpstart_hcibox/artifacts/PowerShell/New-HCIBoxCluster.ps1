@@ -1577,22 +1577,6 @@ function Set-HCIDeployPrereqs {
 
 }
 
-function Set-HCIDeployPrereqsWorkaround {
-
-    Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | ForEach-Object {
-
-        Remove-AzConnectedMachineExtension -MachineName $PSItem.Name -ResourceGroupName $env:resourceGroup -Name AzureEdgeLifecycleManager -AsJob
-
-    } | Wait-Job
-
-
-       Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | ForEach-Object {
-
-        New-AzConnectedMachineExtension -MachineName $PSItem.Name -ResourceGroupName $env:resourceGroup -Name AzureEdgeLifecycleManager -AsJob -TypeHandlerVersion 30.2411.2.789 -Location $env:azureLocation -Publisher "Microsoft.AzureStack.Orchestration" -ExtensionType "LcmController"
-
-    } | Wait-Job
-
-}
 function Update-HCICluster {
     param (
         $HCIBoxConfig,
@@ -1892,8 +1876,6 @@ $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
-
-Set-HCIDeployPrereqsWorkaround
 
 & "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
 
