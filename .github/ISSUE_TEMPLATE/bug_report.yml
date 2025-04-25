@@ -24,6 +24,8 @@ body:
         - label: A specific Jumpstart scenario
         - label: Jumpstart Drops
         - label: Something else
+    validations:
+      required: true
   - type: textarea
     id: what-happened
     attributes:
