@@ -280,8 +280,8 @@ configuration:
             label: Resolution-Duplicate
 
       # ---------------------------------------------------------------------------
-      # ASSIGNED ISSUE MILESTONE CHECK
-      # Labels assigned issues that are missing a milestone for tracking completeness
+      # ISSUE MILESTONE CHECK
+      # Labels issues that are assigned or closed without a milestone
       # ---------------------------------------------------------------------------
       - description: Add Missing-Milestone label to assigned issues without a milestone
         # This rule helps ensure all assigned issues are tracked with a milestone
@@ -291,6 +291,18 @@ configuration:
             - isAssignedToSomeone
             - not:
                 isPartOfAnyMilestone
+        then:
+        - addLabel:
+            label: Missing-Milestone
+
+      - description: Add Missing-Milestone label to closed issues without a milestone
+        # This rule helps ensure all closed issues are tracked with a milestone
+        if:
+        - payloadType: Issues
+        - isAction:
+            action: Closed
+        - not:
+            isPartOfAnyMilestone
         then:
         - addLabel:
             label: Missing-Milestone
