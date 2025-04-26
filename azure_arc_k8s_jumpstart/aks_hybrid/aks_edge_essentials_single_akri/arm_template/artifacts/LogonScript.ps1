@@ -29,6 +29,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 Write-Host "Fetching the latest AKS Edge Essentials release."
 if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $SchemaVersion = $AKSEEPinnedSchemaVersion
+    $schemaVersionAksEdgeConfig = $AKSEEPinnedSchemaVersion
 }else{
     $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
     $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
@@ -38,6 +39,7 @@ if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
     $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
     $schemaVersion = $jsonContent.SchemaVersion
+    $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
     # Clean up the downloaded release files
     Remove-Item -Path $output -Force
     Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
