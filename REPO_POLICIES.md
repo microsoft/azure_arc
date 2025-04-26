@@ -22,6 +22,7 @@ This document summarizes the automated policies for managing Pull Requests (PRs)
 | **Issue Lifecycle Management**| Labels are updated when issues are closed, reopened, or marked as duplicates. Authors can comment `/unresolve` to reopen. | Keeps issue status and labels accurate.                   | Clear communication and ability to reopen issues.       |
 | **Assignment Handling**       | Labels are managed automatically when issues are assigned or unassigned.                     | Ensures issues needing attention are visible.             | Maintainers and contributors see up-to-date labels.     |
 | **Duplicate Issue Handling**  | Issues/PRs identified as duplicates (via comments) are closed and labeled.                   | Prevents duplicate tracking and consolidates discussion.  | PR/issue is closed with a comment and label.            |
+| **Issue Milestone Check**     | Assigned or closed issues without a milestone are labeled "Missing-Milestone".               | Ensures all assigned and closed issues are tracked with milestones. | Maintainers are prompted to add milestones to assigned/closed issues. |
 | **Stale Issue Management**    | Issues needing author feedback and inactive for 7 days are labeled "No-Recent-Activity". If still inactive after another 7 days, the issue is closed. Resolved issues are auto-closed after 7 days of inactivity. | Keeps the issue tracker clean and focused.                | Reminders and auto-closure with clear communication.    |
 
 ---
