@@ -368,6 +368,21 @@ configuration:
         - addLabel:
             label: Missing-Milestone
 
+      - description: Remove the "Missing-Milestone" label from assigned, closed or reopened issues with a milestone.
+        # This rule helps ensure all closed or reopened issues are tracked with a milestone by removing the "Missing-Milestone" label
+        if:
+        - payloadType: Issues
+        - or: 
+            - isAction:
+                action: Closed
+            - isAction:
+                action: Reopened
+        - isPartOfAnyMilestone
+        - isAssignedToSomeone    
+        then:
+        - removeLabel:
+            label: Missing-Milestone
+
     # ===========================================================================
     # SCHEDULED SEARCHES
     # Periodic tasks that run on defined schedules to maintain repository hygiene
