@@ -288,9 +288,11 @@ configuration:
           - addLabel:
               label: Needs-Attention
 
-      - description: Add back the "Needs-Attention" label if removed from assigned issues.
+      - description: Add the "Needs-Attention" label to assigned issues that are open and do not have the "Needs-Attention" label.
+        # This rule ensures that all open issues assigned to someone are marked for attention by adding the "Needs-Attention" label
         if:
-          - payloadType: Issues          
+          - payloadType: Issues
+          - isOpen        
           - and:
              - not:
                 hasLabel:
@@ -299,6 +301,18 @@ configuration:
         then:
           - addLabel:
               label: Needs-Attention
+
+    #   - description: Add back the "Needs-Attention" label if removed from assigned issues.
+    #     if:
+    #       - payloadType: Issues    
+    #       - and:
+    #          - not:
+    #             hasLabel:
+    #                 label: Needs-Attention
+    #       - isAssignedToSomeone
+    #     then:
+    #       - addLabel:
+    #           label: Needs-Attention
 
       # ---------------------------------------------------------------------------
       # DUPLICATE ISSUE HANDLING
