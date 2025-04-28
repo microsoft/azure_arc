@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: azure_jumpstart_hcibox
+name: azure_jumpstart_localbox
 metadata:
-    template: azure_jumpstart_hcibox@0.0.1-beta
+    template: azure_jumpstart_localbox@0.0.1-beta
 infra:
   provider: "bicep"
   path: "bicep"
