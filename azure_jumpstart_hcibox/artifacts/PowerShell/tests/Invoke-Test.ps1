@@ -143,7 +143,7 @@ Write-Header 'Adding deployment test results to wallpaper using BGInfo'
 Set-Content "$Env:windir\TEMP\localbox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\localbox-tests-failed.txt" $tests_failed
 
-bginfo.exe $Env:LocalBoxTestsDir\hcibox-bginfo.bgi /timer:0 /NOLICPROMPT
+bginfo.exe $Env:LocalBoxTestsDir\localbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 # Setup scheduled task for running tests on each logon
 $TaskName = 'Pester tests'
