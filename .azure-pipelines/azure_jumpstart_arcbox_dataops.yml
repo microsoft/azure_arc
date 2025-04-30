@@ -103,7 +103,7 @@ stages:
           }
 
           Test-AzResourceGroupDeployment `
-          -ResourceGroupName $ResourceGroup `
+          -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
