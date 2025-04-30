@@ -102,11 +102,17 @@ stages:
             git checkout -b $githubBranch upstream/$githubBranch
           }
 
+          $bicepFile = "azure_jumpstart_arcbox/bicep/main.bicep"
+          $jsonFile = "azure_jumpstart_arcbox/bicep/main.json"
+
+          Write-Host "Building Bicep file..."
+          az bicep build --file $bicepFile --outFile $jsonFile
+
           try {
 
           New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $rgName `
-          -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
+          -TemplateFile $jsonFile `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
               flavor = $flavor ; `
@@ -120,9 +126,8 @@ stages:
            } -Debug
 
           } catch {
-            Write-Host "Deployment failed. Resolving Azure error..."
-            Resolve-AzError
-            throw "Deployment failed. ${($_.Exception.Message)}"
+            Write-Error "Deployment failed: $($_.Exception.Message)"
+            exit 1
           }
           Write-Host "Deployment completed."
 
