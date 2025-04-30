@@ -120,7 +120,7 @@ stages:
 
           try {
 
-          New-AzResourceGroupDeployment -Name ArcBox `
+          New-AzResourceGroupDeployment -SkipTemplateParameterPrompt -Name ArcBox `
           -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
