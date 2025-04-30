@@ -102,7 +102,7 @@ stages:
             git checkout -b $githubBranch upstream/$githubBranch
           }
 
-          Test-AzResourceGroupDeployment `
+          Test-AzResourceGroupDeployment -SkipTemplateParameterPrompt `
           -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
