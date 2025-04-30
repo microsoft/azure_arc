@@ -104,7 +104,7 @@ stages:
 
           try {
 
-          New-AzResourceGroupDeployment -SkipTemplateParameterPrompt -Name ArcBox `
+          New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
@@ -116,13 +116,13 @@ stages:
               githubAccount = $githubAccount ; `
               githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
-              rdpPort = "3389" `
+              rdpPort = "3389"
            } -Debug
 
           } catch {
-          Write-Host "Deployment failed. Resolving Azure error..."
-          Resolve-AzError
-          throw
+            Write-Host "Deployment failed. Resolving Azure error..."
+            Resolve-AzError
+            throw "Deployment failed. ${($_.Exception.Message)}"
           }
           Write-Host "Deployment completed."
 
