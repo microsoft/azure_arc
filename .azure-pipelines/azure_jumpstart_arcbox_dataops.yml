@@ -101,6 +101,8 @@ stages:
             git fetch upstream
             git checkout -b $githubBranch upstream/$githubBranch
           }
+          try {
+
           New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $rgName `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
@@ -114,7 +116,14 @@ stages:
               githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
               rdpPort = "3389" `
+           }
+
+          } catch {
+          Write-Host "Deployment failed. Resolving Azure error..."
+          Resolve-AzError
+          throw
           }
+          Write-Host "Deployment completed."
 
 # Need to run this script multiple times to avoid Azure PowerShell authentication cache issues when run for more than 60 minutes
     - task: AzurePowerShell@5
