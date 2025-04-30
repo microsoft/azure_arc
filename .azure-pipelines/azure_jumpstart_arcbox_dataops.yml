@@ -106,7 +106,7 @@ stages:
           $jsonFile = "azure_jumpstart_arcbox/bicep/main.json"
 
           Write-Host "Building Bicep file..."
-          az bicep build --file $bicepFile --outFile $jsonFile
+          az bicep build --file $bicepFile --outfile $jsonFile
 
           try {
 
