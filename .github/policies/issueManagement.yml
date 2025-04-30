@@ -1,3 +1,4 @@
+# See repository policies at ../../REPO_POLICIES.md
 # ===========================================================================
 # GitHub Repository Issue Management Policy
 # ===========================================================================
@@ -97,15 +98,18 @@ configuration:
                       By submitting this pull request, you agree that your contributions will be licensed under the [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) license and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
 
       - description: Auto-close issues without Bug-Issue or Feature-Request labels
-        # Ensures issues opened without proper labels are closed automatically
+        # This policy ensures that any issue opened without the required labels is automatically closed.
+        # It acts as a fail-safe mechanism to enforce the use of GitHub Issue Forms for proper categorization.
         if:
           - payloadType: Issues
           - isAction:
               action: Opened
           - and:
+              # Check if the issue does not have the 'Bug-Issue' label
               - not:
                   hasLabel:
                       label: Bug-Issue
+              # Check if the issue does not have the 'Feature-Request' label
               - not:
                   hasLabel:
                       label: Feature-Request
@@ -119,8 +123,14 @@ configuration:
                 This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
 
                 Thank you for your collaboration!
-                
+
         - closeIssue
+        # Remove all working labels
+        - removeLabel:
+            label: Needs-Triage
+        # Add abandoned label to track automatically closed non-form GitHub issues
+        - addLabel:
+            label: Abandoned
 
       # ---------------------------------------------------------------------------
       # ISSUE LIFECYCLE MANAGEMENT
@@ -208,6 +218,63 @@ configuration:
                 We've reopened this issue because we need more information from you or we identified it is not completely resolved.
 
                 Thank you for your collaboration!
+
+      # ---------------------------------------------------------------------------
+      # ISSUE ASSIGNMENT HANDLING
+      # Manages labels when issues are assigned or unassigned
+      # ---------------------------------------------------------------------------
+      - description: Remove Needs-Triage label when issue is assigned
+        if:
+          - payloadType: Issues
+          - and:
+              - isAction:
+                  action: Assigned
+              - hasLabel:
+                  label: Needs-Triage
+        then:
+          - removeLabel:
+              label: Needs-Triage
+
+      - description: Add Needs-Triage label when issue has no assignees
+        if:
+          - payloadType: Issues
+          - and:
+             - not:
+                isAssignedToSomeone
+          - and:
+             - not:
+                hasLabel:
+                    label: Needs-Triage
+        then:
+          - addLabel:
+              label: Needs-Triage
+          - removeLabel:
+              label: Needs-Attention    
+
+      - description: Handle when Needs-Triage is manually added to assigned issues
+        if:
+          - payloadType: Issues
+          - and:
+              - hasLabel:
+                  label: Needs-Triage
+              - isAssignedToSomeone
+        then:
+          - removeLabel:
+              label: Needs-Triage
+          - addLabel:
+              label: Needs-Attention
+
+      - description: Add back Needs-Attention label if removed from assigned issues
+        if:
+          - payloadType: Issues          
+          - and:
+             - not:
+                hasLabel:
+                    label: Needs-Attention
+          - isAssignedToSomeone
+        then:
+          - addLabel:
+              label: Needs-Attention
 
       # ---------------------------------------------------------------------------
       # DUPLICATE ISSUE HANDLING

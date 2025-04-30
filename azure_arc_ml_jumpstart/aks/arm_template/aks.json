@@ -120,10 +120,14 @@
             "count": "[parameters('agentCount')]",
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
-            "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets"
           }
         ],
+        "storageProfile": {
+          "diskCSIDriver": {
+            "enabled": true
+          }
+        },        
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
