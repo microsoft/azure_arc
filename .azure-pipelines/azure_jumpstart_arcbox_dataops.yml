@@ -124,7 +124,7 @@ stages:
               githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
               rdpPort = "3389"
-           } -Debug
+           }
 
           } catch {
             Write-Error "Deployment failed: $($_.Exception.Message)"
