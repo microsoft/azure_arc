@@ -22,56 +22,6 @@ param (
   [string]$vmAutologon
 )
 
-# $debugEnabled = "true"
-# # Create a log directory that will exist even if the script fails
-# New-Item -Path "C:\BootstrapLogs" -ItemType Directory -Force | Out-Null
-
-# # Start transcript to capture all output
-# Start-Transcript -Path "C:\BootstrapLogs\Bootstrap_Detailed.log" -Force
-
-# Write-Host "================ BOOTSTRAP SCRIPT DEBUGGING ================"
-# Write-Host "Script started at: $(Get-Date)"
-# Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
-# Write-Host "Current User: $([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)"
-
-# # Log all parameters (excluding sensitive ones)
-# Write-Host "`n--- PARAMETERS ---"
-# Write-Host "adminUsername: $adminUsername"
-# Write-Host "spnClientId: $spnClientId" 
-# Write-Host "spnTenantId: $spnTenantId"
-# Write-Host "subscriptionId: $subscriptionId"
-# Write-Host "resourceGroup: $resourceGroup"
-# Write-Host "templateBaseUrl: [$templateBaseUrl]"
-# Write-Host "registerCluster: $registerCluster"
-# Write-Host "deployAKSHCI: $deployAKSHCI"
-# Write-Host "deployResourceBridge: $deployResourceBridge"
-
-# # Validate templateBaseUrl
-# Write-Host "`n--- URL VALIDATION ---"
-# if ([string]::IsNullOrEmpty($templateBaseUrl)) {
-#     Write-Host "ERROR: templateBaseUrl is null or empty!"
-# } else {
-#     Write-Host "templateBaseUrl appears to be set: $templateBaseUrl"
-    
-#     # Test URL Formation
-#     $testUrl = $templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1"
-#     Write-Host "Will attempt to download from: $testUrl"
-    
-#     # Test URL connectivity
-#     try {
-#         $testRequest = [System.Net.WebRequest]::Create($testUrl)
-#         $testRequest.Method = "HEAD"
-#         $testResponse = $testRequest.GetResponse()
-#         Write-Host "URL TEST SUCCESS: File exists at $testUrl"
-#         $testResponse.Close()
-#     } catch {
-#         Write-Host "URL TEST FAILED: Cannot access $testUrl"
-#         Write-Host "Error: $_"
-#     }
-# }
-
-# Write-Host "========================================================"
-
 Write-Output "Input parameters:"
 $PSBoundParameters
 
