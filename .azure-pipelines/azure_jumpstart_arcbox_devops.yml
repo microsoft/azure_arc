@@ -119,25 +119,7 @@ stages:
 
 # Need to run this script multiple times to avoid Azure PowerShell authentication cache issues when run for more than 60 minutes
     - task: AzurePowerShell@5
-      displayName: 'Upload Pester test-results from ArcBox VM - 1'
-      inputs:
-        azureSubscription: ${{parameters.AzureSubscription}}
-        ScriptType: FilePath
-        azurePowerShellVersion: 'LatestVersion'
-        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
-
-    - task: AzurePowerShell@5
-      displayName: 'Upload Pester test-results from ArcBox VM - 2'
-      inputs:
-        azureSubscription: ${{parameters.AzureSubscription}}
-        ScriptType: FilePath
-        azurePowerShellVersion: 'LatestVersion'
-        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
-
-    - task: AzurePowerShell@5
-      displayName: 'Upload Pester test-results from ArcBox VM - 3'
+      displayName: 'Upload Pester test-results from ArcBox VM'
       inputs:
         azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: FilePath
