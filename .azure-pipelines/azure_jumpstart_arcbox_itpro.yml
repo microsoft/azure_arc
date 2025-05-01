@@ -110,6 +110,7 @@ stages:
               githubAccount = $githubAccount ; `
               githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
+              autoShutdownEnabled = $false ; `
               rdpPort = "3389" `
           }
 
