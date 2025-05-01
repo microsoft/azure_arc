@@ -18,7 +18,7 @@ parameters:
 - name: ResourceGroupNamePrefix
   displayName: 'Resource Group Name prefix'
   type: string
-  default: 'arcbox-itpro-integration-tests'
+  default: 'arcbox-itpro-tests'
 - name: Location
   displayName: 'Location'
   type: string
