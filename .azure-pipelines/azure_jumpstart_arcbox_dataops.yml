@@ -22,7 +22,7 @@ parameters:
 - name: Location
   displayName: 'Location'
   type: string
-  default: 'northeurope'
+  default: 'australiaeast'
 - name: AzureSubscription
   displayName: 'Azure Subscription'
   type: string
