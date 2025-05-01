@@ -127,8 +127,12 @@ stages:
            }
 
           } catch {
-            Write-Error "Deployment failed: $($_.Exception.Message)"
-            exit 1
+            Write-Host "##vso[task.logissue type=error]Deployment failed."
+             Write-Host "Error: $($_.Exception.Message)"
+             if ($_.Exception.ErrorRecord) {
+             Write-Host "Full ErrorRecord: $($_.Exception.ErrorRecord | ConvertTo-Json -Depth 10 -Compress)"
+            }
+             exit 1
           }
           Write-Host "Deployment completed."
 
