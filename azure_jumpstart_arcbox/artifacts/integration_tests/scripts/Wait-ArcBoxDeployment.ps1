@@ -19,7 +19,7 @@ if ($existingJob) {
     Set-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName ArcBox-Client -RunCommandName RetrievePesterResults -Location $Location -SourceScriptUri "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Send-PesterResult.ps1" -AsyncExecution
 }
 
-$timeoutMinutes = 28
+$timeoutMinutes = 60
 $elapsedMinutes = 0
 
 do {
@@ -32,7 +32,7 @@ do {
     $elapsedMinutes += 1
 
     if ($elapsedMinutes -ge $timeoutMinutes) {
-        Write-Host "Timeout of 28 minutes reached. Exiting wait loop to avoid authentication token cache expiration." -ForegroundColor Yellow
+        Write-Host "Timeout of 60 minutes reached. Exiting wait loop to avoid authentication token cache expiration." -ForegroundColor Yellow
         break
     }
 
