@@ -110,7 +110,7 @@ stages:
 
           try {
 
-          New-AzResourceGroupDeployment -SkipTemplateParameterPrompt -Name ArcBox `
+          New-AzResourceGroupDeployment -SkipTemplateParameterPrompt -WhatIf -Name ArcBox `
           -ResourceGroupName $rgName `
           -TemplateFile $jsonFile `
           -TemplateParameterObject @{ `
