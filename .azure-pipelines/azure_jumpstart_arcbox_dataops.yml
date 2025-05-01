@@ -104,7 +104,7 @@ stages:
 
           New-AzResourceGroupDeployment -SkipTemplateParameterPrompt -Name ArcBox `
           -ResourceGroupName $rgName `
-          -TemplateFile $jsonFile `
+          -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
               windowsAdminUsername = "arcdemo" ; `
               flavor = $flavor ; `
