@@ -96,7 +96,7 @@ if (Get-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName 
 
 }
 
-Write-Output "Waiting for PowerShell transcript end in $logFilePath"
+Write-Output "Waiting for deployment end in $logFilePath"
 
 do {
 
@@ -104,17 +104,17 @@ do {
     Write-Output "Log file $logFilePath exists"
 
     $content = Get-Content -Path $logFilePath -Tail 5
-    if ($content -like "*PowerShell transcript end*") {
-        Write-Output "PowerShell transcript end detected in $logFilePath at $(Get-Date)"
+    if ($content -like "*Running tests to verify infrastructure*") {
+        Write-Output "Deployment end  detected in $logFilePath at $(Get-Date)"
         break
     } else {
-        Write-Output "PowerShell transcript end not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
+        Write-Output "Deployment end  not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
     }
     } else {
         Write-Output "Log file $logFilePath does not yet exist - waiting 60 seconds"
     }
     if ((Get-Date) -ge $endTime) {
-       throw "Timeout reached. PowerShell transcript end not found."
+       throw "Timeout reached. Deployment end not found."
     }
     Start-Sleep -Seconds 60
 } while ((Get-Date) -lt $endTime)
