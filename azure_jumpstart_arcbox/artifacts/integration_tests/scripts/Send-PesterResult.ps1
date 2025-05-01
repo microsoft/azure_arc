@@ -103,12 +103,12 @@ do {
     if (Test-Path $logFilePath) {
     Write-Output "Log file $logFilePath exists"
 
-    $content = Get-Content -Path $logFilePath -Tail 5
+    $content = Get-Content -Path $logFilePath
     if ($content -like "*Running tests to verify infrastructure*") {
-        Write-Output "Deployment end  detected in $logFilePath at $(Get-Date)"
+        Write-Output "Deployment end detected in $logFilePath at $(Get-Date)"
         break
     } else {
-        Write-Output "Deployment end  not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
+        Write-Output "Deployment end not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
     }
     } else {
         Write-Output "Log file $logFilePath does not yet exist - waiting 60 seconds"
