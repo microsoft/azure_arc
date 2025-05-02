@@ -124,6 +124,15 @@ stages:
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
         ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
+    - task: AzurePowerShell@5
+      displayName: 'Download Pester test-results from storage account to pipeline agent'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: FilePath
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
+        ScriptArguments: -ResourceGroupName $(RGname)
+
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
