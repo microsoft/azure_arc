@@ -152,7 +152,8 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-            $xmlFiles = Get-ChildItem -Path $Env:ArcBoxLogsDir -Filter *.xml
+            $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
+            $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
             $failedTestsFound = $false
 
             foreach ($file in $xmlFiles) {
