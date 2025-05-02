@@ -152,8 +152,23 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
+            dir $env:SYSTEM_DEFAULTWORKINGDIRECTORY
             $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
+            Write-Host "Looking in: $resultsPath"
+
+            if (-Not (Test-Path $resultsPath)) {
+                throw "❌ Directory not found: $resultsPath"
+            }
+
             $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
+
+            if ($xmlFiles.Count -eq 0) {
+                throw "❌ No XML test result files found in $resultsPath"
+            }
+
+            $xmlFiles | ForEach-Object {
+                Write-Host "Found test file: $($_.FullName)"
+            }
             $failedTestsFound = $false
 
             foreach ($file in $xmlFiles) {
