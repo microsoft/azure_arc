@@ -149,33 +149,36 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-              $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
-              $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
-              $failedTestsFound = $false
+          $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
+          Write-Host "Looking in: $resultsPath"
 
-              foreach ($file in $xmlFiles) {
+          $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
+          if ($xmlFiles.Count -eq 0) {
+              throw "❌ No test result XML files found in $resultsPath"
+          }
+
+          $failedTestsFound = $false
+
+          foreach ($file in $xmlFiles) {
+              Write-Host "Found test file: $($file.FullName)"
               [xml]$xml = Get-Content -Path $file.FullName
 
-              $failedTests = $xml.'test-results'.'test-suite'.results.'test-suite'.results.'test-suite' |
-                  ForEach-Object {
-                      $_.results.'test-case' |
-                      Where-Object { $_.result -eq 'Failed' }
-                  }
+              $failedTests = $xml.SelectNodes('//test-case[@result="Failure" or @result="Failed"]')
 
               if ($failedTests.Count -gt 0) {
-                Write-Host "`nFAILED TESTS in file: $($file.Name)" -ForegroundColor Red
-                $failedTests | ForEach-Object {
-                    Write-Host " - $($_.name): $($_.description)" -ForegroundColor Red
+                  Write-Host "`n❌ FAILED TESTS in file: $($file.Name)" -ForegroundColor Red
+                  foreach ($test in $failedTests) {
+                      Write-Host " - $($test.name): $($test.description)" -ForegroundColor Red
                   }
-                $failedTestsFound = $true
-                    }
+                  $failedTestsFound = $true
               }
+          }
 
-              if ($failedTestsFound) {
-                  throw "One or more Pester tests failed."
-              } else {
-                  Write-Host "All Pester tests passed." -ForegroundColor Green
-              }
+          if ($failedTestsFound) {
+              throw "❌ One or more Pester tests failed."
+          } else {
+              Write-Host "✅ All Pester tests passed." -ForegroundColor Green
+          }
 
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'

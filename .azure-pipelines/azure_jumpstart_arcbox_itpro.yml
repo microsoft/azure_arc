@@ -147,31 +147,34 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
+          Write-Host "Looking in: $resultsPath"
+
           $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
+          if ($xmlFiles.Count -eq 0) {
+              throw "❌ No test result XML files found in $resultsPath"
+          }
+
           $failedTestsFound = $false
 
           foreach ($file in $xmlFiles) {
-          [xml]$xml = Get-Content -Path $file.FullName
+              Write-Host "Found test file: $($file.FullName)"
+              [xml]$xml = Get-Content -Path $file.FullName
 
-          $failedTests = $xml.'test-results'.'test-suite'.results.'test-suite'.results.'test-suite' |
-              ForEach-Object {
-                  $_.results.'test-case' |
-                  Where-Object { $_.result -eq 'Failed' }
-              }
+              $failedTests = $xml.SelectNodes('//test-case[@result="Failure" or @result="Failed"]')
 
-          if ($failedTests.Count -gt 0) {
-            Write-Host "`nFAILED TESTS in file: $($file.Name)" -ForegroundColor Red
-            $failedTests | ForEach-Object {
-                Write-Host " - $($_.name): $($_.description)" -ForegroundColor Red
+              if ($failedTests.Count -gt 0) {
+                  Write-Host "`n❌ FAILED TESTS in file: $($file.Name)" -ForegroundColor Red
+                  foreach ($test in $failedTests) {
+                      Write-Host " - $($test.name): $($test.description)" -ForegroundColor Red
+                  }
+                  $failedTestsFound = $true
               }
-            $failedTestsFound = $true
-                }
           }
 
           if ($failedTestsFound) {
-              throw "One or more Pester tests failed."
+              throw "❌ One or more Pester tests failed."
           } else {
-              Write-Host "All Pester tests passed." -ForegroundColor Green
+              Write-Host "✅ All Pester tests passed." -ForegroundColor Green
           }
 
 
