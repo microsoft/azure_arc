@@ -63,16 +63,6 @@ stages:
       vmImage: 'ubuntu-latest'
     continueOnError: 'false'
     steps:
-    - checkout: self
-
-    - powershell: |
-        Write-Host "Removing unneeded folders..."
-        Remove-Item -Recurse -Force azure_arc_data_jumpstart, azure_arc_k8s_jumpstart, azure_arc_servers_jumpstart, azure_edge_iot_ops_jumpstart
-      workingDirectory: $(Build.SourcesDirectory)
-      displayName: 'Prune source folders before scanning'
-
-    - task: nuget-security-analysis@0
-      displayName: 'Secure Supply Chain Analysis'
 
     - task: AzurePowerShell@5
       name: DeployRG
