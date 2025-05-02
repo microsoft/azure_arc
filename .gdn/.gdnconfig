@@ -1,0 +1,10 @@
+{
+  "excludePaths": [
+    "azure_arc_data_jumpstart",
+    "azure_arc_k8s_jumpstart",
+    "azure_arc_servers_jumpstart",
+    "azure_edge_iot_ops_jumpstart",
+    "azure_jumpstart_arcbox/artifacts/k8s/longhorn.yaml",
+    "azure_jumpstart_arcbox/artifacts/longhorn.yaml"
+  ]
+}
