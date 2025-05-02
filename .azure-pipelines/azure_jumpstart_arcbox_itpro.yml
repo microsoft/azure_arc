@@ -64,7 +64,6 @@ stages:
     continueOnError: 'false'
     steps:
     - checkout: self
-      path: s
 
     - powershell: |
         Write-Host "Removing unneeded folders..."
