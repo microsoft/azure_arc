@@ -141,6 +141,41 @@ stages:
       inputs:
         testResultsFormat: NUnit
         testResultsFiles: '$(System.DefaultWorkingDirectory)/testresults/*.xml'
+
+    - task: AzurePowerShell@5
+      displayName: 'Check for failed tests'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+              $xmlFiles = Get-ChildItem -Path $Env:ArcBoxLogsDir -Filter *.xml
+              $failedTestsFound = $false
+
+              foreach ($file in $xmlFiles) {
+              [xml]$xml = Get-Content -Path $file.FullName
+
+              $failedTests = $xml.'test-results'.'test-suite'.results.'test-suite'.results.'test-suite' |
+                  ForEach-Object {
+                      $_.results.'test-case' |
+                      Where-Object { $_.result -eq 'Failed' }
+                  }
+
+              if ($failedTests.Count -gt 0) {
+                Write-Host "`nFAILED TESTS in file: $($file.Name)" -ForegroundColor Red
+                $failedTests | ForEach-Object {
+                    Write-Host " - $($_.name): $($_.description)" -ForegroundColor Red
+                  }
+                $failedTestsFound = $true
+                    }
+              }
+
+              if ($failedTestsFound) {
+                  throw "One or more Pester tests failed."
+              } else {
+                  Write-Host "All Pester tests passed." -ForegroundColor Green
+              }
+
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'
       inputs:
