@@ -47,13 +47,13 @@
 
     NodeHostConfig = @(
         @{
-            Hostname    = "AzSHOST1"
+            Hostname    = "AzLHOST1"
             IP          = "192.168.1.12/24"
             StorageAIP  = "10.71.1.10"
             StorageBIP  = "10.71.2.10"
         },
         @{
-            Hostname    = "AzSHOST2"
+            Hostname    = "AzLHOST2"
             IP          = "192.168.1.13/24"
             StorageAIP  = "10.71.1.11"
             StorageBIP  = "10.71.2.11"
