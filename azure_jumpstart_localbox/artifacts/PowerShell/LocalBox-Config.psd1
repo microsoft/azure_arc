@@ -41,7 +41,7 @@
     azsHCIVHDXPath    = "C:\LocalBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
 
     MgmtHostConfig = @{
-        Hostname = "AzSMGMT"
+        Hostname = "AzLMGMT"
         IP       = "192.168.1.11/24"
     }
 
