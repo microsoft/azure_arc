@@ -149,7 +149,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       }
       dataDisks: [
         {
-          name: 'ASHCIHost001_DataDisk_0'
+          name: '${vmName}-DataDisk_0'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 0
@@ -160,7 +160,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_1'
+          name: '${vmName}-DataDisk_1'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 1
@@ -171,7 +171,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_2'
+          name: '${vmName}-DataDisk_2'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 2
@@ -182,7 +182,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_3'
+          name: '${vmName}-DataDisk_3'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 3
@@ -193,7 +193,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_4'
+          name: '${vmName}-DataDisk_4'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 4
@@ -204,7 +204,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_5'
+          name: '${vmName}-DataDisk_5'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 5
@@ -215,7 +215,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_6'
+          name: '${vmName}-DataDisk_6'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 6
@@ -226,7 +226,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          name: 'ASHCIHost001_DataDisk_7'
+          name: '${vmName}-DataDisk_7'
           diskSizeGB: 256
           createOption: 'Empty'
           lun: 7
