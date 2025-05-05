@@ -104,7 +104,7 @@ Start-Transcript -Path "$($LocalBoxConfig.Paths["LogsDir"])\Bootstrap.log"
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
-Write-Host "Downloading Azure Stack HCI configuration scripts"
+Write-Host "Downloading Azure Local configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/localbox_wallpaper_dark.png" -OutFile $LocalBoxPath\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($LocalBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LocalBoxLogonScript.ps1") -OutFile $LocalBoxPath\LocalBoxLogonScript.ps1
@@ -113,13 +113,13 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloa
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $LocalBoxPath\Configure-VMLogicalNetwork.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $LocalBoxPath\Generate-ARM-Template.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\common.tests.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hci.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\hci.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/azlocal.tests.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\azlocal.tests.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/localbox-bginfo.bgi") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\localbox-bginfo.bgi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$($LocalBoxConfig.Paths["TestsDir"])\Invoke-Test.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$($LocalBoxConfig.Paths["LogsDir"])\LogInstructions.txt"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $LocalBoxPath\jumpstart-user-secret.yaml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $LocalBoxPath\hci.json
-Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $LocalBoxPath\hci.parameters.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/azlocal.json") -OutFile $LocalBoxPath\azlocal.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/azlocal.parameters.json") -OutFile $LocalBoxPath\azlocal.parameters.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$LocalBoxPath\WinGet.ps1"
