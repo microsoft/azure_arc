@@ -65,29 +65,29 @@ $storageBIPs += " ]"
 $diagnosticsStorageName = "localboxdiagsa$guid"
 
 # Replace placeholder values in ARM template with real values
-$hciParams = "$env:LocalBoxDir\hci.parameters.json"
-(Get-Content -Path $hciParams) -replace 'clusterName-staging', $LocalBoxConfig.ClusterName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'arcNodeResourceIds-staging', $arcNodeResourceIds | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'localAdminUserName-staging', 'Administrator' | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'localAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'AzureStackLCMAdminUserName-staging', $($LocalBoxConfig.LCMDeployUsername) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'AzureStackLCMAdminAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'arbDeploymentAppId-staging', $($env:spnClientId) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'arbDeploymentAppSecret-staging', $($env:spnClientSecret) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'arbDeploymentSPNObjectID-staging', $SPNobjectId | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'domainFqdn-staging', $($LocalBoxConfig.SDNDomainFQDN) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'namingPrefix-staging', $($LocalBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'adouPath-staging', $ouPath | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'subnetMask-staging', $($LocalBoxConfig.rbSubnetMask) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'defaultGateway-staging', $LocalBoxConfig.SDNLabRoute | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'startingIp-staging', $LocalBoxConfig.clusterIpRangeStart | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'endingIp-staging', $LocalBoxConfig.clusterIpRangeEnd | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'dnsServers-staging', $dns | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'keyVaultName-staging', $keyVaultName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'storageNicAVLAN-staging', $LocalBoxConfig.StorageAVLAN | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'storageNicBVLAN-staging', $LocalBoxConfig.StorageBVLAN | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'customLocation-staging', $LocalBoxConfig.rbCustomLocationName | Set-Content -Path $hciParams
+$AzLocalParams = "$env:LocalBoxDir\azlocal.parameters.json"
+(Get-Content -Path $AzLocalParams) -replace 'clusterName-staging', $LocalBoxConfig.ClusterName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'arcNodeResourceIds-staging', $arcNodeResourceIds | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'localAdminUserName-staging', 'Administrator' | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'localAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminUserName-staging', $($LocalBoxConfig.LCMDeployUsername) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentAppId-staging', $($env:spnClientId) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentAppSecret-staging', $($env:spnClientSecret) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentSPNObjectID-staging', $SPNobjectId | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'domainFqdn-staging', $($LocalBoxConfig.SDNDomainFQDN) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'namingPrefix-staging', $($LocalBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'adouPath-staging', $ouPath | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'subnetMask-staging', $($LocalBoxConfig.rbSubnetMask) | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'defaultGateway-staging', $LocalBoxConfig.SDNLabRoute | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'startingIp-staging', $LocalBoxConfig.clusterIpRangeStart | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'endingIp-staging', $LocalBoxConfig.clusterIpRangeEnd | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'dnsServers-staging', $dns | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'keyVaultName-staging', $keyVaultName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'storageNicAVLAN-staging', $LocalBoxConfig.StorageAVLAN | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'storageNicBVLAN-staging', $LocalBoxConfig.StorageBVLAN | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'customLocation-staging', $LocalBoxConfig.rbCustomLocationName | Set-Content -Path $AzLocalParams

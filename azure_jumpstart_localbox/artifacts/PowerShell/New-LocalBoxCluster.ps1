@@ -368,7 +368,7 @@ function New-ManagementVM {
     return $vmMac
 }
 
-function New-HCINodeVM {
+function New-AzLocalNodeVM {
     param (
         $Name,
         $VHDXPath,
@@ -431,7 +431,7 @@ function Set-MGMTVHDX {
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 20
 
-    # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
+    # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and Azure Local VHD images
     Write-Host "Mounting VHDX file at $path"
     [string]$MountedDrive = ""
     $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
@@ -461,7 +461,7 @@ function Set-MGMTVHDX {
     Write-Host "Injecting files into $path"
     Copy-Item -Path "$Env:LocalBoxDir\LocalBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
     Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
-    Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
+    Copy-Item -Path $AzLocalVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzL-node.vhdx") -Force
     New-Item -Path ($MountedDrive + ":\") -Name "Windows Admin Center" -ItemType Directory -Force | Out-Null
     Copy-Item -Path "$($LocalBoxConfig.Paths["WACDir"])\*.msi" -Destination ($MountedDrive + ":\Windows Admin Center") -Recurse -Force
 
@@ -470,7 +470,7 @@ function Set-MGMTVHDX {
     Dismount-VHD $path
 }
 
-function Set-HCINodeVHDX {
+function Set-AzLocalNodeVHDX {
     param (
         $Hostname,
         $IPAddress,
@@ -1010,7 +1010,7 @@ function New-RouterVM {
     Invoke-Command -VMName $LocalBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $LocalBoxConfig = $using:LocalBoxConfig
         $localCred = $using:localcred
-        $ParentDiskPath = "C:\VMs\Base\AzSHCI.vhdx"
+        $ParentDiskPath = "C:\VMs\Base\AzL-node.vhdx"
         $vmpath = "D:\VMs\"
         $VMName = $LocalBoxConfig.BGPRouterName
 
@@ -1186,7 +1186,7 @@ function New-AdminCenterVM {
         Write-Host "Copying Application and Script Source Files to $VMName"
         Copy-Item 'C:\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
         New-Item -Path C:\TempWACMount\VHDs -ItemType Directory -Force | Out-Null
-        Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force # I dont think this is needed
+        Copy-Item C:\VMs\Base\AzL-node.vhdx -Destination C:\TempWACMount\VHDs -Force # I dont think this is needed
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force # I dont think this is needed
 
         # Create VM
@@ -1451,7 +1451,7 @@ function Set-HostNAT {
     }
 }
 
-function Set-HCIDeployPrereqs {
+function Set-AzLocalDeployPrereqs {
     param (
         $LocalBoxConfig,
         [PSCredential]$localCred,
@@ -1577,7 +1577,7 @@ function Set-HCIDeployPrereqs {
 
 }
 
-function Update-HCICluster {
+function Update-AzLocalCluster {
     param (
         $LocalBoxConfig,
         [PSCredential]$domainCred
@@ -1641,7 +1641,7 @@ function Update-HCICluster {
 
 #region Main
 $guiVHDXPath = $LocalBoxConfig.guiVHDXPath
-$azSHCIVHDXPath = $LocalBoxConfig.azSHCIVHDXPath
+$AzLocalVHDXPath = $LocalBoxConfig.AzLocalVHDXPath
 $HostVMPath = $LocalBoxConfig.HostVMPath
 $InternalSwitch = $LocalBoxConfig.InternalSwitch
 $natDNS = $LocalBoxConfig.natDNS
@@ -1675,17 +1675,14 @@ foreach ($path in $LocalBoxConfig.Paths.GetEnumerator()) {
 # Download LocalBox VHDs
 Write-Host "[Build cluster - Step 1/11] Downloading LocalBox VHDs" -ForegroundColor Green
 
-#BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-#BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
-
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
-<# $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
-$hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
+<# $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
+$hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256"
 if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
 }
@@ -1693,9 +1690,6 @@ else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\LocalBox\LocalBoxLogonScript.ps1 to retry"
     throw
 } #>
-
-#BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
-#BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
 
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.vhdx "$($LocalBoxConfig.Paths.VHDDir)\GUI.vhdx" --recursive=true --check-length=false --log-level=ERROR
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.sha256 "$($LocalBoxConfig.Paths.VHDDir)\GUI.sha256" --recursive=true --check-length=false --log-level=ERROR
@@ -1744,9 +1738,9 @@ Set-VMHost -VirtualHardDiskPath $HostVMPath -VirtualMachinePath $HostVMPath -Ena
 
 Write-Host "Copying VHDX Files to Host virtualization drive"
 $guipath = "$HostVMPath\GUI.vhdx"
-$hcipath = "$HostVMPath\AzSHCI.vhdx"
+$azlocalpath = "$HostVMPath\AzL-node.vhdx"
 Copy-Item -Path $LocalBoxConfig.guiVHDXPath -Destination $guipath -Force | Out-Null
-Copy-Item -Path $LocalBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-Null
+Copy-Item -Path $LocalBoxConfig.AzLocalVHDXPath -Destination $azlocalpath -Force | Out-Null
 
 ################################################################################
 # Create the three nested Virtual Machines
@@ -1770,11 +1764,11 @@ Write-Host "[Build cluster - Step 3/11] Creating Management VM (AzSMGMT)..." -Fo
 $mgmtMac = New-ManagementVM -Name $($LocalBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -LocalBoxConfig $LocalBoxConfig
 Set-MGMTVHDX -VMMac $mgmtMac -LocalBoxConfig $LocalBoxConfig
 
-# Create the HCI host node VMs
-Write-Host "[Build cluster - Step 4/11] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
+# Create the Azure Local node VMs
+Write-Host "[Build cluster - Step 4/11] Creating Azure Local node VMs (AzLHOSTx)..." -ForegroundColor Green
 foreach ($VM in $LocalBoxConfig.NodeHostConfig) {
-    $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -LocalBoxConfig $LocalBoxConfig
-    Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -LocalBoxConfig $LocalBoxConfig
+    $mac = New-AzLocalNodeVM -Name $VM.Hostname -VHDXPath $azlocalpath -VMSwitch $InternalSwitch -LocalBoxConfig $LocalBoxConfig
+    Set-AzLocalNodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -LocalBoxConfig $LocalBoxConfig
 }
 
 # Start Virtual Machines
@@ -1860,7 +1854,7 @@ New-DCVM -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $doma
 # Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM... (skipping step)" -ForegroundColor Green
 #New-AdminCenterVM -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
-Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 9/11] Preparing Azure local cluster cloud deployment..." -ForegroundColor Green
 
 $DeploymentProgressString = 'Preparing Azure Local cluster deployment'
 
@@ -1875,7 +1869,7 @@ if ($null -ne $tags) {
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-Set-HCIDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
+Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
 & "$Env:LocalBoxDir\Generate-ARM-Template.ps1"
 
@@ -1982,7 +1976,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
         $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
         $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-        Update-HCICluster -LocalBoxConfig $LocalBoxConfig -domainCred $domainCred
+        Update-AzLocalCluster -LocalBoxConfig $LocalBoxConfig -domainCred $domainCred
 
     }
     else {

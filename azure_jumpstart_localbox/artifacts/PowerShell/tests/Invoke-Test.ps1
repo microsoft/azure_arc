@@ -93,7 +93,7 @@ function Wait-AzLocalClusterConnectivity {
 if ('True' -eq $env:autoDeployClusterResource) {
 
     # Wait for the deployment to complete
-    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName hcicluster-deploy -ClusterName $LocalBoxConfig.ClusterName
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName localcluster-deploy -ClusterName $LocalBoxConfig.ClusterName
 
     # Wait for the cluster to be connected
     Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName
@@ -105,9 +105,9 @@ $tests_passed = $tests_common.Passed.Count
 $tests_failed = $tests_common.Failed.Count
 
 
-Invoke-Pester -Path "$Env:LocalBoxTestsDir\hci.tests.ps1" -Output Detailed -PassThru -OutVariable tests_hci
-$tests_passed = $tests_passed + $tests_hci.Passed.Count
-$tests_failed = $tests_failed + $tests_hci.Failed.Count
+Invoke-Pester -Path "$Env:LocalBoxTestsDir\azlocal.tests.ps1" -Output Detailed -PassThru -OutVariable tests_azlocal
+$tests_passed = $tests_passed + $tests_azlocal.Passed.Count
+$tests_failed = $tests_failed + $tests_azlocal.Failed.Count
 
 
 Write-Output "Tests succeeded: $tests_passed"

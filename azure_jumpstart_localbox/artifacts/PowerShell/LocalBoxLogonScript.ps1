@@ -46,9 +46,9 @@ az provider register --namespace Microsoft.Compute --wait
 # Add RBAC permissions
 #####################################################################
 
-# Add required RBAC permission required for the service principal to deploy Azure Stack HCI
+# Add required RBAC permission required for the service principal to deploy Azure Local
 
-Write-Header "Add required RBAC permission required for the service principal to deploy Azure Stack HCI"
+Write-Header "Add required RBAC permission required for the service principal to deploy Azure Local"
 
 $roleAssignment = Get-AzRoleAssignment -ServicePrincipalName $Env:spnClientId -Scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup" -RoleDefinitionName "Key Vault Administrator" -ErrorAction SilentlyContinue
 if ($null -eq $roleAssignment) {
@@ -120,21 +120,21 @@ foreach ($extension in $LocalBoxConfig.VSCodeExtensions) {
 
 # Configure storage pools and data disks
 Write-Header "Configuring storage"
-New-StoragePool -FriendlyName AsHciPool -StorageSubSystemFriendlyName '*storage*' -PhysicalDisks (Get-PhysicalDisk -CanPool $true)
-$disks = Get-StoragePool -FriendlyName AsHciPool -IsPrimordial $False | Get-PhysicalDisk
+New-StoragePool -FriendlyName AzLocalPool -StorageSubSystemFriendlyName '*storage*' -PhysicalDisks (Get-PhysicalDisk -CanPool $true)
+$disks = Get-StoragePool -FriendlyName AzLocalPool -IsPrimordial $False | Get-PhysicalDisk
 $diskNum = $disks.Count
-New-VirtualDisk -StoragePoolFriendlyName AsHciPool -FriendlyName AsHciDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
-$vDisk = Get-VirtualDisk -FriendlyName AsHciDisk
+New-VirtualDisk -StoragePoolFriendlyName AzLocalPool -FriendlyName AzLocalDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
+$vDisk = Get-VirtualDisk -FriendlyName AzLocalDisk
 if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
-    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AzLocalData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
-    $vDisk | Get-Disk | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | New-Partition -DriveLetter $LocalBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AzLocalData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 
 Stop-Transcript
 
-# Build HCI cluster
+# Build Azure Local cluster
 & "$Env:LocalBoxDir\New-LocalBoxCluster.ps1"
 
 Start-Transcript -Append -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
