@@ -1900,11 +1900,11 @@ if ("True" -eq $env:autoDeployClusterResource) {
     $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
     $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-$TemplateFile = Join-Path -Path $env:LocalBoxDir -ChildPath "hci.json"
-$TemplateParameterFile = Join-Path -Path $env:LocalBoxDir -ChildPath "hci.parameters.json"
+$TemplateFile = Join-Path -Path $env:LocalBoxDir -ChildPath "azlocal.json"
+$TemplateParameterFile = Join-Path -Path $env:LocalBoxDir -ChildPath "azlocal.parameters.json"
 
 try {
-    New-AzResourceGroupDeployment -Name 'hcicluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment -ErrorAction Stop
+    New-AzResourceGroupDeployment -Name 'localcluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment -ErrorAction Stop
 }
 catch {
     Write-Output "Validation failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
@@ -1956,10 +1956,10 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
     $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
     $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
-    Write-Host "Validation succeeded. Deploying HCI cluster..."
+    Write-Host "Validation succeeded. Deploying Local cluster..."
 
     try {
-        New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
+        New-AzResourceGroupDeployment -Name 'localcluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment -ErrorAction Stop
     }
     catch {
         Write-Output "Deployment command failed. Re-run New-AzResourceGroupDeployment to retry. Error: $($_.Exception.Message)"
@@ -1967,7 +1967,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
 
     if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
 
-        Write-Host "Deployment succeeded. Upgrading HCI cluster..."
+        Write-Host "Deployment succeeded. Upgrading Local cluster..."
 
         $DeploymentProgressString = 'Upgrading Azure Local cluster'
 
@@ -1987,7 +1987,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
     }
     else {
 
-        Write-Host '$autoUpgradeClusterResource is false, skipping HCI cluster upgrade...follow the documentation to upgrade the cluster manually'
+        Write-Host '$autoUpgradeClusterResource is false, skipping Local cluster upgrade...follow the documentation to upgrade the cluster manually'
 
     }
 
@@ -2000,7 +2000,7 @@ else {
 
 }
 else {
-    Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment. If desired, follow the documentation to deploy the cluster manually'
+    Write-Host '$autoDeployClusterResource is false, skipping Local cluster deployment. If desired, follow the documentation to deploy the cluster manually'
 }
 
 
