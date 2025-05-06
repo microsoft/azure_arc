@@ -279,8 +279,10 @@ configuration:
                 isAssignedToSomeone
           - and:
              - not:
-                hasLabel:
+                - hasLabel:
                     label: Needs-Triage
+                - hasLabel:
+                    label: Abandoned
         then:
           - addLabel:
               label: Needs-Triage   
