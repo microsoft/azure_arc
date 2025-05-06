@@ -383,6 +383,10 @@ configuration:
             action: Closed
         - not:
             isPartOfAnyMilestone
+        - and:
+            - not:
+                hasLabel:
+                    label: Abandoned
         then:
         - addLabel:
             label: Missing-Milestone
