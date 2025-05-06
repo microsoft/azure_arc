@@ -271,16 +271,21 @@ configuration:
               label: Needs-Triage
 
       - description: Add the "Needs-Triage" label when issue has no assignees.
-        # This rule ensures that all open issues that are not assigned to someone are marked for triage by adding the "Needs-Triage" label
+        # This rule ensures that all open issues that are not assigned to someone, do not have the "Needs-Triage" label, and are not labeled as "Abandoned" are marked for triage by adding the "Needs-Triage" label
         if:
           - payloadType: Issues
           - and:
              - not:
-                - hasLabel:
-                    label: Needs-Triage
-                - hasLabel:
-                    label: Abandoned
-                - isAssignedToSomeone
+                isAssignedToSomeone
+          - and:
+              # Check if the issue does not have the "Needs-Triage" label
+              - not:
+                  hasLabel:
+                      label: Needs-Triage
+              # Check if the issue does not have the "Abandoned" label
+              - not:
+                  hasLabel:
+                      label: Abandoned
         then:
           - addLabel:
               label: Needs-Triage   
