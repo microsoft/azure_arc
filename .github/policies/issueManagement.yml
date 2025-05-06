@@ -45,13 +45,21 @@ configuration:
                 - addLabel:
                     label: ArcBox
           - if:
-              # Identify if the issue title contains the word "hcibox" (not case insensitive) and add the "HCIBox" label
+              # Identify if the issue title contains the word "hcibox" (not case insensitive) and add the "LocalBox" label
               - titleContains:
                     pattern: "(?i)hcibox"
                     isRegex: true
             then:
                 - addLabel:
-                    label: HCIBox
+                    label: LocalBox
+          - if:
+              # Identify if the issue title contains the word "hcibox" (not case insensitive) and add the "LocalBox" label
+              - titleContains:
+                    pattern: "(?i)localbox"
+                    isRegex: true
+            then:
+                - addLabel:
+                    label: LocalBox
           - if:
               # Identify if the issue title contains the word "agora" (not case insensitive) and add the "Agora" label
               - titleContains:
