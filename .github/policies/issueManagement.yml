@@ -276,13 +276,11 @@ configuration:
           - payloadType: Issues
           - and:
              - not:
-                isAssignedToSomeone
-          - and:
-             - not:
                 - hasLabel:
                     label: Needs-Triage
                 - hasLabel:
                     label: Abandoned
+                - isAssignedToSomeone
         then:
           - addLabel:
               label: Needs-Triage   
