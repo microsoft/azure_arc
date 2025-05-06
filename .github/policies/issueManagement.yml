@@ -375,14 +375,18 @@ configuration:
         - addLabel:
             label: Missing-Milestone
 
-      - description: Add the "Missing-Milestone" label to closed issues without a milestone.
-        # This rule helps ensure all closed issues are tracked with a milestone by adding the "Missing-Milestone" label
+      - description: Add the "Missing-Milestone" label to closed issues without a milestone and not labeled as "Abandoned".
+        # This rule helps ensure all closed issues without a milestone and not labeled as "Abandoned" are tracked with a milestone by adding the "Missing-Milestone" label
         if:
         - payloadType: Issues
         - isAction:
             action: Closed
         - not:
             isPartOfAnyMilestone
+        - and:
+            - not:
+                hasLabel:
+                    label: Abandoned
         then:
         - addLabel:
             label: Missing-Milestone
