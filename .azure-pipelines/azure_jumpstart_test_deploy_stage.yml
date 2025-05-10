@@ -85,4 +85,11 @@ stages:
         Inline: |
             $rgName = "$(ResourceGroupNamePrefix)"
             Write-Host "Deleting resource group $rgName"
-            #Remove-AzResourceGroup -Name $rgName -Force
+            $projectName = "Azure Arc Jumpstart"
+            $pipelineId = 64   # The ID of the pipeline
+            $organization = "AzureArcJumpstart"
+            $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
+
+            Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
+
+            Get-VSTeamProject
