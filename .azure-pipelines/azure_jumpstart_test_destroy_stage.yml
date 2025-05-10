@@ -24,7 +24,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'
       inputs:
-        azureSubscription: ${{parameters.AzureSubscription}}
+        azureSubscription: 'HCIBox-ServiceConnection'
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
