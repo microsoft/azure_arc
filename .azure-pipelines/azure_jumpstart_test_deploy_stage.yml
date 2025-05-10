@@ -63,7 +63,7 @@ stages:
           $failedTestsFound = $false
 
           # Simulate failing tests if the parameter is set
-          if (${{ parameters.simulateFailingTests }}) {
+          if ([System.Convert]::ToBoolean("${{ parameters.simulateFailingTests }}")) {
               $failedTestsFound = $true
           }
           if ($failedTestsFound) {
