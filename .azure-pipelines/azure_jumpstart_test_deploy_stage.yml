@@ -103,7 +103,7 @@ stages:
                 resources = @{
                     repositories = @{
                         self = @{
-                            refName = "refs/heads/main"
+                            refName = "refs/heads/arcbox_pipeline"
                         }
                     }
                 }
