@@ -60,6 +60,9 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
+          $dateSuffix = (Get-Date -Format "yyyy-MM-dd-HH-mm")
+          $RGname = "$(ResourceGroupNamePrefix)-$dateSuffix"
+
           $failedTestsFound = $false
 
           # Simulate failing tests if the parameter is set
@@ -80,6 +83,6 @@ stages:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
-            $rgName = "$(RGname)"
+            $rgName = "$(ResourceGroupNamePrefix)"
             Write-Host "Deleting resource group $rgName"
             #Remove-AzResourceGroup -Name $rgName -Force
