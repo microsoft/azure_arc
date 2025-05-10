@@ -82,6 +82,7 @@ stages:
         azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
         Inline: |
             $rgName = "$(ResourceGroupNamePrefix)"
             Write-Host "Deleting resource group $rgName"
@@ -89,6 +90,8 @@ stages:
             $pipelineId = 64   # The ID of the pipeline
             $organization = "AzureArcJumpstart"
             $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
+
+            Install-PSResource -Name VSTeam -TrustRepository
 
             Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
 
