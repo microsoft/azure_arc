@@ -98,3 +98,21 @@ stages:
             Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
 
             Get-VSTeamProject
+
+            $body = @{
+                resources = @{
+                    repositories = @{
+                        self = @{
+                            refName = "refs/heads/main"
+                        }
+                    }
+                }
+                templateParameters = @{
+                    ResourceGroupName = $rgName
+                }
+            }
+
+            $jsonBody = $body | ConvertTo-Json -Depth 100
+
+            Invoke-VSTeamRequest -Url "https://dev.azure.com/$organization/$projectName/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1" -Method POST -Body $jsonBody -ContentType "application/json"
+
