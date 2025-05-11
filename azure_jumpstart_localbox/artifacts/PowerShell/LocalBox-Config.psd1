@@ -1,0 +1,186 @@
+@{
+
+    # This is the PowerShell datafile used to provide configuration information for the LocalBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
+
+    # LocalBox Folders
+    Paths = @{
+        DSCDir = "C:\LocalBox\DSC"
+        TestsDir = "C:\LocalBox\Tests"
+        VMDir = "C:\LocalBox\Virtual Machines"
+        LogsDir = "C:\LocalBox\Logs"
+        IconDir = "C:\LocalBox\Icons"
+        VHDDir = "C:\LocalBox\VHD"
+        SDNDir = "C:\LocalBox\SDN"
+        KVDir = "C:\LocalBox\KeyVault"
+        WACDir = "C:\LocalBox\Windows Admin Center"
+        AgentScriptDir = "C:\LocalBox\agentScript"
+        ToolsDir = "C:\Tools"
+        TempDir = "C:\Temp"
+        VMPath = "C:\VMs"
+    }
+
+    PowerShellModulesList = @(
+        'Az.Resources',
+        'Az.ConnectedMachine'
+    )
+
+    # VSCode extensions
+    VSCodeExtensions        = @(
+        'ms-vscode-remote.remote-containers',
+        'ms-vscode-remote.remote-wsl',
+        'ms-vscode.powershell',
+        'redhat.vscode-yaml',
+        'ZainChen.json',
+        'esbenp.prettier-vscode',
+        'ms-kubernetes-tools.vscode-kubernetes-tools'
+    )
+
+    HostVMDriveLetter = "V"
+    HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
+    guiVHDXPath       = "C:\LocalBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.
+    AzLocalVHDXPath    = "C:\LocalBox\VHD\AzL-node.vhdx"           # This value controls the location of the Azure Local VHDX. \
+
+    MgmtHostConfig = @{
+        Hostname = "AzLMGMT"
+        IP       = "192.168.1.11/24"
+    }
+
+    NodeHostConfig = @(
+        @{
+            Hostname    = "AzLHOST1"
+            IP          = "192.168.1.12/24"
+            StorageAIP  = "10.71.1.10"
+            StorageBIP  = "10.71.2.10"
+        },
+        @{
+            Hostname    = "AzLHOST2"
+            IP          = "192.168.1.13/24"
+            StorageAIP  = "10.71.1.11"
+            StorageBIP  = "10.71.2.11"
+        }
+    )
+
+    # SDN Lab Admin Password
+    SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
+
+    # VM Configuration
+    NestedVMMemoryinGB                   = 96GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
+    AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
+    AzSMGMTProcCount                     = 20
+    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the LocalBox VMs will use in Single Host mode.
+    FabricSwitch                         = "vSwitch-Fabric"
+    FabricNIC                            = "FABRIC"
+    ClusterVSwitchName                   = "hciSwitch"
+    ClusterName                          = "localboxcluster"
+    WACVMName                            = "AdminCenter"
+    ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
+    LCMDeployUsername                    = "LocalBoxDeployUser"
+    LCMADOUName                          = "hcioudocs"
+    LCMDeploymentPrefix                  = "localbox"
+
+    # ProductKeys
+    GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
+
+    # SDN Lab Domain
+    SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name.
+    DCName                               = "jumpstartdc"                          # Name of the domain controller virtual machine (limit to 14 characters)
+
+    # NAT Configuration
+    natHostSubnet                        = "192.168.128.0/24"
+    natHostVMSwitchName                  = "InternalNAT"
+    natConfigure                         = $true
+    natSubnet                            = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
+    natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
+
+    # Global MTU
+    SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts.
+
+    #SDN Provisioning
+    ProvisionNC                          = $false                                 # Provisions Network Controller Automatically.
+    ConfigureBGPpeering                  = $true                                  # Peers the GW and MUX VMs with the BGP-ToR-Router automatically if ProvisionNC = $true
+
+    ################################################################################################################
+    # Edit at your own risk. If you edit the subnets, ensure that you keep using the PreFix /24.                   #
+    ################################################################################################################
+
+    # AzSMGMT Management VM's Memory Settings
+    MEM_DC                               = 2GB                                     # Memory provided for the Domain Controller VM
+    MEM_BGP                              = 2GB                                     # Memory provided for the BGP-ToR-Router
+    MEM_WAC                              = 10GB                                    # Memory provided for the Windows Admin Center VM
+
+    # Cluster S2D Storage Disk Size (per disk)
+    S2D_Disk_Size                        = 170GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
+
+    # Physical Host Internal IP
+    PhysicalHostInternalIP               = "192.168.1.20"                          # IP Address assigned to Internal Switch vNIC in a Single Host Configuration
+
+    # SDN Lab DNS
+    SDNLABDNS                            = "192.168.1.254"
+
+    # SDN Lab Gateway
+    SDNLABRoute                          = "192.168.1.1"
+
+    # Management IPs for Console and Domain Controller
+    DCIP                                 = "192.168.1.254/24"
+    WACIP                                = "192.168.1.9/24"
+    WACMAC                               = "10155D010B00"
+
+    # Router Config
+    BGPRouterName                        = "vm-router"
+    BGPRouterIP_MGMT                     = "192.168.1.1/24"
+    BGPRouterIP_ProviderNetwork          = "172.16.0.1/24"
+    BGPRouterIP_VLAN110                  = "10.10.0.1/24"
+    BGPRouterIP_VLAN200                  = "192.168.200.1/24"
+    BGPRouterIP_SimulatedInternet        = "131.127.0.1/24"
+    BGPRouterASN                         = "65534"
+
+    # VLANs
+    providerVLAN                         = 12
+    vlan110VLAN                          = 110
+    vlan200VLAN                          = 200
+    mgmtVLAN                             = 0
+    simInternetVLAN                      = 131
+    StorageAVLAN                         = 711
+    StorageBVLAN                         = 712
+
+    # Subnets
+    MGMTSubnet                           = "192.168.1.0/24"
+    storageAsubnet                       = "255.255.255.0"
+    storageBsubnet                       = "255.255.255.0"
+
+    # VIP Subnets
+    PublicVIPSubnet                      = "40.40.40.0/24"
+
+    # SDN ASN
+    SDNASN                               = 64512
+    WACASN                               = 65533
+
+    # Windows Admin Center HTTPS Port
+    WACport                              = 443
+
+    # AKS and Resource bridge variables
+    rbCustomLocationName                 = "jumpstart"
+    AKSworkloadClusterName               = "localbox-aks" # lowercase only
+    AKSvnetname                          = "akshcivnet"
+    AKSNodeStartIP                       = "10.10.0.101"
+    AKSNodeEndIP                         = "10.10.0.199"
+    AKSVIPStartIP                        = "10.10.0.10"
+    AKSVIPEndIP                          = "10.10.0.100"
+    AKSIPPrefix                          = "10.10.0.0/24"
+    AKSControlPlaneIP                    = "10.10.0.5"
+    AKSGWIP                              = "10.10.0.1"
+    AKSDNSIP                             = "192.168.1.254"
+    AKSVLAN                              = "110"
+    # rbVipStart                           = "192.168.200.200"
+    # rbVipEnd                             = "192.168.200.249"
+    # rbDHCPExclusionStart                 = "192.168.200.200"
+    # rbDHCPExclusionEnd                   = "192.168.200.209"
+    dcVLAN200IP                          = "192.168.200.205"
+    rbSubnetMask                         = "255.255.255.0"
+    clusterIpRangeStart                  = "192.168.1.100"
+    clusterIpRangeEnd                    = "192.168.1.199"
+    vmGateway                            = "192.168.200.1"
+    vmIpPrefix                           = "192.168.200.0/24"
+    vmDNS                                = "192.168.1.254"
+    vmVLAN                               = "200"
+}
