@@ -38,7 +38,7 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.parameters.json"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
-Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.8.9/SqlQueryStress-0.9.8.9.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
 
 # Installing tools

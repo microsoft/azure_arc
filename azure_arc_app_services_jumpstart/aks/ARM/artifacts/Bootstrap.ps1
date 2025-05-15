@@ -9,16 +9,8 @@ param (
     [string]$workspaceName,
     [string]$clusterName,
     [string]$connectedClusterName,
-    [string]$deployContainerApps,
-    [string]$deployAppService,
-    [string]$deployFunction,
-    [string]$deployApiMgmt,
-    [string]$deployLogicApp,
-    [string]$adminEmail,
     [string]$templateBaseUrl,
-    [string]$productsImage,
-    [string]$inventoryImage,
-    [string]$storeImage
+    [string]$helloworldImage
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -31,15 +23,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('connectedClusterName', $connectedClusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployApiMgmt', $deployApiMgmt,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('productsImage', $productsImage,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('inventoryImage', $inventoryImage,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('storeImage', $storeImage,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('helloworldImage', $helloworldImage,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path
@@ -73,25 +58,14 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 # Downloading global Jumpstart artifacts
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 
-# Downloading GitHub artifacts for AppServicesLogonScript.ps1
-if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1"
-}
-
 # Downloading GitHub artifacts for ContainerAppsLogonScript.ps1
-if ($deployContainerApps -eq $true) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") -OutFile "C:\Temp\ContainerAppsLogonScript.ps1"
-}
 
 # Installing tools
 workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
-            $kubectlVersion = '1.28.5'
+            $kubectlVersion = '1.30.0'
             #Run commands in parallel.
             Parallel
                 {
@@ -154,19 +128,11 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
-if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
-# Creating scheduled task for AppServicesLogonScript.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AppServicesLogonScript.ps1'
-Register-ScheduledTask -TaskName "AppServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-}
 
-if ($deployContainerApps -eq $true) {
 # Creating scheduled task for ContainerAppsLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\ContainerAppsLogonScript.ps1'
 Register-ScheduledTask -TaskName "ContainerAppsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-}
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

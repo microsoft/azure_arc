@@ -1,0 +1,587 @@
+# See repository policies at ../../REPO_POLICIES.md
+# ===========================================================================
+# GitHub Repository Issue Management Policy
+# ===========================================================================
+# Purpose: Automate issue workflow management for this repository.
+# This policy handles issue creation, triage, labeling, and lifecycle management.
+# ===========================================================================
+
+id: 
+name: GitOps.PullRequestIssueManagement
+description: Comprehensive automation for issue lifecycle management, including triage, assignment, labeling, and resolution.
+owner: Arc Jumpstart
+resource: repository
+disabled: false
+where:
+configuration:
+  resourceManagementConfiguration:
+    # ===========================================================================
+    # EVENT RESPONDER TASKS
+    # Defines automated actions triggered by specific GitHub events.
+    # These tasks create a streamlined workflow for issue management.
+    # ===========================================================================
+
+    eventResponderTasks:
+      # ---------------------------------------------------------------------------
+      # NEW ISSUE MANAGEMENT
+      # Handles initial triage and labeling of new issues.
+      # Automatically categorizes issues to improve visibility and tracking.
+      # ---------------------------------------------------------------------------
+      - description: If issue title contains "bug", add the "Bug-Issue" label.
+        # Automatically categorize issues with "bug" in the title as bug reports.
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)bug"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: Bug-Issue
+        then:
+          - addLabel:
+              label: Bug-Issue
+
+      - description: If issue title contains "feature", add the "Feature-Request" label.
+        # Automatically categorize issues with "feature" in the title as feature requests.
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)feature"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: Feature-Request
+        then:
+          - addLabel:
+              label: Feature-Request
+
+      - description: If issue title contains "arcbox", add the "ArcBox" label.
+        # Automatically categorize issues mentioning "arcbox".
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)arcbox"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: ArcBox
+        then:
+          - addLabel:
+              label: ArcBox
+
+      - description: If issue title contains "localbox", add the "LocalBox" label.
+        # Automatically categorize issues mentioning "localbox".
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)localbox"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: LocalBox
+        then:
+          - addLabel:
+              label: LocalBox
+
+      - description: If issue title contains "hcibox", add the "LocalBox" label.
+        # Automatically categorize issues mentioning "hcibox".
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)hcibox"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: HCIBox
+        then:
+          - addLabel:
+              label: LocalBox
+
+      - description: If issue title contains "agora", add the "Agora" label.
+        # Automatically categorize issues mentioning "agora".
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - titleContains:
+              pattern: "(?i)agora"
+              isRegex: true
+          - not:
+              hasLabel:
+                  label: Agora
+        then:
+          - addLabel:
+              label: Agora
+
+      - description: Close issues opened without "Bug-Issue" or "Feature-Request" labels.
+        # Close issues that do not have the required labels and mark them as abandoned.
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - and:
+              - not:
+                  hasLabel:
+                      label: Bug-Issue
+              - not:
+                  hasLabel:
+                      label: Feature-Request
+        then:
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  This issue does not appear to have been submitted using our GitHub Issue Forms, or the required labels ("Bug-Issue" or "Feature-Request") are missing. All issues must be submitted using our forms to ensure they are categorized correctly.
+
+                  This issue will now be closed. Please resubmit your issue or feature request [using the appropriate template](https://github.com/microsoft/azure_arc/issues/new/choose).
+
+                  Thank you for your collaboration!
+          - addLabel:
+              label: Abandoned                    
+          - closeIssue
+
+      - description: Add "Needs-Triage" to new issues with "Bug-Issue" or "Feature-Request" labels.
+        # Mark valid new issues for triage.
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Opened
+          - or:
+              - hasLabel:
+                  label: Bug-Issue
+              - hasLabel:
+                  label: Feature-Request
+          - not: 
+              hasLabel: # Avoid re-labeling if already triaged.
+                  label: Needs-Triage
+          - not: # Ensure this rule doesn't apply if the issue was just abandoned.
+              hasLabel:
+                  label: Abandoned
+        then:
+          - addLabel:
+              label: Needs-Triage
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  Thank you for reporting this issue. A team member will review and triage it soon. All issues and pull requests are evaluated by the Arc Jumpstart team to determine next steps.
+
+                  By submitting this issue request, you agree that your contributions will be licensed under the project's [MIT license](https://github.com/microsoft/azure_arc/blob/main/LICENSE-CODE) and you confirm that you've read and will abide by our [Code of Conduct](https://github.com/microsoft/azure_arc/blob/main/CODE_OF_CONDUCT.md).
+
+                  Thank you for your collaboration!
+
+      # ---------------------------------------------------------------------------
+      # ISSUE LIFECYCLE MANAGEMENT
+      # Handles issue closing, reopening, and duplicate detection.
+      # Creates a consistent workflow for issue resolution.
+      # ---------------------------------------------------------------------------
+      - description: Clear workflow labels when an issue is closed and add the "Issue-Addressed" label.
+        # Clean up workflow labels and mark the issue as addressed when it is closed.
+        triggerOnOwnActions: false
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Closed
+        then:
+          - removeLabel:
+              label: Needs-Triage
+          - removeLabel:
+              label: Needs-Attention
+          - removeLabel: 
+              label: Needs-Author-Feedback    
+          - addLabel:
+              label: Issue-Addressed
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  We've closed this issue because it has been addressed. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
+
+                  Thank you for your collaboration!
+
+      - description: Reopen unresolved issues by removing resolution labels and adding the "Needs-Author-Feedback" label.
+        # Allow authors to reopen issues for further discussion by adding the "Needs-Author-Feedback" label.
+        triggerOnOwnActions: false
+        if:
+          - payloadType: Issue_Comment
+          - and:
+              - commentContains:
+                  pattern: "(?i)unresolve"
+                  isRegex: true
+        then:
+          - removeLabel:
+              label: Issue-Addressed
+          - removeLabel:
+              label: Resolution-Duplicate
+          - removeLabel:
+              label: No-Recent-Activity
+          - addLabel:
+              label: Needs-Author-Feedback
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  We've reopened this issue because you marked it as unresolved. We need more information from you or we identified it is not completely resolved. 
+
+                  Thank you for your collaboration!
+
+          - reopenIssue
+
+      - description: Add the "Needs-Triage" label to reopened, non-abandoned issues that are not assigned.
+        # Ensures reopened issues that are not abandoned and not assigned get proper attention from maintainers by adding the "Needs-Triage" label.
+        triggerOnOwnActions: false
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Reopened
+          - not:
+              isAssignedToSomeone
+          - not: # Ensure the issue is not abandoned.
+              hasLabel:
+                  label: Abandoned
+        then:
+          - removeLabel:
+              label: Issue-Addressed
+          - removeLabel:
+              label: Resolution-Duplicate
+          - removeLabel:
+              label: Missing-Milestone
+          - addLabel:
+              label: Needs-Triage
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  We've reopened this issue because we need more information from you or we identified it is not completely resolved.
+
+                  Thank you for your collaboration!
+
+      - description: Add the "Needs-Attention" label to reopened issues that are assigned.
+        # Ensures reopened issues get proper attention from maintainers by adding the "Needs-Attention" label.
+        triggerOnOwnActions: false
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Reopened
+          - isAssignedToSomeone
+        then:
+          - removeLabel:
+              label: Issue-Addressed
+          - removeLabel:
+              label: Resolution-Duplicate            
+          - addLabel:
+              label: Needs-Attention
+          - addReply:
+              reply: |
+                  👋 Hello ${issueAuthor},
+
+                  We've reopened this issue because we need more information from you or we identified it is not completely resolved.
+
+                  Thank you for your collaboration!
+
+      # ---------------------------------------------------------------------------
+      # ISSUE ASSIGNMENT HANDLING
+      # Manages labels when issues are assigned or unassigned.
+      # ---------------------------------------------------------------------------
+      - description: Remove the "Needs-Triage" label when an issue is assigned.
+        # Ensure that assigned issues are no longer marked for triage.
+        if:
+          - payloadType: Issues
+          - and:
+              - isAction:
+                  action: Assigned
+              - hasLabel:
+                  label: Needs-Triage
+        then:
+          - removeLabel:
+              label: Needs-Triage
+
+      - description: Add "Needs-Triage" to open, unassigned, non-abandoned issues.
+        # Mark open, unassigned, and non-abandoned issues for triage.
+        if:
+          - and:
+            - payloadType: Issues
+            - not:
+                isAction: # Exclude newly opened issues
+                    action: Opened
+            - isOpen
+            - not:
+                isAssignedToSomeone
+            - not:
+                hasLabel:
+                    label: Abandoned
+            - not:
+                hasLabel: # To prevent redundant adds
+                    label: Needs-Triage
+        then:
+          - addLabel:
+              label: Needs-Triage
+
+      - description: Remove "Needs-Attention" from open, unassigned issues.
+        # Ensure that unassigned issues no longer have the "Needs-Attention" label.
+        if:
+          - payloadType: Issues
+          - isOpen
+          - not:
+              isAssignedToSomeone
+          - hasLabel:
+              label: Needs-Attention
+        then:
+          - removeLabel:
+              label: Needs-Attention
+
+      - description: Remove "Missing-Milestone" from open, unassigned issues.
+        # Ensure that unassigned issues no longer have the "Missing-Milestone" label.
+        if:
+          - payloadType: Issues
+          - isOpen
+          - not:
+              isAssignedToSomeone
+          - hasLabel:
+              label: Missing-Milestone
+        then:
+          - removeLabel:
+              label: Missing-Milestone
+
+      - description: Handle when the "Needs-Triage" label is manually added to assigned issues that are open. Remove the "Needs-Triage" label and add the "Needs-Attention" label.
+        # Ensure that all open issues assigned to someone are marked for attention by removing the "Needs-Triage" label and adding the "Needs-Attention" label.
+        if:
+          - payloadType: Issues
+          - isOpen
+          - and:
+              - hasLabel:
+                  label: Needs-Triage
+              - isAssignedToSomeone
+        then:
+          - removeLabel:
+              label: Needs-Triage
+          - addLabel:
+              label: Needs-Attention
+
+      - description: Add the "Needs-Attention" label to assigned issues that are open and do not have the "Needs-Attention" label.
+        # Ensure that all open issues assigned to someone are marked for attention by adding the "Needs-Attention" label.
+        if:
+          - payloadType: Issues
+          - isOpen        
+          - and:
+             - not:
+                hasLabel:
+                    label: Needs-Attention
+          - isAssignedToSomeone
+        then:
+          - addLabel:
+              label: Needs-Attention
+
+      # ---------------------------------------------------------------------------
+      # DUPLICATE ISSUE HANDLING
+      # Manages issues identified as duplicates in comments.
+      # Streamlines issue tracking by consolidating duplicates.
+      # ---------------------------------------------------------------------------
+      - description: Add the "Resolution-Duplicate" label to issues or PRs that are identified as duplicates.
+        # Detect comments containing variations of the word "duplicate" and mark the issue accordingly by adding the "Resolution-Duplicate" label.
+        triggerOnOwnActions: false
+        if:
+          - payloadType: Issue_Comment
+          - and:
+              - commentContains:
+                  pattern: "(?i)duplicat(e|ed|ing)?"
+                  isRegex: true
+        then:
+          - addReply:
+              reply: |
+                  ⚠️ **WARNING: Duplicate Issue** ⚠️
+                  
+                  👋 Hello ${issueAuthor},
+
+                  We've identified this as a duplicate of another issue or PR that already exists. This specific instance is being closed in favor of the linked issue. Please add your 👍 to the other issue to raise its priority.
+
+                  Thank you for your collaboration!
+
+          - closeIssue
+          - removeLabel:
+              label: Needs-Triage
+          - removeLabel:
+              label: Needs-Attention
+          - removeLabel:
+              label: Needs-Feedback-Hub
+          - removeLabel:
+              label: Needs-Author-Feedback
+          - addLabel:
+              label: Resolution-Duplicate
+
+      # ---------------------------------------------------------------------------
+      # ISSUE MILESTONE CHECK
+      # Labels issues that are assigned or closed without a milestone by adding the "Missing-Milestone" label.
+      # ---------------------------------------------------------------------------
+      - description: Add the "Missing-Milestone" label to assigned issues without a milestone, if not already present.
+        # Ensure all assigned issues are tracked with a milestone by adding the "Missing-Milestone" label.
+        if:
+          - payloadType: Issues
+          - isAssignedToSomeone
+          - not:
+              isPartOfAnyMilestone
+          - not:
+              hasLabel:
+                  label: Missing-Milestone
+        then:
+          - addLabel:
+              label: Missing-Milestone
+
+      - description: Add the "Missing-Milestone" label to closed issues without a milestone, if not already present.
+        # Ensure all closed issues are tracked with a milestone by adding the "Missing-Milestone" label.
+        if:
+          - payloadType: Issues
+          - isAction:
+              action: Closed
+          - not:
+              isPartOfAnyMilestone
+          - not:
+              hasLabel:
+                  label: Missing-Milestone
+        then:
+          - addLabel:
+              label: Missing-Milestone
+
+    # ===========================================================================
+    # SCHEDULED SEARCHES
+    # Periodic tasks that run on defined schedules to maintain repository hygiene.
+    # ===========================================================================
+    scheduledSearches:
+
+    # ---------------------------------------------------------------------------
+    # CLOSED ISSUE MILESTONE CHECK
+    # Removes the "Missing-Milestone" label from closed issues that have a milestone.
+    # ---------------------------------------------------------------------------
+    - description: Periodically remove "Missing-Milestone" label from issues that have it but also have a milestone.
+      # This scheduled task runs every hour and acts as a cleanup for cases where the event-driven removal might not have triggered.
+      frequencies:
+      - hourly:
+          hour: 1
+      filters:
+      - isIssue
+      - hasLabel: # Ensure the label is present.
+          label: Missing-Milestone
+      - isNotPartOfMilestone: # Ensure the issue actually has a milestone.
+                milestone: INVALID # Intentionally invalid to ensure the rule is triggered.
+      actions:
+      - removeLabel:
+          label: Missing-Milestone
+
+    - description: Periodically add "Missing-Milestone" label to open, assigned issues that lack a milestone and the label itself.
+      # This scheduled task runs every hour and ensures that open, assigned issues without milestones are correctly labeled if event-driven rules did not catch it (e.g., after a milestone removal).
+      frequencies:
+      - hourly:
+          hour: 1
+      filters:
+      - isIssue
+      - isNotInAnyMilestone # Ensure the issue does not have a milestone.
+      - hasLabel: # Ensure the issue is assigned via the "Needs-Attention" label.
+          label: Needs-Attention
+      - isNotLabeledWith:
+            label: Missing-Milestone
+      actions:
+      - addLabel:
+          label: Missing-Milestone
+
+    # ---------------------------------------------------------------------------
+    # STALE ISSUE MANAGEMENT
+    # Automatically closes issues that need feedback but have no activity.
+    # ---------------------------------------------------------------------------
+    - description: Close stale issues. Issues that have not had any activity for 7 days and are labeled with the "Needs-Author-Feedback" label and the "No-Recent-Activity" label will be closed.
+      # This runs every hour and closes issues after the warning period has elapsed.
+      frequencies:
+      - hourly:
+          hour: 1
+      filters:
+      # Only target issues that are open and need author feedback.
+      # Exclude issues that are labeled with the "Feature-Request" label or the "Upstream-Bug-Issue" label.    
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Needs-Author-Feedback
+      - hasLabel:
+          label: No-Recent-Activity
+      - isNotLabeledWith:
+          label: Feature-Request
+      - isNotLabeledWith:
+          label: Upstream-Bug-Issue             
+      - noActivitySince:
+          days: 7
+      actions:
+      - closeIssue
+      - addLabel:
+          label: Close-Stale
+      - removeLabel:
+          label: Needs-Triage
+
+    - description: Add the "No-Recent-Activity" label to issues that have not had any activity for 7 days.
+      # This runs every hour and adds the "No-Recent-Activity" label to issues that have not had any activity for 7 days.
+      # First warning stage before closing stale issues by adding the "No-Recent-Activity" label.
+      # Timeline: Day 7 - Add warning label, Day 14 - Close issue if no response.
+      frequencies:
+      - hourly:
+          hour: 1
+      filters:
+      # Only target issues that are open and need author feedback.
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Needs-Author-Feedback
+      - noActivitySince:
+          days: 7
+      - isNotLabeledWith:
+          label: No-Recent-Activity
+      actions:
+      - addLabel:
+          label: No-Recent-Activity
+      - addReply:
+          reply: |
+                👋 Hello ${issueAuthor},
+
+                We're sending this friendly reminder because we haven't heard back from you in a while and we need more information about this issue to help address it. Please be sure to give us your input within the next **7 days**. If we don't hear back from you within **7 days** of this comment the issue will be automatically closed.
+
+                Thank you for your collaboration!
+
+    - description: Close issues that have not had any activity for 7 days and are labeled with the "Issue-Addressed" label.
+      # This runs every hour and closes issues that have not had any activity for 7 days and are labeled with the "Issue-Addressed" label.
+      # Auto-close resolved issues after waiting period for any objections by adding the "Issue-Addressed" label.
+      frequencies:
+      - hourly:
+          hour: 1
+      filters:
+      # Only target issues that are open and have been addressed.
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Issue-Addressed
+      - noActivitySince:
+          days: 7
+      actions:
+      - addReply:
+          reply: |
+                👋 Hello ${issueAuthor},
+                
+                Since you haven't asked that we "`/unresolve`" the issue, we'll close this out. If you believe further discussion is needed, please add a comment "`/unresolve`" to reopen the issue.
+
+                Thank you for your collaboration!
+
+      - closeIssue
+
+# ---------------------------------------------------------------------------
+# ERROR HANDLING CONFIGURATION
+# Defines what happens when policy execution succeeds or fails.
+# ---------------------------------------------------------------------------
+onFailure:
+  # Can be configured to notify admins or log errors.
+onSuccess:
+  # Can be configured to perform actions upon successful execution.

@@ -109,7 +109,7 @@ param influxDBPassword string = windowsAdminPassword
 param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 //param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
 
-param deployGPUNodes bool = false
+// param deployGPUNodes bool = false
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/refs/heads/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster

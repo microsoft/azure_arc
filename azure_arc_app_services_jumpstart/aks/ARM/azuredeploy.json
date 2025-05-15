@@ -47,7 +47,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.28.5",
+            "defaultValue": "1.30.0",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes"
@@ -65,47 +65,6 @@
             "defaultValue": "arcappsvc",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
-            }
-        },
-        "deployContainerApps": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Container Apps deployment"
-            }
-        },
-        "deployAppService": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Web App deployment"
-            }
-        },
-        "deployFunction": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Function deployment"
-            }
-        },
-        "deployApiMgmt": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure API Management deployment"
-            }
-        },
-        "deployLogicApp": {
-            "type": "bool",
-            "defaultValue": false,
-            "metadata": {
-                "description": "Azure Logic App deployment"
-            }
-        },
-        "adminEmail": {
-            "type": "string",
-            "metadata": {
-                "description": "Email address used on the Azure API Management deployment to receive all system notifications"
             }
         },
         "githubAccount": {
@@ -136,25 +95,11 @@
                 "description": "the Azure Bastion host name"
             }
         },
-        "productsImage": {
+        "helloworldImage": {
             "type": "string",
-            "defaultValue": "arcjumpstart.azurecr.io/products:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
+            "defaultValue": "mcr.microsoft.com/k8se/quickstart:latest",
             "metadata": {
-                "description": "Products API Image"
-            }
-        },
-        "inventoryImage": {
-            "type": "string",
-            "defaultValue": "arcjumpstart.azurecr.io/inventory:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
-            "metadata": {
-                "description": "Inventory API Image"
-            }
-        },
-        "storeImage": {
-            "type": "string",
-            "defaultValue": "arcjumpstart.azurecr.io/store:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
-            "metadata": {
-                "description": "Store API Image"
+                "description": "Hello World Image"
             }
         }
 
@@ -278,24 +223,6 @@
                     "subnetName": {
                         "value": "[variables('subnetName')]"
                     },
-                    "deployContainerApps": {
-                        "value": "[parameters('deployContainerApps')]"
-                    },
-                    "deployAppService": {
-                        "value": "[parameters('deployAppService')]"
-                    },
-                    "deployFunction": {
-                        "value": "[parameters('deployFunction')]"
-                    },
-                    "deployApiMgmt": {
-                        "value": "[parameters('deployApiMgmt')]"
-                    },
-                    "deployLogicApp": {
-                        "value": "[parameters('deployLogicApp')]"
-                    },
-                    "adminEmail": {
-                        "value": "[parameters('adminEmail')]"
-                    },
                     "templateBaseUrl": {
                         "value": "[variables('templateBaseUrl')]"
                     },
@@ -311,14 +238,8 @@
                     "bastionSubnetPrefix": {
                         "value": "[variables('bastionSubnetPrefix')]"
                     },
-                    "productsImage": {
-                        "value": "[parameters('productsImage')]"
-                    },
-                    "inventoryImage": {
-                        "value": "[parameters('inventoryImage')]"
-                    },
-                    "storeImage": {
-                        "value": "[parameters('storeImage')]"
+                    "helloworldImage": {
+                        "value": "[parameters('helloworldImage')]"
                     }
                 }
             }

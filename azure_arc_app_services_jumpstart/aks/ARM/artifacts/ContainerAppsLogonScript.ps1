@@ -47,7 +47,7 @@ Write-Host "`n"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
-az extension add --source https://download.microsoft.com/download/5/c/2/5c2ec3fc-bd2a-4615-a574-a1b7c8e22f40/containerapp-0.0.1-py2.py3-none-any.whl --yes
+az extension add --name "containerapp" -y
 
 Write-Host "`n"
 az -v
@@ -71,6 +71,17 @@ Write-Host "`n"
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+Start-Sleep -Seconds 10
+
+# Copying kubectl to kubectl-client location
+$Env:KUBECLIENTFOLDER = "C:\Users\$Env:adminUsername\.azure\kubectl-client"
+if (-not (Test-Path -Path $Env:KUBECLIENTFOLDER)) {
+    New-Item -ItemType Directory -Path $Env:KUBECLIENTFOLDER
+    Write-Host "Created folder: $Env:KUBECLIENTFOLDER"
+}
+Write-Host "Copying kubectl.exe"
+Copy-Item -Path "$Env:ChocolateyInstall\bin\kubectl.exe" -Destination "$Env:KUBECLIENTFOLDER\kubectl.exe"
+Write-Host "Copied kubectl.exe"
 Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
@@ -144,6 +155,8 @@ $customLocationId = $(az customlocation create `
     --query id `
     --output tsv)
 
+az resource wait --ids $customLocationId --created
+
 # Deploying Connected Environment
 Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
@@ -162,78 +175,21 @@ $containerAppEnvId = $(az containerapp connected-env show `
 
 az resource wait --ids $containerAppEnvId --created
 
-# Deploying Products API Container App
+# Deploying HelloWorld Container App
 Write-Host "`n"
-Write-Host "Creating the products api container app"
+Write-Host "Creating the HelloWorld container app"
 Write-Host "`n"
 az containerapp create `
-    --name 'products' `
+    --name 'helloworld' `
     --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
     --environment-type connected `
     --enable-dapr true `
-    --dapr-app-id 'products' `
+    --dapr-app-id 'helloworld' `
     --dapr-app-port 80 `
     --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
-    --image $Env:productsImage `
-    --ingress 'internal' `
-    --target-port 80 `
-    --transport 'http' `
-    --min-replicas 1 `
-    --max-replicas 1 `
-    --query properties.configuration.ingress.fqdn
-
-Write-Host "`n"
-Do {
-    Write-Host "Waiting for products api to become available."
-    Start-Sleep -Seconds 15
-    $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($productsapi -eq "Nope")
-
-# Deploying Inventory API Container App
-Write-Host "`n"
-Write-Host "Creating the inventory api container app"
-Write-Host "`n"
-az containerapp create `
-    --name 'inventory' `
-    --resource-group $Env:resourceGroup `
-    --environment $connectedEnvironmentName `
-    --environment-type connected `
-    --enable-dapr true `
-    --dapr-app-id 'inventory' `
-    --dapr-app-port 80 `
-    --dapr-app-protocol 'http' `
-    --revisions-mode 'single' `
-    --image $Env:inventoryImage `
-    --ingress 'internal' `
-    --target-port 80 `
-    --transport 'http' `
-    --min-replicas 1 `
-    --max-replicas 1 `
-    --query properties.configuration.ingress.fqdn
-
-Do {
-    Write-Host "Waiting for inventory api to become available."
-    Start-Sleep -Seconds 15
-    $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($inventoryapi -eq "Nope")
-
-# Deploying Store API Container App
-Write-Host "`n"
-Write-Host "Creating the store api container app"
-Write-Host "`n"
-az containerapp create `
-    --name 'store' `
-    --resource-group $Env:resourceGroup `
-    --environment $connectedEnvironmentName `
-    --environment-type connected `
-    --enable-dapr true `
-    --dapr-app-id 'store' `
-    --dapr-app-port 80 `
-    --dapr-app-protocol 'http' `
-    --revisions-mode 'single' `
-    --image $Env:storeImage `
+    --image $Env:helloworldImage `
     --ingress 'external' `
     --target-port 80 `
     --transport 'http' `
@@ -241,11 +197,12 @@ az containerapp create `
     --max-replicas 1 `
     --query properties.configuration.ingress.fqdn
 
+Write-Host "`n"
 Do {
-    Write-Host "Waiting for store api to become available."
+    Write-Host "Waiting for Hello World to become available."
     Start-Sleep -Seconds 15
-    $storeapi = $(if(kubectl get pods -n $namespace | Select-String "store" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($storeapi -eq "Nope")
+    $helloworldapp = $(if(kubectl get pods -n $namespace | Select-String "helloworld" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($helloworldapp -eq "Nope")
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
