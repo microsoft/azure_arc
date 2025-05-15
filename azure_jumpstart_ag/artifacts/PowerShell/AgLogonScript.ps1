@@ -172,7 +172,7 @@ if ($scenario -eq "contoso_supermarket") {
 if($scenario -eq "contoso_motors"){
     Get-K3sConfigFileContosoMotors 
     Merge-K3sConfigFilesContosoMotors
-    Set-K3sClusters
+    #Set-K3sClustersContosoMotors # comment this out to not use kube-vip
 }
 
 if($scenario -eq "contoso_hypermarket"){
@@ -245,7 +245,7 @@ if ($scenario -eq "contoso_supermarket") {
 }
 
 if ($scenario -eq "contoso_motors") {
-    Deploy-AIO-M3
+    Deploy-AIO-M3ContosoMotors
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
     Deploy-MotorsConfigs

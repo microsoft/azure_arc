@@ -1,6 +1,6 @@
 tput setaf 1;echo "-----------------------------------------------------------------------------------------------------------------------------"
 echo ""
-tput setaf 6;echo "Welcome to Jumpstart ArcBox Rancher K3s Kubernetes cluster management virtual machine!"
+tput setaf 6;echo "Welcome to Jumpstart Agora Rancher K3s Kubernetes cluster management virtual machine!"
 echo ""
 tput setaf 6;echo "* To check the Rancher K3s deployment log, use the 'cat jumpstart_logs/installK3s.log' command."
 echo ""

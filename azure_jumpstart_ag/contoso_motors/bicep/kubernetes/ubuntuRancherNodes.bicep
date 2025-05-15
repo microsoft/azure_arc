@@ -155,9 +155,9 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${deployGPUNodes}'
+      commandToExecute: 'bash installK3s-motors.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${deployGPUNodes}'
       fileUris: [
-        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
+        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s-motors.sh'
       ]
     }
   }
