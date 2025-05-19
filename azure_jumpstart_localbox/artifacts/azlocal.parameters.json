@@ -27,7 +27,7 @@
             "value": "location-staging"
         },
         "tenantId": {
-            "value": ""
+            "value": "tenantId-staging"
         },
         "witnessType": {
             "value": "Cloud"
