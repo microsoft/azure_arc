@@ -24,7 +24,7 @@
             "value": "clusterName-staging"
         },
         "location": {
-            "value": "customLocation-staging"
+            "value": "location-staging"
         },
         "tenantId": {
             "value": ""

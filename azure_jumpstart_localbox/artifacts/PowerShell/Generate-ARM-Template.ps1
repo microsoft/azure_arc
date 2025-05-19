@@ -29,6 +29,7 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json -AsArray
 # Convert user credentials to base64
 $SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
 
+# "Insufficient privileges to complete the operation." when using Managed Identity.
 #$spnProviderId = Get-AzADServicePrincipal -DisplayName "Microsoft.AzureStackHCI Resource Provider"
 
 # Construct OU path
@@ -90,3 +91,4 @@ $AzLocalParams = "$env:LocalBoxDir\azlocal.parameters.json"
 (Get-Content -Path $AzLocalParams) -replace 'storageNicAVLAN-staging', $LocalBoxConfig.StorageAVLAN | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'storageNicBVLAN-staging', $LocalBoxConfig.StorageBVLAN | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'customLocation-staging', $LocalBoxConfig.rbCustomLocationName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'location-staging', $env:azureLocation | Set-Content -Path $AzLocalParams
