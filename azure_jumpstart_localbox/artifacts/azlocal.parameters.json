@@ -123,7 +123,7 @@
             "value": "switchlessMultiServerDeployment"
         },
         "networkingPattern": {
-            "value": "hyperConverged"
+            "value": "convergedManagementCompute"
         },
         "intentList": {
             "value": [
@@ -147,12 +147,34 @@
                         "priorityValue8021Action_SMB": "3",
                         "bandwidthPercentage_SMB": "50"
                     },
-                    "overrideAdapterProperty": true,
+                    "overrideAdapterProperty": false,
                     "adapterPropertyOverrides": {
                         "jumboPacket": "9014",
                         "networkDirect": "Enabled",
                         "networkDirectTechnology": "RoCEv2"
                     }
+                },
+                {
+                  "name": "Storage",
+                  "trafficType": ["Storage"],
+                  "adapter": ["StorageA", "StorageB"],
+                  "overrideVirtualSwitchConfiguration": false,
+                  "virtualSwitchConfigurationOverrides": {
+                    "enableIov": "",
+                    "loadBalancingAlgorithm": ""
+                  },
+                  "overrideQosPolicy": true,
+                  "qosPolicyOverrides": {
+                    "priorityValue8021Action_Cluster": "7",
+                    "priorityValue8021Action_SMB": "3",
+                    "bandwidthPercentage_SMB": "50"
+                  },
+                  "overrideAdapterProperty": false,
+                  "adapterPropertyOverrides": {
+                    "jumboPacket": "9014",
+                    "networkDirect": "Enabled",
+                    "networkDirectTechnology": "RoCEv2"
+                  }
                 }
             ]
         },
