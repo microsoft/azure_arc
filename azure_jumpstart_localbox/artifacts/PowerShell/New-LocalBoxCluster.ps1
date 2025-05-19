@@ -1516,12 +1516,12 @@ function Set-AzLocalDeployPrereqs {
             Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
             #Install Arc registration script from PSGallery
-            # Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
+            Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
 
             #Install required PowerShell modules in your node for registration
-            # Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
-            #Install-Module Az.ConnectedMachine -Force
-            #Install-Module Az.Resources -Force
+            Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
+            Install-Module Az.ConnectedMachine -Force
+            Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
@@ -1678,7 +1678,7 @@ Write-Host "[Build cluster - Step 1/11] Downloading LocalBox VHDs" -ForegroundCo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp 'https://azlocalvhds.blob.core.windows.net/images/AzLocal2504.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://azlocalvhds.blob.core.windows.net/images/AzLocal2503.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
 #azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/preprod/AzLocal2411.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
 <# $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
