@@ -1516,25 +1516,25 @@ function Set-AzLocalDeployPrereqs {
             Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
             #Install Arc registration script from PSGallery
-            Install-Module AzsHCI.ARCinstaller -Force
+            # Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
 
             #Install required PowerShell modules in your node for registration
-            Install-Module Az.Accounts -Force
-            Install-Module Az.ConnectedMachine -Force
-            Install-Module Az.Resources -Force
+            # Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
+            #Install-Module Az.ConnectedMachine -Force
+            #Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
 
             # Workaround for BITS transfer issue
-            Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId -ErrorAction Continue
 
-            Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
     }
 
