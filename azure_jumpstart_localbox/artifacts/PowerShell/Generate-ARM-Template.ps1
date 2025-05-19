@@ -74,7 +74,7 @@ $AzLocalParams = "$env:LocalBoxDir\azlocal.parameters.json"
 (Get-Content -Path $AzLocalParams) -replace 'localAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminUserName-staging', $($LocalBoxConfig.LCMDeployUsername) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
-(Get-Content -Path $AzLocalParams) -replace 'hciResourceProviderObjectID-staging', $spnProviderId.Id | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'domainFqdn-staging', $($LocalBoxConfig.SDNDomainFQDN) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'namingPrefix-staging', $($LocalBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'adouPath-staging', $ouPath | Set-Content -Path $AzLocalParams
