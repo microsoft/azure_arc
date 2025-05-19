@@ -1511,12 +1511,12 @@ function Set-AzLocalDeployPrereqs {
             #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
 
             # Register PSGallery as a trusted repo
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-            Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
-            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            #Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            #Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
+            #Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
             #Install Arc registration script from PSGallery
-            Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
+            #Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
 
             #Install required PowerShell modules in your node for registration
             #Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
