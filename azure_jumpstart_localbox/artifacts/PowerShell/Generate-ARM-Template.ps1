@@ -29,7 +29,7 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json -AsArray
 # Convert user credentials to base64
 $SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
 
-$spnProviderId = Get-AzADServicePrincipal -DisplayName "Microsoft.AzureStackHCI Resource Provider"
+#$spnProviderId = Get-AzADServicePrincipal -DisplayName "Microsoft.AzureStackHCI Resource Provider"
 
 # Construct OU path
 $domainName = $LocalBoxConfig.SDNDomainFQDN.Split('.')
