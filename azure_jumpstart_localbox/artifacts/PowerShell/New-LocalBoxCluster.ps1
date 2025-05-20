@@ -1888,7 +1888,7 @@ $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:r
 
 Invoke-AzureEdgeBootstrap -LocalBoxConfig $LocalBoxConfig -localCred $localCred
 
-Start-Sleep 120
+Start-Sleep 240
 
 Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
