@@ -1695,10 +1695,10 @@ Write-Host "[Build cluster - Step 1/11] Downloading LocalBox VHDs" -ForegroundCo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp 'https://azlocalvhds.blob.core.windows.net/images/AzLocal2504.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
-#azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/preprod/AzLocal2411.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/preprod/AzLocal2504.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/preprod/AzLocal2504.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
-<# $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
+$checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
 $hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256"
 if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
@@ -1706,7 +1706,7 @@ if ($checksum.Hash -eq $hash) {
 else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\LocalBox\LocalBoxLogonScript.ps1 to retry"
     throw
-} #>
+}
 
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.vhdx "$($LocalBoxConfig.Paths.VHDDir)\GUI.vhdx" --recursive=true --check-length=false --log-level=ERROR
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.sha256 "$($LocalBoxConfig.Paths.VHDDir)\GUI.sha256" --recursive=true --check-length=false --log-level=ERROR
