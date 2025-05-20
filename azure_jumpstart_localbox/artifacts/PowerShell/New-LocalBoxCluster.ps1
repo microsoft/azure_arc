@@ -1451,6 +1451,63 @@ function Set-HostNAT {
     }
 }
 
+function Wait-AzureEdgeBootstrap {
+    param (
+        [string]$VMName,
+        [PSCredential]$Credential,
+        [int]$TimeoutSeconds = 300,
+        [int]$RetryIntervalSeconds = 10
+    )
+
+    $pathsToCheck = @(
+        'C:\Windows\System32\WindowsPowerShell\v1.0\Modules\AzureEdgeBootstrap',
+        'C:\Program Files\WindowsPowerShell\Modules\Az.Accounts'
+    )
+
+    $scriptBlock = {
+        param($paths, $timeout, $interval)
+
+        $elapsed = 0
+
+        while ($true) {
+            $status = foreach ($path in $paths) {
+                $exists = Test-Path $path
+                [PSCustomObject]@{
+                    Path   = $path
+                    Exists = $exists
+                }
+            }
+
+            $missing = $status | Where-Object { -not $_.Exists }
+
+            Write-Host "🔍 Path check status at $((Get-Date).ToString("HH:mm:ss")):"
+            foreach ($entry in $status) {
+                if ($entry.Exists) {
+                    Write-Host "✅ $($entry.Path)"
+                } else {
+                    Write-Host "❌ $($entry.Path)"
+                }
+            }
+
+            if (-not $missing) {
+                Write-Host "✅ All required paths found. Continuing."
+                break
+            }
+
+            Start-Sleep -Seconds $interval
+            $elapsed += $interval
+
+            if ($elapsed -ge $timeout) {
+                $missingPaths = $missing.Path -join ', '
+                throw "❌ Timeout waiting for required paths: $missingPaths"
+            }
+        }
+    }
+
+    Invoke-Command -VMName $VMName -Credential $Credential -ScriptBlock $scriptBlock -ArgumentList $pathsToCheck, $TimeoutSeconds, $RetryIntervalSeconds
+}
+
+
 function Invoke-AzureEdgeBootstrap {
     param (
         $LocalBoxConfig,
@@ -1458,11 +1515,14 @@ function Invoke-AzureEdgeBootstrap {
     )
 
     foreach ($node in $LocalBoxConfig.NodeHostConfig) {
+        Write-Host "🛠️ Running bootstrap script on $($node.Hostname)..."
         Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
-
-            & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
-
+          # & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
+          Get-ScheduledTask -TaskName ImageCustomizationScheduledTask | Start-ScheduledTask
         }
+
+        Write-Host "⏳ Waiting for modules and agent on $($node.Hostname)..."
+        Wait-AzureEdgeBootstrap -VMName $node.Hostname -Credential $localCred
     }
 }
 
@@ -1803,6 +1863,7 @@ foreach ($VM in $LocalBoxConfig.NodeHostConfig) {
 Write-Host "[Build cluster - Step 6/11] Configuring host networking and storage..." -ForegroundColor Green
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -LocalBoxConfig $LocalBoxConfig -Credential $localCred
+
 Start-Sleep -Seconds 60
 
 # Format and partition data drives
@@ -1887,8 +1948,6 @@ $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
 
 Invoke-AzureEdgeBootstrap -LocalBoxConfig $LocalBoxConfig -localCred $localCred
-
-Start-Sleep 240
 
 Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
