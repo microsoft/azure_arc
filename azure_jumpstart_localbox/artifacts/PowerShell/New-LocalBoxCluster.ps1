@@ -1451,6 +1451,21 @@ function Set-HostNAT {
     }
 }
 
+function Invoke-AzureEdgeBootstrap {
+    param (
+        $LocalBoxConfig,
+        [PSCredential]$localCred
+    )
+
+    foreach ($node in $LocalBoxConfig.NodeHostConfig) {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
+
+            & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
+
+        }
+    }
+}
+
 function Set-AzLocalDeployPrereqs {
     param (
         $LocalBoxConfig,
@@ -1506,8 +1521,6 @@ function Set-AzLocalDeployPrereqs {
                 }
             }
 
-            & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
-
             # Prep nodes for Azure Arc onboarding
             #winrm quickconfig -quiet
             #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
@@ -1540,7 +1553,9 @@ function Set-AzLocalDeployPrereqs {
         }
     }
 
-    Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | foreach-object {
+<#     Not needed in 24H2, extensions are installed by cluster validation stage
+
+        Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | foreach-object {
 
         Write-Host "Checking extension status for $($PSItem.Name)"
 
@@ -1575,7 +1590,7 @@ function Set-AzLocalDeployPrereqs {
 
         } while ($attempts -lt $maxAttempts)
 
-       }
+       } #>
 
 }
 
@@ -1870,6 +1885,10 @@ if ($null -ne $tags) {
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
+Invoke-AzureEdgeBootstrap -LocalBoxConfig $LocalBoxConfig -localCred $localCred
+
+Start-Sleep 120
 
 Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
