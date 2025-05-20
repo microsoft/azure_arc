@@ -1506,6 +1506,8 @@ function Set-AzLocalDeployPrereqs {
                 }
             }
 
+            & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
+
             # Prep nodes for Azure Arc onboarding
             #winrm quickconfig -quiet
             #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
