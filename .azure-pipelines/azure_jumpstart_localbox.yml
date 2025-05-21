@@ -192,15 +192,15 @@ stages:
             Remove-AzResourceGroup -Name $rgName -Force
 
 - stage: destroy
-  displayName: 'ArcBox_teardown'
-  dependsOn: ArcBox_deployment
-  condition: failed('ArcBox_deployment')
+  displayName: 'LocalBox_teardown'
+  dependsOn: LocalBox_deployment
+  condition: failed('LocalBox_deployment')
   variables:
-    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
+    RGname: $[ stageDependencies.LocalBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
   - deployment:
     displayName: "Get approval"
-    environment: 'arcbox_teardown_approval'
+    environment: 'LocalBox_teardown_approval'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
