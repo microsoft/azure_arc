@@ -1872,18 +1872,6 @@ Set-DataDrives -LocalBoxConfig $LocalBoxConfig -Credential $localCred
 # Configure networking
 Set-NICs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
 
-# Restart Machines
-Restart-VMs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Wait for AzSHOSTs to come online
-Test-AllVMsAvailable -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Configure networking
-Set-NICs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Format and partition data drives
-Set-DataDrives -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -LocalBoxConfig $LocalBoxConfig
 
