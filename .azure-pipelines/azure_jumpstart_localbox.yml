@@ -88,7 +88,6 @@ stages:
           Write-Host "Deploying to $(RGname)"
           $githubAccount = "$(githubAccount)"
           $githubBranch = "$(githubBranch)"
-          $flavor = "$(flavor)"
           if ($githubAccount -ne "microsoft") {
             Write-Host "Checking out $githubAccount/$githubBranch"
             git remote add upstream https://github.com/$($githubAccount)/azure_arc.git
