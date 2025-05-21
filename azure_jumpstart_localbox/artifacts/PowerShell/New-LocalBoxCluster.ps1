@@ -1451,6 +1451,81 @@ function Set-HostNAT {
     }
 }
 
+function Wait-AzureEdgeBootstrap {
+    param (
+        [string]$VMName,
+        [PSCredential]$Credential,
+        [int]$TimeoutSeconds = 300,
+        [int]$RetryIntervalSeconds = 10
+    )
+
+    $pathsToCheck = @(
+        'C:\Windows\System32\WindowsPowerShell\v1.0\Modules\AzureEdgeBootstrap',
+        'C:\Program Files\WindowsPowerShell\Modules\Az.Accounts'
+    )
+
+    $scriptBlock = {
+        param($paths, $timeout, $interval)
+
+        $elapsed = 0
+
+        while ($true) {
+            $status = foreach ($path in $paths) {
+                $exists = Test-Path $path
+                [PSCustomObject]@{
+                    Path   = $path
+                    Exists = $exists
+                }
+            }
+
+            $missing = $status | Where-Object { -not $_.Exists }
+
+            Write-Host "🔍 Path check status at $((Get-Date).ToString("HH:mm:ss")):"
+            foreach ($entry in $status) {
+                if ($entry.Exists) {
+                    Write-Host "✅ $($entry.Path)"
+                } else {
+                    Write-Host "❌ $($entry.Path)"
+                }
+            }
+
+            if (-not $missing) {
+                Write-Host "✅ All required paths found. Continuing."
+                break
+            }
+
+            Start-Sleep -Seconds $interval
+            $elapsed += $interval
+
+            if ($elapsed -ge $timeout) {
+                $missingPaths = $missing.Path -join ', '
+                throw "❌ Timeout waiting for required paths: $missingPaths"
+            }
+        }
+    }
+
+    Invoke-Command -VMName $VMName -Credential $Credential -ScriptBlock $scriptBlock -ArgumentList $pathsToCheck, $TimeoutSeconds, $RetryIntervalSeconds
+}
+
+
+function Invoke-AzureEdgeBootstrap {
+    param (
+        $LocalBoxConfig,
+        [PSCredential]$localCred
+    )
+
+    foreach ($node in $LocalBoxConfig.NodeHostConfig) {
+        Write-Host "🛠️ Running bootstrap script on $($node.Hostname)..."
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
+          # & C:\startupScriptsWrapper.ps1 'C:\BootstrapPackage\bootstrap\content\Bootstrap-Setup.ps1 -Install'
+          Get-ScheduledTask -TaskName ImageCustomizationScheduledTask | Start-ScheduledTask
+        }
+
+        Write-Host "⏳ Waiting for modules and agent on $($node.Hostname)..."
+        Wait-AzureEdgeBootstrap -VMName $node.Hostname -Credential $localCred
+    }
+}
+
 function Set-AzLocalDeployPrereqs {
     param (
         $LocalBoxConfig,
@@ -1511,34 +1586,36 @@ function Set-AzLocalDeployPrereqs {
             #netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
 
             # Register PSGallery as a trusted repo
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-            Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
-            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            #Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            #Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
+            #Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
             #Install Arc registration script from PSGallery
-            Install-Module AzsHCI.ARCinstaller -Force
+            #Install-Module AzsHCI.ARCinstaller -Force # Pre-installed in 24H2 base image, part of module AzureEdgeBootstrap
 
             #Install required PowerShell modules in your node for registration
-            Install-Module Az.Accounts -Force
-            Install-Module Az.ConnectedMachine -Force
-            Install-Module Az.Resources -Force
+            #Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
+            #Install-Module Az.ConnectedMachine -Force
+            #Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
 
             # Workaround for BITS transfer issue
-            Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId -ErrorAction Continue
 
-            Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
-            Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
+            #Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
     }
 
-    Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | foreach-object {
+<#     Not needed in 24H2, extensions are installed by cluster validation stage
+
+        Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | foreach-object {
 
         Write-Host "Checking extension status for $($PSItem.Name)"
 
@@ -1573,7 +1650,7 @@ function Set-AzLocalDeployPrereqs {
 
         } while ($attempts -lt $maxAttempts)
 
-       }
+       } #>
 
 }
 
@@ -1678,10 +1755,10 @@ Write-Host "[Build cluster - Step 1/11] Downloading LocalBox VHDs" -ForegroundCo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2411.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2504.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2504.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
-<# $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
+$checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
 $hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256"
 if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
@@ -1689,7 +1766,7 @@ if ($checksum.Hash -eq $hash) {
 else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\LocalBox\LocalBoxLogonScript.ps1 to retry"
     throw
-} #>
+}
 
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.vhdx "$($LocalBoxConfig.Paths.VHDDir)\GUI.vhdx" --recursive=true --check-length=false --log-level=ERROR
 azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.sha256 "$($LocalBoxConfig.Paths.VHDDir)\GUI.sha256" --recursive=true --check-length=false --log-level=ERROR
@@ -1786,6 +1863,7 @@ foreach ($VM in $LocalBoxConfig.NodeHostConfig) {
 Write-Host "[Build cluster - Step 6/11] Configuring host networking and storage..." -ForegroundColor Green
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -LocalBoxConfig $LocalBoxConfig -Credential $localCred
+
 Start-Sleep -Seconds 60
 
 # Format and partition data drives
@@ -1793,18 +1871,6 @@ Set-DataDrives -LocalBoxConfig $LocalBoxConfig -Credential $localCred
 
 # Configure networking
 Set-NICs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Restart Machines
-Restart-VMs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Wait for AzSHOSTs to come online
-Test-AllVMsAvailable -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Configure networking
-Set-NICs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
-
-# Format and partition data drives
-Set-DataDrives -LocalBoxConfig $LocalBoxConfig -Credential $localCred
 
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -LocalBoxConfig $LocalBoxConfig
@@ -1868,6 +1934,8 @@ if ($null -ne $tags) {
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
+Invoke-AzureEdgeBootstrap -LocalBoxConfig $LocalBoxConfig -localCred $localCred
 
 Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 

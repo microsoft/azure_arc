@@ -29,6 +29,9 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json -AsArray
 # Convert user credentials to base64
 $SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
 
+# "Insufficient privileges to complete the operation." when using Managed Identity.
+#$spnProviderId = Get-AzADServicePrincipal -DisplayName "Microsoft.AzureStackHCI Resource Provider"
+
 # Construct OU path
 $domainName = $LocalBoxConfig.SDNDomainFQDN.Split('.')
 $ouPath = "OU=$($LocalBoxConfig.LCMADOUName)"
@@ -72,9 +75,6 @@ $AzLocalParams = "$env:LocalBoxDir\azlocal.parameters.json"
 (Get-Content -Path $AzLocalParams) -replace 'localAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminUserName-staging', $($LocalBoxConfig.LCMDeployUsername) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'AzureStackLCMAdminAdminPassword-staging', $($LocalBoxConfig.SDNAdminPassword) | Set-Content -Path $AzLocalParams
-(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentAppId-staging', $($env:spnClientId) | Set-Content -Path $AzLocalParams
-(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentAppSecret-staging', $($env:spnClientSecret) | Set-Content -Path $AzLocalParams
-(Get-Content -Path $AzLocalParams) -replace 'arbDeploymentSPNObjectID-staging', $SPNobjectId | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'domainFqdn-staging', $($LocalBoxConfig.SDNDomainFQDN) | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'namingPrefix-staging', $($LocalBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $AzLocalParams
@@ -91,3 +91,5 @@ $AzLocalParams = "$env:LocalBoxDir\azlocal.parameters.json"
 (Get-Content -Path $AzLocalParams) -replace 'storageNicAVLAN-staging', $LocalBoxConfig.StorageAVLAN | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'storageNicBVLAN-staging', $LocalBoxConfig.StorageBVLAN | Set-Content -Path $AzLocalParams
 (Get-Content -Path $AzLocalParams) -replace 'customLocation-staging', $LocalBoxConfig.rbCustomLocationName | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'location-staging', $env:azureLocation | Set-Content -Path $AzLocalParams
+(Get-Content -Path $AzLocalParams) -replace 'tenantId-staging', $env:spnTenantId | Set-Content -Path $AzLocalParams
