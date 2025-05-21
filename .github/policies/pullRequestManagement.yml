@@ -1,7 +1,8 @@
+# See repository policies at ../../REPO_POLICIES.md
 # ===========================================================================
 # GitHub Repository Pull Request Management Policy
 # ===========================================================================
-# Purpose: Automate PR workflow management for the Arc Jumpstart repository
+# Purpose: Automate PR workflow management for for this repository
 # This policy handles PR creation, validation, and provides appropriate guidance to contributors
 id: 
 name: GitOps.PullRequestIssueManagement

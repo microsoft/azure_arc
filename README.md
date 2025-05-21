@@ -1,6 +1,6 @@
 [![Stale Branches](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml/badge.svg)](https://github.com/microsoft/azure_arc/actions/workflows/stale-branches.yml)
 
-# Arc Jumpstart source code
+# ⚡ Arc Jumpstart source code
 
 Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.
 
@@ -10,12 +10,12 @@ Welcome to the Arc Jumpstart source code repository! This repository is your go-
 
 **Note:** This repository does not contain the source code for the documentation of the Arc Jumpstart which can be found in another [dedicated repository](https://github.com/Azure/arc_jumpstart_docs).
 
-## What you'll find here
+## 📦 What you'll find here
 
 - **Automation Source Code:** Arc Jumpstart automation scripts and tools utilized in our scenarios and solutions.
 - **Supportive Documents and Files:** Additional resources used across the [Arc Jumpstart](https://aka.ms/ArcJumpstart) website, aiding in various contexts and providing supplemental information.
 
-## How to Utilize this repository
+## 🛠️ How to Utilize this repository
 
 This source code repository is designed with contributors in mind and works in tandem with the [our documentation repository](https://github.com/Azure/arc_jumpstart_docs). While it's not mandatory, it's highly likely that contributors will need to clone both repositories to effectively contribute to Arc Jumpstart.
 
@@ -25,7 +25,7 @@ If you're unsure about your future contribution, don't hesitate to start a [GitH
 
 Happy contributing!
 
-## Cloning the repositories
+## 📥 Cloning the repositories
 
 To contribute, you'll likely need to clone both this repository and the [documentation repository](https://github.com/Azure/arc_jumpstart_docs). Use the following commands:
 
@@ -46,7 +46,7 @@ You can use partial clones if you want to reduce the time and size it takes to c
 git clone --filter=blob:none https://github.com/microsoft/azure_arc
 ```
 
-## Contribution and feedback
+## 🙌 Contribution and feedback
 
 We value your input! If you have suggestions, feedback, or valuable insights to share, feel free to open an issue. Your contributions help us improve the documentation for the entire community.
 
@@ -62,7 +62,11 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## Trademarks
+## 📑 Repository Policies
+
+See [REPO_POLICIES.md](./REPO_POLICIES.md) for details on automated pull request and issue management policies.
+
+## 🏷️ Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/legal/intellectualproperty/trademarks/usage/general).
 
