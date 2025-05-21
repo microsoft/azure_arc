@@ -8,7 +8,7 @@ Write-Host "Getting Pester test-result files from storage account in resource gr
 $path = $ENV:SYSTEM_DEFAULTWORKINGDIRECTORY + "/testresults"
 $null = New-Item -ItemType Directory -Force -Path $path
 
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName | select-object -First 1
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName | Where-Object storageaccountname -like localboxdiag* | select-object -First 1
 if ($null -eq $StorageAccount) {
     Write-Error -Message "No storage account found in resource group $ResourceGroupName"
     exit 1

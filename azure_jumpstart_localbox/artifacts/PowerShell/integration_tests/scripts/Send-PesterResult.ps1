@@ -56,7 +56,11 @@ Write-Output 'Az CLI Login'
 az login --identity
 az account set -s $env:subscriptionId
 
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup | Where-Object storageaccountname -like localboxdiag* | select-object -First 1
+if ($null -eq $StorageAccount) {
+    Write-Error -Message "No storage account found in resource group $env:resourceGroup"
+    exit 1
+}
 
 # Get the VM's resource ID
 $vmResourceId = (Invoke-RestMethod -Headers @{Metadata = 'true' } -Method GET -Uri 'http://169.254.169.254/metadata/instance?api-version=2021-02-01').compute.resourceId
