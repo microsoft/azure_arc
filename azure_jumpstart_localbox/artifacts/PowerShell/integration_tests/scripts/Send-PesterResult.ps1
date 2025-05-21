@@ -56,7 +56,7 @@ Write-Output 'Az CLI Login'
 az login --identity
 az account set -s $env:subscriptionId
 
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup | Where-Object storageaccountname -like localboxdiag* | select-object -First 1
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup | Where-Object storageaccountname -notlike localboxdiag* | select-object -First 1
 if ($null -eq $StorageAccount) {
     Write-Error -Message "No storage account found in resource group $env:resourceGroup"
     exit 1
