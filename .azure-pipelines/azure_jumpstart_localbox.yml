@@ -110,7 +110,7 @@ stages:
               autoUpgradeClusterResource = $false
               githubAccount = "$(githubAccount)"
               githubBranch = "$(githubBranch)"
-              location = "westeurope"
+              location = "australiaeast"
               governResourceTags = $true
               vmAutologon = $true
           }
