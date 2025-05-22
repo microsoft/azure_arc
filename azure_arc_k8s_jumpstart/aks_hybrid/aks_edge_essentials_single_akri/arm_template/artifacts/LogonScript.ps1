@@ -146,9 +146,9 @@ if ($env:windowsNode -eq $true) {
 Write-Host "`n"
 Write-Host "Installing PowerShell modules for AKS Edge Essentials cluster connection to Azure Arc, this will take a few minutes." -ForegroundColor Green
 $ProgressPreference = "SilentlyContinue"
-Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
