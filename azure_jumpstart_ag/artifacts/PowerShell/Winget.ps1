@@ -90,6 +90,13 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Temporary fix for Helm 3.18.0
+Write-Header "Fixing Helm installation"
+Write-Host "`n"
+winget uninstall Helm.Helm
+winget install Helm.Helm --version 3.17.3 -s winget --silent --accept-package-agreements --accept-source-agreements --ignore-warnings
+
+
 # Start remaining logon scripts
 Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 
