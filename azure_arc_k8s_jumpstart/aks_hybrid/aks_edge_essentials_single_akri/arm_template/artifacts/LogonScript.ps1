@@ -29,6 +29,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 Write-Host "Fetching the latest AKS Edge Essentials release."
 if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $SchemaVersion = $AKSEEPinnedSchemaVersion
+    $schemaVersionAksEdgeConfig = $AKSEEPinnedSchemaVersion
 }else{
     $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
     $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
@@ -38,6 +39,7 @@ if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
     $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
     $schemaVersion = $jsonContent.SchemaVersion
+    $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
     # Clean up the downloaded release files
     Remove-Item -Path $output -Force
     Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
@@ -163,7 +165,7 @@ Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
 $aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
 . $aksedgeShell
 
-# Download, install and deploy AKS EE 
+# Download, install and deploy AKS EE
 Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
 # invoke the workflow, the json file already stored above.
 $retval = Start-AideWorkflow -jsonFile $aidejson
@@ -204,8 +206,8 @@ az -v
 az login --service-principal --username $Env:appId --password=$Env:password --tenant $Env:tenantId
 
 # Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
+# "subscriptionId" value comes from clientVM.json ARM template, based on which
+# subscription user deployed ARM template to. This is needed in case Service
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $Env:subscriptionId
 
