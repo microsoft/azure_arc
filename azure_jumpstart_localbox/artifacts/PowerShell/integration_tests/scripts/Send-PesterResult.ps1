@@ -113,6 +113,103 @@ $ctx = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountNa
 
 New-AzStorageContainer -Name testresults -Context $ctx -Permission Off
 
+# Import Configuration data file
+$LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
+
+function Wait-AzDeployment {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ResourceGroupName,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DeploymentName,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ClusterName,
+
+        [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
+    )
+
+    $startTime = Get-Date
+    $endTime = $startTime.AddMinutes($TimeoutMinutes)
+
+    $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
+
+    if ($clusterObject) {
+
+        Write-Host "Waiting for deployment '$DeploymentName' in resource group '$ResourceGroupName' to complete..."
+
+        while ($true) {
+            $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName
+
+            if ($deployment.ProvisioningState -ne 'InProgress') {
+                Write-Host "Deployment completed with state: $($deployment.ProvisioningState)"
+                return $deployment.ProvisioningState
+            }
+
+            if (Get-Date -gt $endTime) {
+                Write-Host 'Timeout reached. Deployment still in progress.'
+                return 'Timeout'
+            }
+
+            Write-Host 'Deployment still in progress. Checking again in 1 minute...'
+            Start-Sleep -Seconds 60
+        }
+    } else {
+        Write-Host "Cluster '$ClusterName' does not exist - skipping deployment status check..."
+    }
+}
+
+function Wait-AzLocalClusterConnectivity {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ResourceGroupName,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ClusterName,
+
+        [int]$TimeoutMinutes = 60  # Default timeout of 60 minutes
+    )
+
+    $startTime = Get-Date
+    $endTime = $startTime.AddMinutes($TimeoutMinutes)
+
+    $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
+
+    if ($clusterObject) {
+
+        Write-Host "Waiting for cluster '$ClusterName' in resource group '$ResourceGroupName' to be 'Connected'..."
+
+        while ($true) {
+            $clusterObject = Get-AzStackHciCluster -ResourceGroupName $ResourceGroupName -Name $ClusterName -ErrorAction Ignore
+
+            if ($clusterObject -and $clusterObject.ConnectivityStatus -eq 'Connected') {
+                Write-Host "Cluster '$ClusterName' is now Connected."
+                return $true
+            }
+
+            if ([DateTime]::Now -gt $endTime) {
+                Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected."
+                return $false
+            }
+
+            Write-Host "Cluster '$ClusterName' is still not Connected. Checking again in 30 seconds..."
+            Start-Sleep -Seconds 30
+        }
+    } else {
+        Write-Host "Cluster '$ClusterName' does not exist - skipping connectivity check..."
+    }
+}
+
+if ('True' -eq $env:autoDeployClusterResource) {
+
+    # Wait for the deployment to complete
+    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName localcluster-deploy -ClusterName $LocalBoxConfig.ClusterName
+
+    # Wait for the cluster to be connected
+    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName
+
+}
 
 Write-Output 'Running Pester tests'
 
