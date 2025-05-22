@@ -91,7 +91,16 @@ if ($env:windowsNode -eq $true) {
                 "MemoryInMB": 4096
             }
         }
-    ]
+    ],
+    "Arc":{
+        "ClusterName":"ClusterName-Stage",
+        "Location":"$env:location",
+        "ResourceGroupName":"$env:resourceGroup",
+        "SubscriptionId":"$env:subscriptionId",
+        "TenantId":"$env:tenantId",
+        "ClientId":"$env:appId",
+        "ClientSecret":"$env:password"
+    }
 }
 "@
 } else {
@@ -120,6 +129,15 @@ if ($env:windowsNode -eq $true) {
             }
         }
     ]
+    "Arc": {
+        "ClusterName":"ClusterName-Stage",
+        "Location":"$env:location",
+        "ResourceGroupName":"$env:resourceGroup",
+        "SubscriptionId":"$env:subscriptionId",
+        "TenantId":"$env:tenantId",
+        "ClientId":"$env:appId",
+        "ClientSecret":"$env:password"
+    }
 }
 "@
 }
@@ -254,6 +272,24 @@ $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clus
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
+
+# Replace the cluster name in the aksedge-config.json file
+$aksedgeConfig = Get-Content -Path $aksedgejson -Raw
+$content = Get-Content $AKSEEConfigFilePath
+$content = $content -replace "ClusterName-Stage", $Env:arcClusterName
+Set-Content $aksedgejson -Value $content
+
+$ProgressPreference = "SilentlyContinue"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+
+Write-Host "INFO: Arc-enabling $Env:arcClusterName AKS Edge Essentials cluster." -ForegroundColor Gray
+kubectl get svc
+Connect-AksEdgeArc -JsonConfigFilePath $aksedgejson
+
+<#
 if ($env:kubernetesDistribution -eq "k8s") {
     az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
@@ -269,6 +305,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 }
+#>
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
