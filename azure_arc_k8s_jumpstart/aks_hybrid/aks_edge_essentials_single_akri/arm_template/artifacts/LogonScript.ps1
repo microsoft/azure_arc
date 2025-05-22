@@ -146,6 +146,7 @@ if ($env:windowsNode -eq $true) {
 Write-Host "`n"
 Write-Host "Installing PowerShell modules for AKS Edge Essentials cluster connection to Azure Arc, this will take a few minutes." -ForegroundColor Green
 $ProgressPreference = "SilentlyContinue"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
