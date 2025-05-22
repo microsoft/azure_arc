@@ -92,7 +92,7 @@ if ($env:windowsNode -eq $true) {
             }
         }
     ],
-    "Arc":{
+    "Arc": {
         "ClusterName":"ClusterName-Stage",
         "Location":"$env:location",
         "ResourceGroupName":"$env:resourceGroup",
@@ -128,7 +128,7 @@ if ($env:windowsNode -eq $true) {
                 "DataSizeInGB": 20
             }
         }
-    ]
+    ],
     "Arc": {
         "ClusterName":"ClusterName-Stage",
         "Location":"$env:location",
@@ -141,6 +141,14 @@ if ($env:windowsNode -eq $true) {
 }
 "@
 }
+
+# Installing the Az modules for Azure Arc connection
+Write-Host "`n"
+Write-Host "Installing PowerShell modules for AKS Edge Essentials cluster connection to Azure Arc, this will take a few minutes." -ForegroundColor Green
+$ProgressPreference = "SilentlyContinue"
+Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
@@ -274,38 +282,13 @@ $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
 
 # Replace the cluster name in the aksedge-config.json file
-$aksedgeConfig = Get-Content -Path $aksedgejson -Raw
-$content = Get-Content $AKSEEConfigFilePath
+$content = Get-Content $aksedgejson -Raw
 $content = $content -replace "ClusterName-Stage", $Env:arcClusterName
 Set-Content $aksedgejson -Value $content
-
-$ProgressPreference = "SilentlyContinue"
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
 Write-Host "INFO: Arc-enabling $Env:arcClusterName AKS Edge Essentials cluster." -ForegroundColor Gray
 kubectl get svc
 Connect-AksEdgeArc -JsonConfigFilePath $aksedgejson
-
-<#
-if ($env:kubernetesDistribution -eq "k8s") {
-    az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --distribution aks_edge_k8s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-} else {
-    az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --distribution aks_edge_k3s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-}
-#>
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
@@ -396,7 +379,7 @@ helm install akri akri-helm-charts/akri `
 --set onvif.configuration.capacity=2 `
 --set onvif.configuration.brokerPod.image.repository='ghcr.io/project-akri/akri/onvif-video-broker' `
 --set onvif.configuration.brokerPod.image.tag='latest'
- # Copy video scripts
+# Copy video scripts
 Write-Host "Downloading video artifacts"
 $videoDir = ".\video"
 New-Item -Path $videoDir -ItemType directory -Force
@@ -405,11 +388,11 @@ Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p 
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p udp -m udp --sport 3702 -j ACCEPT' /etc/systemd/scripts/ip4save"
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo ip route add 239.255.255.250/32 dev cni0"
 Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
-    
+
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
 kubectl apply -f $videoDir\akri-video-streaming-app.yaml
-kubectl apply -f $videoDir\video-streaming.yaml  
+kubectl apply -f $videoDir\video-streaming.yaml
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
