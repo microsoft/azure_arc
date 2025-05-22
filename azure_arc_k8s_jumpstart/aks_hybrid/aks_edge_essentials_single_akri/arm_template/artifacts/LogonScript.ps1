@@ -266,8 +266,6 @@ if ($retval) {
     exit -1
 }
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
-
 if ($env:windowsNode -eq $true) {
     # Get a list of all nodes in the cluster
     $nodes = kubectl get nodes -o json | ConvertFrom-Json
@@ -382,9 +380,6 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/video-streaming.yaml"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
 kubectl apply -f $videoDir\akri-video-streaming-app.yaml
 kubectl apply -f $videoDir\video-streaming.yaml
-
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
