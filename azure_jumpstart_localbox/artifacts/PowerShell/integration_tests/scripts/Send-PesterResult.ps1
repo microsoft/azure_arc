@@ -189,7 +189,7 @@ function Wait-AzLocalClusterConnectivity {
             }
 
             if ([DateTime]::Now -gt $endTime) {
-                Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected."
+                Write-Host "Timeout reached. Cluster '$ClusterName' is still not Connected: $($clusterObject.ConnectivityStatus)"
                 return $false
             }
 
@@ -207,7 +207,7 @@ if ('True' -eq $env:autoDeployClusterResource) {
     Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName localcluster-deploy -ClusterName $LocalBoxConfig.ClusterName
 
     # Wait for the cluster to be connected
-    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName
+    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName -TimeoutMinutes 180
 
 }
 
