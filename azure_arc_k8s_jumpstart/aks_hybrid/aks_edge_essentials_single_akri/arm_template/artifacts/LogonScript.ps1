@@ -284,7 +284,6 @@ if ($env:windowsNode -eq $true) {
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
 $workspaceName = ($Env:arcClusterName).ToLower()
