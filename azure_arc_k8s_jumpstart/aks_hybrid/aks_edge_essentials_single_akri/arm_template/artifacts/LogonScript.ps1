@@ -255,8 +255,6 @@ $content = Get-Content $aksedgejson -Raw
 $content = $content -replace "ClusterName-Stage", $Env:arcClusterName
 Set-Content $aksedgejson -Value $content
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
-
 $retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
@@ -267,6 +265,8 @@ if ($retval) {
     Pop-Location
     exit -1
 }
+
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 if ($env:windowsNode -eq $true) {
     # Get a list of all nodes in the cluster
