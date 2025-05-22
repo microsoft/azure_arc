@@ -150,75 +150,6 @@ Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAct
 Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
 
-Set-ExecutionPolicy Bypass -Scope Process -Force
-# Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
-$zipFile = "$aksEdgeDeployModules.zip"
-$installDir = "C:\AksEdgeScript"
-$workDir = "$installDir\AKS-Edge-main"
-
-if (-not (Test-Path -Path $installDir)) {
-    Write-Host "Creating $installDir..."
-    New-Item -Path "$installDir" -ItemType Directory | Out-Null
-}
-
-Push-Location $installDir
-
-Write-Host "`n"
-Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
-Write-Host "`n"
-
-try {
-    function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
-    download2
-}
-catch {
-    Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if (!(Test-Path -Path "$workDir")) {
-    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
-}
-
-$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
-Set-Content -Path $aidejson -Value $aideuserConfig -Force
-$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
-Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
-
-$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
-. $aksedgeShell
-
-# Download, install and deploy AKS EE
-Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
-# invoke the workflow, the json file already stored above.
-$retval = Start-AideWorkflow -jsonFile $aidejson
-# report error via Write-Error for Intune to show proper status
-if ($retval) {
-    Write-Host "Deployment Successful. "
-} else {
-    Write-Error -Message "Deployment failed" -Category OperationStopped
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if ($env:windowsNode -eq $true) {
-    # Get a list of all nodes in the cluster
-    $nodes = kubectl get nodes -o json | ConvertFrom-Json
-
-    # Loop through each node and check the OSImage field
-    foreach ($node in $nodes.items) {
-        $os = $node.status.nodeInfo.osImage
-        if ($os -like '*windows*') {
-            # If the OSImage field contains "windows", assign the "worker" role
-            kubectl label nodes $node.metadata.name node-role.kubernetes.io/worker=worker
-        }
-    }
-}
-
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -269,15 +200,52 @@ Write-Host "`n"
 az provider show --namespace Microsoft.ExtendedLocation -o table
 Write-Host "`n"
 
-# Onboarding the cluster to Azure Arc
-Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
+Set-ExecutionPolicy Bypass -Scope Process -Force
+# Download the AksEdgeDeploy modules from Azure/AksEdge
+$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
+$zipFile = "$aksEdgeDeployModules.zip"
+$installDir = "C:\AksEdgeScript"
+$workDir = "$installDir\AKS-Edge-main"
+
+if (-not (Test-Path -Path $installDir)) {
+    Write-Host "Creating $installDir..."
+    New-Item -Path "$installDir" -ItemType Directory | Out-Null
+}
+
+Push-Location $installDir
+
+Write-Host "`n"
+Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+try {
+    function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
+    download2
+}
+catch {
+    Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
+    Stop-Transcript | Out-Null
+    Pop-Location
+    exit -1
+}
 
-#Tag
-$clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
+if (!(Test-Path -Path "$workDir")) {
+    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
+}
 
+$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
+Set-Content -Path $aidejson -Value $aideuserConfig -Force
+$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
+Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
+
+$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
+. $aksedgeShell
+
+# Download, install and deploy AKS EE
+Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
+# invoke the workflow, the json file already stored above.
+
+# Set the cluster name to a random value
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
 
@@ -286,9 +254,32 @@ $content = Get-Content $aksedgejson -Raw
 $content = $content -replace "ClusterName-Stage", $Env:arcClusterName
 Set-Content $aksedgejson -Value $content
 
-Write-Host "INFO: Arc-enabling $Env:arcClusterName AKS Edge Essentials cluster." -ForegroundColor Gray
-kubectl get svc
-Connect-AksEdgeArc -JsonConfigFilePath $aksedgejson
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+
+$retval = Start-AideWorkflow -jsonFile $aidejson
+# report error via Write-Error for Intune to show proper status
+if ($retval) {
+    Write-Host "Deployment Successful. "
+} else {
+    Write-Error -Message "Deployment failed" -Category OperationStopped
+    Stop-Transcript | Out-Null
+    Pop-Location
+    exit -1
+}
+
+if ($env:windowsNode -eq $true) {
+    # Get a list of all nodes in the cluster
+    $nodes = kubectl get nodes -o json | ConvertFrom-Json
+
+    # Loop through each node and check the OSImage field
+    foreach ($node in $nodes.items) {
+        $os = $node.status.nodeInfo.osImage
+        if ($os -like '*windows*') {
+            # If the OSImage field contains "windows", assign the "worker" role
+            kubectl label nodes $node.metadata.name node-role.kubernetes.io/worker=worker
+        }
+    }
+}
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
@@ -309,8 +300,6 @@ az k8s-extension create --name "azuremonitor-containers" `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
