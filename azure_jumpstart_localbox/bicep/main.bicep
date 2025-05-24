@@ -1,10 +1,3 @@
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
@@ -107,8 +100,6 @@ module hostDeployment 'host/host.bicep' = {
     vmSize: vmSize
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     spnProviderId: spnProviderId
     workspaceName: logAnalyticsWorkspaceName

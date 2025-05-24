@@ -26,9 +26,6 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json -AsArray
 #     $ErrorActionPreference = "Stop"
 # }
 
-# Convert user credentials to base64
-$SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
-
 # "Insufficient privileges to complete the operation." when using Managed Identity.
 #$spnProviderId = Get-AzADServicePrincipal -DisplayName "Microsoft.AzureStackHCI Resource Provider"
 

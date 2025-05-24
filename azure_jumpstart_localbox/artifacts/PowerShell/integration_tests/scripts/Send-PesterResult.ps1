@@ -12,7 +12,7 @@ $endTime = (Get-Date).Add($timeout)
 
 $logFilePath = 'C:\LocalBox\Logs\New-LocalBoxCluster.log'
 
-Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
+Write-Output "Adding Storage Blob Data Contributor role assignment to Managed Identity for allowing upload of Pester test results to Azure Storage"
 
 $null = Connect-AzAccount -Identity -Scope Process
 
