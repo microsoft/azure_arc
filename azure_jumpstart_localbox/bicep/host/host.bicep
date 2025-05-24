@@ -279,23 +279,25 @@ resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
-// Add role assignment for the deploy user: Azure Key Vault Administrator role
+// Add role assignment for the VM: Azure Key Vault Administrator role
 resource deployerRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'KeyVaultAdministrator')
   scope: resourceGroup()
   properties: {
     principalId: vm.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
+    principalType: 'ServicePrincipal'
   }
 }
 
-// Add role assignment for the deploy user: Storage Account Contributor role
+// Add role assignment for the VM: Storage Account Contributor role
 resource deployerRoleAssignment_StorageAccountContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'StorageAccountContributor')
   scope: resourceGroup()
   properties: {
     principalId: vm.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')
+    principalType: 'ServicePrincipal'
   }
 }
 
