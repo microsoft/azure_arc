@@ -29,6 +29,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 Write-Host "Fetching the latest AKS Edge Essentials release."
 if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $SchemaVersion = $AKSEEPinnedSchemaVersion
+    $schemaVersionAksEdgeConfig = $AKSEEPinnedSchemaVersion
 }else{
     $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
     $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
@@ -38,6 +39,7 @@ if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
     $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
     $schemaVersion = $jsonContent.SchemaVersion
+    $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
     # Clean up the downloaded release files
     Remove-Item -Path $output -Force
     Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
@@ -89,7 +91,16 @@ if ($env:windowsNode -eq $true) {
                 "MemoryInMB": 4096
             }
         }
-    ]
+    ],
+    "Arc": {
+        "ClusterName":"ClusterName-Stage",
+        "Location":"$env:location",
+        "ResourceGroupName":"$env:resourceGroup",
+        "SubscriptionId":"$env:subscriptionId",
+        "TenantId":"$env:tenantId",
+        "ClientId":"$env:appId",
+        "ClientSecret":"$env:password"
+    }
 }
 "@
 } else {
@@ -117,10 +128,78 @@ if ($env:windowsNode -eq $true) {
                 "DataSizeInGB": 20
             }
         }
-    ]
+    ],
+    "Arc": {
+        "ClusterName":"ClusterName-Stage",
+        "Location":"$env:location",
+        "ResourceGroupName":"$env:resourceGroup",
+        "SubscriptionId":"$env:subscriptionId",
+        "TenantId":"$env:tenantId",
+        "ClientId":"$env:appId",
+        "ClientSecret":"$env:password"
+    }
 }
 "@
 }
+
+# Installing the Az modules for Azure Arc connection
+Write-Host "`n"
+Write-Host "Installing PowerShell modules for AKS Edge Essentials cluster connection to Azure Arc, this will take a few minutes." -ForegroundColor Green
+$ProgressPreference = "SilentlyContinue"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -Confirm:$false
+
+Write-Host "`n"
+Write-Host "Checking kubernetes nodes"
+Write-Host "`n"
+kubectl get nodes -o wide
+Write-Host "`n"
+
+# az version
+az -v
+
+# Login as service principal
+az login --service-principal --username $Env:appId --password=$Env:password --tenant $Env:tenantId
+
+# Set default subscription to run commands against
+# "subscriptionId" value comes from clientVM.json ARM template, based on which
+# subscription user deployed ARM template to. This is needed in case Service
+# Principal has access to multiple subscriptions, which can break the automation logic
+az account set --subscription $Env:subscriptionId
+
+# Installing Azure CLI extensions
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+Write-Host "`n"
+Write-Host "Installing Azure CLI extensions"
+az extension add --name connectedk8s
+az extension add --name k8s-extension
+Write-Host "`n"
+
+# Registering Azure Arc providers
+Write-Host "Registering Azure Arc providers, hold tight..."
+Write-Host "`n"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.HybridConnectivity --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+
+az provider show --namespace Microsoft.Kubernetes -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.HybridCompute -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.GuestConfiguration -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.HybridConnectivity -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.ExtendedLocation -o table
+Write-Host "`n"
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
@@ -163,9 +242,19 @@ Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
 $aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
 . $aksedgeShell
 
-# Download, install and deploy AKS EE 
+# Download, install and deploy AKS EE
 Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
 # invoke the workflow, the json file already stored above.
+
+# Set the cluster name to a random value
+$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
+$Env:arcClusterName = "$Env:resourceGroup-$guid"
+
+# Replace the cluster name in the aksedge-config.json file
+$content = Get-Content $aksedgejson -Raw
+$content = $content -replace "ClusterName-Stage", $Env:arcClusterName
+Set-Content $aksedgejson -Value $content
+
 $retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
@@ -192,85 +281,7 @@ if ($env:windowsNode -eq $true) {
 }
 
 Write-Host "`n"
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes -o wide
-Write-Host "`n"
-
-# az version
-az -v
-
-# Login as service principal
-az login --service-principal --username $Env:appId --password=$Env:password --tenant $Env:tenantId
-
-# Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
-# Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $Env:subscriptionId
-
-# Installing Azure CLI extensions
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-Write-Host "Installing Azure CLI extensions"
-az extension add --name connectedk8s --version 1.9.3
-az extension add --name k8s-extension
-Write-Host "`n"
-
-# Registering Azure Arc providers
-Write-Host "Registering Azure Arc providers, hold tight..."
-Write-Host "`n"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
-az provider register --namespace Microsoft.HybridConnectivity --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-
-az provider show --namespace Microsoft.Kubernetes -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.HybridCompute -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.GuestConfiguration -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.HybridConnectivity -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.ExtendedLocation -o table
-Write-Host "`n"
-
-# Onboarding the cluster to Azure Arc
-Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
-Write-Host "`n"
-
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
-
-#Tag
-$clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
-
-$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$Env:arcClusterName = "$Env:resourceGroup-$guid"
-if ($env:kubernetesDistribution -eq "k8s") {
-    az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --distribution aks_edge_k8s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-} else {
-    az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --distribution aks_edge_k3s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-}
-
-Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
 $workspaceName = ($Env:arcClusterName).ToLower()
@@ -287,8 +298,6 @@ az k8s-extension create --name "azuremonitor-containers" `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
@@ -357,7 +366,7 @@ helm install akri akri-helm-charts/akri `
 --set onvif.configuration.capacity=2 `
 --set onvif.configuration.brokerPod.image.repository='ghcr.io/project-akri/akri/onvif-video-broker' `
 --set onvif.configuration.brokerPod.image.tag='latest'
- # Copy video scripts
+# Copy video scripts
 Write-Host "Downloading video artifacts"
 $videoDir = ".\video"
 New-Item -Path $videoDir -ItemType directory -Force
@@ -366,14 +375,11 @@ Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p 
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p udp -m udp --sport 3702 -j ACCEPT' /etc/systemd/scripts/ip4save"
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo ip route add 239.255.255.250/32 dev cni0"
 Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
-    
+
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
 kubectl apply -f $videoDir\akri-video-streaming-app.yaml
-kubectl apply -f $videoDir\video-streaming.yaml  
-
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
+kubectl apply -f $videoDir\video-streaming.yaml
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
