@@ -8,7 +8,7 @@ BeforeDiscovery {
     $clusters = @($LocalBoxConfig.ClusterName)
 
     # Login to Azure PowerShell
-    Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 }
 

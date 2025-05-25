@@ -18,10 +18,10 @@ Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log
 
 # Login to Azure CLI with service principal provided by user
 Write-Header "Az CLI Login"
-az login --identity --tenant $Env:spnTenantId
+az login --identity --tenant $Env:tenantId
 
 # Login to Azure PowerShell
-Connect-AzAccount -Identity -Tenant $Env:spnTenantId -Subscription $Env:subscriptionId
+Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
 
 #####################################################################
 # Register Azure providers

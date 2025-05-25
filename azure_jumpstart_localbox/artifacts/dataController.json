@@ -33,7 +33,7 @@
     "subscriptionId": {
       "type": "string"
     },
-     "spnTenantId": {
+     "tenantId": {
       "type": "string"
     },
     "spnAuthority": {
@@ -99,7 +99,7 @@
           "password": "[parameters('azdataPassword')]"
         },
         "uploadServicePrincipal": {
-          "tenantId": "[parameters('spnTenantId')]",
+          "tenantId": "[parameters('tenantId')]",
           "authority": "[parameters('spnAuthority')]"
         },
         "logAnalyticsWorkspaceConfig": {

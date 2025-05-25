@@ -1560,7 +1560,7 @@ function Set-AzLocalDeployPrereqs {
     $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
     $clientId = (Get-AzContext).Account.Id
     foreach ($node in $LocalBoxConfig.NodeHostConfig) {
-        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $clientId, $armtoken, $env:resourceGroup, $env:azureLocation -ScriptBlock {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:tenantId, $clientId, $armtoken, $env:resourceGroup, $env:azureLocation -ScriptBlock {
             $subId = $args[0]
             $tenantId = $args[1]
             $clientId = $args[2]
@@ -1722,7 +1722,7 @@ $HostVMPath = $LocalBoxConfig.HostVMPath
 $InternalSwitch = $LocalBoxConfig.InternalSwitch
 $natDNS = $LocalBoxConfig.natDNS
 $natSubnet = $LocalBoxConfig.natSubnet
-$tenantId = $env:spnTenantId
+$tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup

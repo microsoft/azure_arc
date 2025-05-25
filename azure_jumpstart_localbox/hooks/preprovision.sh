@@ -129,11 +129,11 @@ else
     spn=$(az ad sp create-for-rbac --name "http://AzureArcJumpstart" --role "Owner" --scopes "/subscriptions/$AZURE_SUBSCRIPTION_ID")
     spnClientId=$(echo $spn | jq -r .appId)
     spnClientSecret=$(echo $spn | jq -r .password)
-    spnTenantId=$(echo $spn | jq -r .tenant)
+    tenantId=$(echo $spn | jq -r .tenant)
     spnObjectId=$(az ad sp show --id $spnClientId --query id -o tsv)
     # Set the environment variables
     azd env set SPN_CLIENT_ID $spnClientId
     azd env set SPN_CLIENT_SECRET $spnClientSecret
-    azd env set SPN_TENANT_ID $spnTenantId
+    azd env set SPN_TENANT_ID $tenantId
     azd env set SPN_OBJECT_ID $spnObjectId
 fi

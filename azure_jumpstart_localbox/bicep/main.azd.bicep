@@ -11,7 +11,7 @@ param spnClientId string = 'null'
 param spnClientSecret string = 'null'
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string = 'null'
+param tenantId string = 'null'
 
 @description('Azure AD object id for your Microsoft.AzureStackHCI resource provider')
 param spnProviderId string ='null'
@@ -96,7 +96,7 @@ module hostDeployment 'host/host.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
+    tenantId: tenantId
     spnProviderId: spnProviderId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: storageAccountDeployment.outputs.storageAccountName

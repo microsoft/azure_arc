@@ -1,6 +1,6 @@
 BeforeDiscovery {
 
-    $null = Connect-AzAccount -Identity -Tenant $env:spnTenantId -Subscription $env:subscriptionId
+    $null = Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 }
 

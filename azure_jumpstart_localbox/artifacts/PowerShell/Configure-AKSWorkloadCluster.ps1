@@ -20,7 +20,7 @@ az extension add --name aksarc
 
 $subId = $env:subscriptionId
 $rg = $env:resourceGroup
-$spnTenantId = $env:spnTenantId
+$tenantId = $env:tenantId
 $location = $env:azureLocation
 $lnetName = "localbox-aks-lnet-vlan110"
 $customLocName = $LocalBoxConfig.rbCustomLocationName

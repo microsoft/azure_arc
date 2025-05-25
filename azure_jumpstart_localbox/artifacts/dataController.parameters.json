@@ -26,8 +26,8 @@
       "subscriptionId": {
         "value": "subscriptionId-stage"
       },
-      "spnTenantId": {
-        "value": "spnTenantId-stage"
+      "tenantId": {
+        "value": "tenantId-stage"
       },
       "spnAuthority": {
         "value": "https://login.microsoftonline.com"
