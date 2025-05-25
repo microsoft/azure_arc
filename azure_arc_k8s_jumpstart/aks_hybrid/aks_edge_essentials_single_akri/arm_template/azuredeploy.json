@@ -97,14 +97,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "microsoft"
+            "defaultValue": "nabeelmsft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "main"
+            "defaultValue": "nabeel-onvif-updates"
         },
         "virtualNetworkName": {
             "type": "string",
@@ -264,7 +264,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2022-11-01",
+            "apiVersion": "2024-07-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
@@ -312,7 +312,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/Bootstrap')]",
-            "apiVersion": "2022-11-01",
+            "apiVersion": "2024-07-01",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
