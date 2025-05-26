@@ -6,13 +6,14 @@ trigger:
     include:
       - azure_jumpstart_arcbox/*
 
-schedules:
-- cron: "00 18 * * *"
-  displayName: Daily 18:00 UTC
-  branches:
-    include:
-      - arcbox_pipeline
-  always: true
+# Disabled schedules for now, as there is a known issue with the DR-cluster
+# schedules:
+# - cron: "00 18 * * *"
+#   displayName: Daily 18:00 UTC
+#   branches:
+#     include:
+#       - arcbox_pipeline
+#   always: true
 
 parameters:
 - name: ResourceGroupNamePrefix
