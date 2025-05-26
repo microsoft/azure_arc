@@ -98,9 +98,7 @@ stages:
           -ResourceGroupName $(RGname) `
           -TemplateFile azure_jumpstart_localbox/bicep/main.bicep `
           -TemplateParameterObject @{ `
-              spnClientId = "$(spnClientId)"
-              spnClientSecret = "$(spnClientSecret)"
-              spnTenantId = "$(spnTenantId)"
+              tenantId = "$(spnTenantId)"
               spnProviderId = "$(spnProviderId)"
               windowsAdminUsername = "arcdemo"
               windowsAdminPassword = "$(windowsAdminPassword)"
