@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmSize": {
-      "value": "Standard_D8s_v3"
+      "value": "Standard_D8s_v5"
     },
     "vmName": {
       "value": "AKS-EE-Win-Demo"
