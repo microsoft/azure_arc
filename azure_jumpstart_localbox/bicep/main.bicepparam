@@ -1,8 +1,6 @@
 using './main.bicep'
 
-param spnClientId = ''
-param spnClientSecret = ''
-param spnTenantId = ''
+param tenantId = ''
 param spnProviderId = ''
 param windowsAdminUsername = ''
 param windowsAdminPassword = ''

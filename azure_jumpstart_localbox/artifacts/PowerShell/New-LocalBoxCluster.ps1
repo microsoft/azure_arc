@@ -1557,12 +1557,14 @@ function Set-AzLocalDeployPrereqs {
         }
     }
 
+    $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
+    $clientId = (Get-AzContext).Account.Id
     foreach ($node in $LocalBoxConfig.NodeHostConfig) {
-        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $env:spnClientID, $env:spnClientSecret, $env:resourceGroup, $env:azureLocation -ScriptBlock {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:tenantId, $clientId, $armtoken, $env:resourceGroup, $env:azureLocation -ScriptBlock {
             $subId = $args[0]
             $tenantId = $args[1]
             $clientId = $args[2]
-            $clientSecret = $args[3]
+            $armtoken = $args[3]
             $resourceGroup = $args[4]
             $location = $args[5]
 
@@ -1597,9 +1599,6 @@ function Set-AzLocalDeployPrereqs {
             #Install-Module Az.Accounts -Force # Pre-installed in 24H2 base image
             #Install-Module Az.ConnectedMachine -Force
             #Install-Module Az.Resources -Force
-            $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
-            Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
-            $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
 
             # Workaround for BITS transfer issue
             #Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
@@ -1723,7 +1722,7 @@ $HostVMPath = $LocalBoxConfig.HostVMPath
 $InternalSwitch = $LocalBoxConfig.InternalSwitch
 $natDNS = $LocalBoxConfig.natDNS
 $natSubnet = $LocalBoxConfig.natSubnet
-$tenantId = $env:spnTenantId
+$tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup

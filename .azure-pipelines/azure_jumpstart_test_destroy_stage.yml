@@ -1,0 +1,31 @@
+trigger: none
+
+parameters:
+- name: ResourceGroupName
+  displayName: 'Resource Group Name'
+  type: string
+  default: 'arcbox-itpro-tests'
+
+variables:
+- name: ResourceGroupName
+  value: ${{parameters.ResourceGroupName}}
+
+stages:
+- stage: destroy
+  displayName: 'ArcBox_teardown'
+  variables:
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
+  jobs:
+  - deployment:
+    displayName: "Get approval"
+    environment: 'arcbox_teardown_approval'
+  - job: Delete
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: 'HCIBox-ServiceConnection'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Deleting resource group $(RGname)"

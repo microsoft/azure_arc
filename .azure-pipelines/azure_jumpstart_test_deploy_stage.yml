@@ -1,0 +1,118 @@
+trigger: none
+
+parameters:
+- name: ResourceGroupNamePrefix
+  displayName: 'Resource Group Name prefix'
+  type: string
+  default: 'arcbox-itpro-tests'
+- name: Location
+  displayName: 'Location'
+  type: string
+  default: 'northeurope'
+- name: AzureSubscription
+  displayName: 'Azure Subscription'
+  type: string
+  default: 'jumpstart-ext-sub-ado-pipeline-tests-identity'
+- name: githubAccount
+  displayName: 'githubAccount'
+  type: string
+  default: 'microsoft'
+- name: githubBranch
+  displayName: 'githubBranch'
+  type: string
+  default: 'arcbox_pipeline'
+- name: flavor
+  displayName: 'flavor'
+  type: string
+  default: 'ITPro'
+- name: simulateFailingTests
+  displayName: 'Simulate failing tests'
+  type: boolean
+  default: false
+
+variables:
+#- group: 'integration-tests'
+- name: ResourceGroupNamePrefix
+  value: ${{parameters.ResourceGroupNamePrefix}}
+- name: githubAccount
+  value: ${{parameters.githubAccount}}
+- name: githubBranch
+  value: ${{parameters.githubBranch}}
+- name: flavor
+  value: ${{parameters.flavor}}
+- name: Location
+  value: ${{parameters.Location}}
+
+stages:
+- stage: 'ArcBox_deployment'
+  jobs:
+  - job: Deploy
+    timeoutInMinutes: 235 # 5 minutes before the ACA self-hosted runner in order for the runner to gracefully shutdown
+    pool:
+      vmImage: 'ubuntu-latest'
+    continueOnError: 'false'
+    steps:
+
+    - task: AzurePowerShell@5
+      displayName: 'Check for failed tests'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          $dateSuffix = (Get-Date -Format "yyyy-MM-dd-HH-mm")
+          $RGname = "$(ResourceGroupNamePrefix)-$dateSuffix"
+
+          $failedTestsFound = $false
+
+          # Simulate failing tests if the parameter is set
+          if ([System.Convert]::ToBoolean("${{ parameters.simulateFailingTests }}")) {
+              $failedTestsFound = $true
+          }
+          if ($failedTestsFound) {
+              throw "❌ One or more Pester tests failed."
+          } else {
+              Write-Host "✅ All Pester tests passed." -ForegroundColor Green
+          }
+
+
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+        Inline: |
+            $rgName = "$(ResourceGroupNamePrefix)"
+            Write-Host "Deleting resource group $rgName"
+            $projectName = "Azure Arc Jumpstart"
+            $pipelineId = 64   # The ID of the pipeline
+            $organization = "AzureArcJumpstart"
+            $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
+
+            Install-PSResource -Name VSTeam -TrustRepository
+
+            Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
+
+            Get-VSTeamProject
+
+            $body = @{
+                resources = @{
+                    repositories = @{
+                        self = @{
+                            refName = "refs/heads/arcbox_pipeline"
+                        }
+                    }
+                }
+                templateParameters = @{
+                    ResourceGroupName = $rgName
+                }
+            }
+
+            $jsonBody = $body | ConvertTo-Json -Depth 100
+
+            Invoke-VSTeamRequest -Url "https://dev.azure.com/$organization/$projectName/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1" -Method POST -Body $jsonBody -ContentType "application/json"
+

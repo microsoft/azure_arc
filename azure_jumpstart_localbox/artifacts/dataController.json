@@ -33,14 +33,8 @@
     "subscriptionId": {
       "type": "string"
     },
-    "spnClientId": {
+     "tenantId": {
       "type": "string"
-    },
-    "spnTenantId": {
-      "type": "string"
-    },
-    "spnClientSecret": {
-      "type": "securestring"
     },
     "spnAuthority": {
       "type": "string"
@@ -105,10 +99,8 @@
           "password": "[parameters('azdataPassword')]"
         },
         "uploadServicePrincipal": {
-          "clientId": "[parameters('spnClientId')]",
-          "tenantId": "[parameters('spnTenantId')]",
-          "authority": "[parameters('spnAuthority')]",
-          "clientSecret": "[parameters('spnClientSecret')]"
+          "tenantId": "[parameters('tenantId')]",
+          "authority": "[parameters('spnAuthority')]"
         },
         "logAnalyticsWorkspaceConfig": {
           "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",

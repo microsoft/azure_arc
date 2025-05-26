@@ -1,7 +1,7 @@
 $ErrorActionPreference = $env:ErrorActionPreference
 
 $Env:LocalBoxLogsDir = "$Env:LocalBoxDir\Logs"
-$tenantId = $env:spnTenantId
+$tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
 $resourceGroup = $env:resourceGroup
 

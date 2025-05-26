@@ -27,10 +27,7 @@ switch ($env:flavor) {
 
 Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
 
-$spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-
-$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:tenantId -Subscription $env:subscriptionId -Scope Process
+$null = Connect-AzAccount -Identity -Scope Process
 
 Write-Output "Wait for Azure CLI to become available (installed by WinGet)"
 
@@ -69,46 +66,55 @@ $newPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
 $env:Path = $currentPath + ";" + $newPath
 
 Write-Output "Az CLI Login"
-az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:tenantId
+az login --identity
 az account set -s $env:subscriptionId
 
-$ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
+$ClientObjectId = Get-AzContext
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
-if (Get-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
+# Get the VM's resource ID
+$vmResourceId = (Invoke-RestMethod -Headers @{Metadata="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance?api-version=2021-02-01").compute.resourceId
+
+# Get the VM resource
+$vm = Get-AzResource -ResourceId $vmResourceId
+
+# Get the identity objectId
+$vm.Identity.PrincipalId
+
+if (Get-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
 
     Write-Output "Role assignment already exists"
 
 } else {
 
     Write-Output "Role assignment does not yet exist"
-    $null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+    $null = New-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
 
     Write-Output "Wait for eventual consistency after RBAC assignment"
     Start-Sleep 120
 
 }
 
-Write-Output "Waiting for PowerShell transcript end in $logFilePath"
+Write-Output "Waiting for deployment end in $logFilePath"
 
 do {
 
     if (Test-Path $logFilePath) {
     Write-Output "Log file $logFilePath exists"
 
-    $content = Get-Content -Path $logFilePath -Tail 5
-    if ($content -like "*PowerShell transcript end*") {
-        Write-Output "PowerShell transcript end detected in $logFilePath at $(Get-Date)"
+    $content = Get-Content -Path $logFilePath
+    if ($content -like "*Running tests to verify infrastructure*") {
+        Write-Output "Deployment end detected in $logFilePath at $(Get-Date)"
         break
     } else {
-        Write-Output "PowerShell transcript end not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
+        Write-Output "Deployment end not detected in $logFilePath at $(Get-Date) - waiting 60 seconds"
     }
     } else {
         Write-Output "Log file $logFilePath does not yet exist - waiting 60 seconds"
     }
     if ((Get-Date) -ge $endTime) {
-       throw "Timeout reached. PowerShell transcript end not found."
+       throw "Timeout reached. Deployment end not found."
     }
     Start-Sleep -Seconds 60
 } while ((Get-Date) -lt $endTime)
