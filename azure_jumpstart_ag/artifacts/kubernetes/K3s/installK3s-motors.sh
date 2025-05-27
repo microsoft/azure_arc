@@ -124,6 +124,21 @@ az -v
 
 check_dpkg_lock
 
+# Set prereqs for ACSA and  AIO
+
+echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
+
+
+echo 512 | sudo tee /proc/sys/vm/nr_hugepages
+echo "vm.nr_hugepages=512" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+sudo apt install linux-modules-extra-`uname -r`  -y
+
+
+
 if [[ "$k3sControlPlane" == "true" ]]; then
 
     # Installing Azure Arc extensions
