@@ -128,13 +128,13 @@ $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:r
 # First create the Management VM (AzSMGMT)
 Write-Host "[Build cluster - Step 3/11] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($LocalBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -LocalBoxConfig $LocalBoxConfig
-Set-MGMTVHDX -VMMac $mgmtMac -LocalBoxConfig $LocalBoxConfig
+Set-MgmtVhdx -VMMac $mgmtMac -LocalBoxConfig $LocalBoxConfig
 
 # Create the Azure Local node VMs
 Write-Host "[Build cluster - Step 4/11] Creating Azure Local node VMs (AzLHOSTx)..." -ForegroundColor Green
 foreach ($VM in $LocalBoxConfig.NodeHostConfig) {
     $mac = New-AzLocalNodeVM -Name $VM.Hostname -VHDXPath $azlocalpath -VMSwitch $InternalSwitch -LocalBoxConfig $LocalBoxConfig
-    Set-AzLocalNodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -LocalBoxConfig $LocalBoxConfig
+    Set-AzLocalNodeVhdx -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -LocalBoxConfig $LocalBoxConfig
 }
 
 # Start Virtual Machines
