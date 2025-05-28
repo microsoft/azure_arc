@@ -350,7 +350,7 @@ function New-ManagementVM {
     # Create Nested VM
     New-VM -Name $Name -MemoryStartupBytes $LocalBoxConfig.AzSMGMTMemoryinGB -VHDPath $VHDX1.Path -SwitchName $VMSwitch -Generation 2 | Out-Null
     Add-VMHardDiskDrive -VMName $Name -Path $VHDX2.Path
-    Set-VM -Name $Name -ProcessorCount $LocalBoxConfig.AzSMGMTProcCount -AutomaticStartAction Start | Out-Null
+    Set-VM -Name $Name -ProcessorCount $LocalBoxConfig.AzSMGMTProcCount -AutomaticStartAction Start -AutomaticStopAction ShutDown -AutomaticStartDelay 0 | Out-Null
 
     Get-VMNetworkAdapter -VMName $Name | Rename-VMNetworkAdapter -NewName "SDN"
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
@@ -398,7 +398,7 @@ function New-AzLocalNodeVM {
     Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk5.vhdx" -VMName $Name | Out-Null
     Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -VMName $Name | Out-Null
 
-    Set-VM -Name $Name -ProcessorCount 20 -AutomaticStartAction Start
+    Set-VM -Name $Name -ProcessorCount 20 -AutomaticStartAction Start -AutomaticStopAction ShutDown -AutomaticStartDelay 300
     Get-VMNetworkAdapter -VMName $Name | Rename-VMNetworkAdapter -NewName "SDN"
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
     # Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
@@ -810,7 +810,7 @@ function New-DCVM {
 
         Write-Host "Configuring $VMName's settings"
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
-        Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
+        Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown -AutomaticStartDelay 0 | Out-Null
 
         # Inject Answer File
         Write-Host "Mounting and injecting answer file into the $VMName VM."
@@ -1027,7 +1027,7 @@ function New-RouterVM {
         Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $true -StartupBytes $LocalBoxConfig.MEM_BGP -MinimumBytes 500MB -MaximumBytes $LocalBoxConfig.MEM_BGP | Out-Null
         Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter" | Out-Null
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
-        Set-VM -Name $VMName -AutomaticStopAction ShutDown | Out-Null
+        Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown -AutomaticStartDelay 0 | Out-Null
 
         # Configure VM Networking
         Write-Host "Configuring $VMName's Networking"
