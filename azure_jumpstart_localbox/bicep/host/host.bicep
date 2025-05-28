@@ -70,6 +70,9 @@ param autoUpgradeClusterResource bool = false
 @description('Enable automatic logon into LocalBox Virtual Machine')
 param vmAutologon bool = false
 
+@description('Option to enable spot pricing for the LocalBox Client VM')
+param enableAzureSpotPricing bool = false
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'LocalBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -247,6 +250,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         enableAutomaticUpdates: false
       }
     }
+    priority: enableAzureSpotPricing ? 'Spot' : 'Regular'
+    evictionPolicy: enableAzureSpotPricing ? 'Deallocate' : null
+    billingProfile: enableAzureSpotPricing ? {
+      maxPrice: -1
+    } : null
   }
 }
 

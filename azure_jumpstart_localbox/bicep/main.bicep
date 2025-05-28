@@ -50,6 +50,9 @@ param vmAutologon bool = true
 ])
 param vmSize string = 'Standard_E32s_v6'
 
+@description('Option to enable spot pricing for the LocalBox Client VM')
+param enableAzureSpotPricing bool = false
+
 @description('Setting this parameter to `true` will add the `CostControl` and `SecurityControl` tags to the provisioned resources. These tags are applicable to ONLY Microsoft-internal Azure lab tenants and designed for managing automated governance processes related to cost optimization and security controls')
 param governResourceTags bool = true
 
@@ -114,6 +117,7 @@ module hostDeployment 'host/host.bicep' = {
     autoUpgradeClusterResource: autoUpgradeClusterResource
     vmAutologon: vmAutologon
     resourceTags: resourceTags
+    enableAzureSpotPricing: enableAzureSpotPricing
   }
 }
 

@@ -5,3 +5,4 @@ param spnProviderId = ''
 param windowsAdminUsername = ''
 param windowsAdminPassword = ''
 param logAnalyticsWorkspaceName = ''
+param enableAzureSpotPricing = false
