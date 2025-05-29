@@ -593,13 +593,6 @@ function Deploy-AIO-M3ContosoMotors {
         $kvIndex++
 
 
-        # Verify the deployment status
-        $deploymentStatus = az deployment group show --name $deploymentName --resource-group $resourceGroup --query properties.provisioningState -o tsv
-        if ($deploymentStatus -eq "Succeeded") {
-            Write-Host "[$(Get-Date -Format t)] INFO: Deployment succeeded for $deploymentName" -ForegroundColor Green
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Deployment failed for $deploymentName" -ForegroundColor Red
-        }
+
     }
 }
