@@ -10,7 +10,7 @@ param (
   [string]$workspaceName,
   [string]$templateBaseUrl,
   [string]$registerCluster,
-  [string]$deployAKSHCI,
+  [string]$deployAKSArc,
   [string]$deployResourceBridge,
   [string]$natDNS,
   [string]$rdpPort,
@@ -32,7 +32,7 @@ $PSBoundParameters
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployAKSArc', $deployAKSArc, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('autoDeployClusterResource', $autoDeployClusterResource, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource, [System.EnvironmentVariableTarget]::Machine)
