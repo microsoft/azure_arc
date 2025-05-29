@@ -1,7 +1,5 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.6.0"}
 
-$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
-
 # Import Configuration data file
 $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 

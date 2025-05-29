@@ -8,7 +8,6 @@ Set-PSDebug -Strict
 
 # Load config file
 $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
-$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
 
 Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 

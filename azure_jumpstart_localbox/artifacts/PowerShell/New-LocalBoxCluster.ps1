@@ -1,8 +1,4 @@
-﻿# Set paths
-$Env:LocalBoxDir = "C:\LocalBox"
-$Env:LocalBoxLogsDir = "C:\LocalBox\Logs"
-
-Start-Transcript -Path $Env:LocalBoxLogsDir\New-LocalBoxCluster.log
+﻿Start-Transcript -Path $Env:LocalBoxLogsDir\New-LocalBoxCluster.log
 $starttime = Get-Date
 
 # Import Configuration data file
