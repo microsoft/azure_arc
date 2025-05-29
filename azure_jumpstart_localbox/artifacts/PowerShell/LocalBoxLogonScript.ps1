@@ -11,33 +11,8 @@ $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 
 Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 
-#####################################################################
-# Setup Azure CLI and Azure PowerShell
-#####################################################################
-
-# Login to Azure CLI with service principal provided by user
-Write-Header "Az CLI Login"
-az login --identity
-
 # Login to Azure PowerShell
 Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
-
-#####################################################################
-# Register Azure providers
-#####################################################################
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-az provider register --namespace Microsoft.OperationsManagement --wait
-az provider register --namespace Microsoft.AzureStackHCI --wait
-az provider register --namespace Microsoft.ResourceConnector --wait
-az provider register --namespace Microsoft.Compute --wait
 
 #####################################################################
 # Add RBAC permissions
