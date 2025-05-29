@@ -165,7 +165,7 @@ Set-NICs -LocalBoxConfig $LocalBoxConfig -Credential $localCred
 New-NATSwitch -LocalBoxConfig $LocalBoxConfig
 
 # Configure fabric network on AzSMGMT
-Set-FabricNetwork -LocalBoxConfig $LocalBoxConfig -localCred $localCred
+Set-FabricNetwork -LocalBoxConfig $LocalBoxConfig -localCred $localCred -domainCred $domainCred
 
 #######################################################################################
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
