@@ -28,7 +28,7 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Location to deploy resources')
+@description('Location to deploy resources (except Azure Local cluster resource)')
 param location string = resourceGroup().location
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
@@ -61,6 +61,19 @@ param governResourceTags bool = true
 param tags object = {
   Project: 'jumpstart_LocalBox'
 }
+
+@description('Region to register Azure Local cluster')
+@allowed([
+  'australiaeast'
+  'southcentralus'
+  'eastus'
+  'westeurope'
+  'southeastasia'
+  'canadacentral'
+  'japaneast'
+  'centralindia'
+])
+param azureLocalRegion string = 'australiaeast'
 
 // if governResourceTags is true, add the following tags
 var resourceTags = governResourceTags ? union(tags, {
@@ -118,6 +131,7 @@ module hostDeployment 'host/host.bicep' = {
     vmAutologon: vmAutologon
     resourceTags: resourceTags
     enableAzureSpotPricing: enableAzureSpotPricing
+    azureLocalRegion: azureLocalRegion
   }
 }
 
