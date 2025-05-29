@@ -23,7 +23,7 @@ param windowsOSVersion string = '2025-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('Region to register Azure Local cluster')
+@description('Region to register Azure Local instance in. This is the region where the Azure Local cluster resource will be created. The region must be one of the supported Azure Local regions.')
 @allowed([
   'australiaeast'
   'southcentralus'
@@ -34,7 +34,7 @@ param location string = resourceGroup().location
   'japaneast'
   'centralindia'
 ])
-param azureLocalRegion string = 'australiaeast'
+param azureLocalInstanceLocation string = 'australiaeast'
 
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
@@ -284,7 +284,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${azureLocalRegion} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSArc ${deployAKSArc} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${azureLocalInstanceLocation} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSArc ${deployAKSArc} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
     }
   }
 }

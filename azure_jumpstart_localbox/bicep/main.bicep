@@ -62,7 +62,7 @@ param tags object = {
   Project: 'jumpstart_LocalBox'
 }
 
-@description('Region to register Azure Local cluster')
+@description('Region to register Azure Local instance in. This is the region where the Azure Local cluster resource will be created. The region must be one of the supported Azure Local regions.')
 @allowed([
   'australiaeast'
   'southcentralus'
@@ -73,7 +73,7 @@ param tags object = {
   'japaneast'
   'centralindia'
 ])
-param azureLocalRegion string = 'australiaeast'
+param azureLocalInstanceLocation string = 'australiaeast'
 
 // if governResourceTags is true, add the following tags
 var resourceTags = governResourceTags ? union(tags, {
@@ -131,7 +131,7 @@ module hostDeployment 'host/host.bicep' = {
     vmAutologon: vmAutologon
     resourceTags: resourceTags
     enableAzureSpotPricing: enableAzureSpotPricing
-    azureLocalRegion: azureLocalRegion
+    azureLocalInstanceLocation: azureLocalInstanceLocation
   }
 }
 
