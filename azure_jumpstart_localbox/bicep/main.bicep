@@ -105,7 +105,7 @@ module networkDeployment 'network/network.bicep' = {
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
-    location: location
+    location: azureLocalInstanceLocation
     resourceTags: resourceTags
   }
 }
