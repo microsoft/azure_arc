@@ -23,6 +23,8 @@ $addressPrefixes = $LocalBoxConfig.vmIpPrefix
 $gateway = $LocalBoxConfig.vmGateway
 $dnsServers = $LocalBoxConfig.vmDNS
 $vlanid = $LocalBoxConfig.vmVLAN
+$customLocName = $LocalBoxConfig.rbCustomLocationName
+$customLocationID = (az customlocation show --resource-group $rg --name $customLocName --query id -o tsv)
 
 az stack-hci-vm network lnet create --subscription $subId --resource-group $rg --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
 
