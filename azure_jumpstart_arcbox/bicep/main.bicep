@@ -76,7 +76,7 @@ param debugEnabled bool = false
 
 @description('Tags to assign for all ArcBox resources')
 param resourceTags object = {
-  Solution: 'jumpstart_arcbox'
+  Solution: 'jumpstart_arcbox_${toLower(flavor)}'
 }
 
 @maxLength(7)
