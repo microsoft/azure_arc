@@ -23,7 +23,7 @@ param windowsOSVersion string = '2025-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('Region to register Azure Local instance in. This is the region where the Azure Local cluster resource will be created. The region must be one of the supported Azure Local regions.')
+@description('Region to register Azure Local instance in. This is the region where the Azure Local instance resources will be created. The region must be one of the supported Azure Local regions.')
 @allowed([
   'australiaeast'
   'southcentralus'
@@ -62,7 +62,7 @@ param registerCluster bool = true
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Option to deploy AKSArc with LocalBox')
+@description('Option to deploy AKS Arc with LocalBox')
 param deployAKSArc bool = true
 
 @description('Option to deploy Resource Bridge with LocalBox')

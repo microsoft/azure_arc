@@ -62,7 +62,7 @@ param tags object = {
   Project: 'jumpstart_LocalBox'
 }
 
-@description('Region to register Azure Local instance in. This is the region where the Azure Local cluster resource will be created. The region must be one of the supported Azure Local regions.')
+@description('Region to register Azure Local instance in. This is the region where the Azure Local instance resources will be created. The region must be one of the supported Azure Local regions.')
 @allowed([
   'australiaeast'
   'southcentralus'
