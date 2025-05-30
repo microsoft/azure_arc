@@ -497,7 +497,7 @@ function Deploy-AIO-M3ContosoMotors {
                 --query id -o tsv)
 
         Write-Host "[$(Get-Date -Format t)] INFO: The aio storage account name is: $aioStorageAccountName" -ForegroundColor DarkGray
-        Write-Host "[$(Get-Date -Format t)] INFO: the schemaId is '$schemaId' - verify this" -ForegroundColor DarkGray
+        Write-Host "[$(Get-Date -Format t)] INFO: the schemaId is '$schemaId'" -ForegroundColor DarkGray
 
         $customLocationName = $arcClusterName.toLower() + "-cl"
 
@@ -592,32 +592,7 @@ function Deploy-AIO-M3ContosoMotors {
 
         $kvIndex++
 
-        # Get IoT Operations extension pricipalId
-        Write-Host "[$(Get-Date -Format t)] INFO: Retrieving IoT Operations extension principalId" -ForegroundColor DarkGray
-        $iotExtensionPrincipalId = (az k8s-extension list --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --query "[?extensionType=='microsoft.iotoperations'].identity.principalId" -o tsv)
-        Write-Host "[$(Get-Date -Format t)] INFO: IoT Operations extension principalId is $iotExtensionPrincipalId" -ForegroundColor DarkGray
 
-        # Assign "Azure Event Hubs Data Sender" role to IoT managed identity
-        Write-Host "[$(Get-Date -Format t)] INFO: Assigning 'Azure Event Hubs Data Sender role' to '$iotExtensionPrincipalId' to EventHub namespace" -ForegroundColor DarkGray
-        az role assignment create --assignee-object-id $iotExtensionPrincipalId --role "Azure Event Hubs Data Sender" --scope $eventHubNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
 
-        # Deploy IoT DataFlows using bicep template
-        Write-Host "[$(Get-Date -Format t)] INFO: Deploying IoT DataFlows using bicep template" -ForegroundColor DarkGray
-        $deploymentName = "$arcClusterName" + "-iot-dataflow"
-        $iotInstanceName = $arcClusterName.toLower()
-
-        Write-Host "[$(Get-Date -Format t)] INFO:  az deployment group create --name $deploymentName  --resource-group $resourceGroup --template-file $dataflowBicepTemplatePath --parameters aioInstanceName=$iotInstanceName evenHubNamespaceHost=$evenHubNamespaceHost eventHubName=$eventHubName customLocationName=$customLocationName"
-        az deployment group create --name $deploymentName  --resource-group $resourceGroup --template-file $dataflowBicepTemplatePath `
-            --parameters aioInstanceName=$iotInstanceName evenHubNamespaceHost=$evenHubNamespaceHost eventHubName=$eventHubName `
-            customLocationName=$customLocationName
-
-        # Verify the deployment status
-        $deploymentStatus = az deployment group show --name $deploymentName --resource-group $resourceGroup --query properties.provisioningState -o tsv
-        if ($deploymentStatus -eq "Succeeded") {
-            Write-Host "[$(Get-Date -Format t)] INFO: Deployment succeeded for $deploymentName" -ForegroundColor Green
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Deployment failed for $deploymentName" -ForegroundColor Red
-        }
     }
 }
