@@ -23,6 +23,19 @@ param windowsOSVersion string = '2025-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Region to register Azure Local instance in. This is the region where the Azure Local instance resources will be created. The region must be one of the supported Azure Local regions.')
+@allowed([
+  'australiaeast'
+  'southcentralus'
+  'eastus'
+  'westeurope'
+  'southeastasia'
+  'canadacentral'
+  'japaneast'
+  'centralindia'
+])
+param azureLocalInstanceLocation string = 'australiaeast'
+
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
@@ -49,8 +62,8 @@ param registerCluster bool = true
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Option to deploy AKS-HCI with LocalBox')
-param deployAKSHCI bool = true
+@description('Option to deploy AKS Arc with LocalBox')
+param deployAKSArc bool = true
 
 @description('Option to deploy Resource Bridge with LocalBox')
 param deployResourceBridge bool = true
@@ -69,6 +82,9 @@ param autoUpgradeClusterResource bool = false
 
 @description('Enable automatic logon into LocalBox Virtual Machine')
 param vmAutologon bool = false
+
+@description('Option to enable spot pricing for the LocalBox Client VM')
+param enableAzureSpotPricing bool = false
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'LocalBox-Bastion'
@@ -247,6 +263,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         enableAutomaticUpdates: false
       }
     }
+    priority: enableAzureSpotPricing ? 'Spot' : 'Regular'
+    evictionPolicy: enableAzureSpotPricing ? 'Deallocate' : null
+    billingProfile: enableAzureSpotPricing ? {
+      maxPrice: -1
+    } : null
   }
 }
 
@@ -263,7 +284,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${azureLocalInstanceLocation} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSArc ${deployAKSArc} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
     }
   }
 }

@@ -84,7 +84,7 @@
             "value": true
         },
         "wdacEnforced": {
-            "value": true
+            "value": false
         },
         "streamingDataClient": {
             "value": true
@@ -128,7 +128,7 @@
         "intentList": {
             "value": [
                 {
-                    "name": "Compute_Management_Storage",
+                    "name": "Compute_Management",
                     "trafficType": [
                       "Management",
                       "Compute"

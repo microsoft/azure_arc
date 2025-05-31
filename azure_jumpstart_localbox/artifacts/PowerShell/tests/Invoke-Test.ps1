@@ -1,7 +1,5 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.6.0"}
 
-$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
-
 # Import Configuration data file
 $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 
@@ -137,6 +135,28 @@ if ($null -ne $tags) {
 
 $null = Set-AzResourceGroup -ResourceGroupName $env:resourceGroup -Tag $tags
 $null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $env:resourceGroup -ResourceType 'microsoft.compute/virtualmachines' -Tag $tags -Force
+
+$DeploymentStatusPath = "C:\LocalBox\Logs\DeploymentStatus.log"
+
+Write-Header "Exporting deployment test results to $DeploymentStatusPath"
+
+Write-Output "Deployment Status" | Out-File -FilePath $DeploymentStatusPath
+
+Write-Output "`nTests succeeded: $tests_passed" | Out-File -FilePath $DeploymentStatusPath -Append
+Write-Output "Tests failed: $tests_failed`n" | Out-File -FilePath $DeploymentStatusPath -Append
+
+Write-Output "To get an updated deployment status, open Windows Terminal and run:" | Out-File -FilePath $DeploymentStatusPath -Append
+Write-Output "C:\LocalBox\Tests\Invoke-Test.ps1`n" | Out-File -FilePath $DeploymentStatusPath -Append
+
+if ($tests_failed -ne 0) {
+    Write-Output "Failed:" | Out-File -FilePath $DeploymentStatusPath -Append
+    $tests_common.Failed | Out-File -FilePath $DeploymentStatusPath -Append
+    $tests_azlocal.Failed | Out-File -FilePath $DeploymentStatusPath -Append
+}
+
+Write-Output "Passed:" | Out-File -FilePath $DeploymentStatusPath -Append
+$tests_common.Passed | Out-File -FilePath $DeploymentStatusPath -Append
+$tests_azlocal.Passed | Out-File -FilePath $DeploymentStatusPath -Append
 
 Write-Header 'Adding deployment test results to wallpaper using BGInfo'
 

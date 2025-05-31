@@ -9,20 +9,7 @@ $logFilePath = Join-Path -Path $Env:LocalBoxLogsDir -ChildPath ('WinGet-provisio
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
-$DeploymentProgressString = "Installing WinGet packages..."
-
-Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
-
-$tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
-
-if ($null -ne $tags) {
-    $tags["DeploymentProgress"] = $DeploymentProgressString
-} else {
-    $tags = @{"DeploymentProgress" = $DeploymentProgressString}
-}
-
-$null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
-$null = Set-AzResource -ResourceName $env:computername -ResourceGroupName $resourceGroup -ResourceType "microsoft.compute/virtualmachines" -Tag $tags -Force
+Update-AzDeploymentProgressTag -ProgressString 'Installing WinGet packages...' -ResourceGroupName $env:resourceGroup -ComputerName $env:computername
 
 # Install WinGet PowerShell modules
 Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
