@@ -34,6 +34,6 @@ $vlanid = $LocalBoxConfig.AKSVLAN
 az stack-hci-vm network lnet create --subscription $subId --resource-group $rg --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "static" --ip-pool-start $LocalBoxConfig.AKSNodeStartIP --ip-pool-end $LocalBoxConfig.AKSNodeEndIP --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
 
 $lnetId = "/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.AzureStackHCI/logicalnetworks/$lnetName"
-az aksarc create -n $LocalBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $LocalBoxConfig.AKSControlPlaneIP
+az aksarc create -n $LocalBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --location $location --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $LocalBoxConfig.AKSControlPlaneIP
 
 Stop-Transcript
