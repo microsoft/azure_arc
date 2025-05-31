@@ -128,7 +128,7 @@
         "intentList": {
             "value": [
                 {
-                    "name": "Compute_Management_Storage",
+                    "name": "Compute_Management",
                     "trafficType": [
                       "Management",
                       "Compute"
