@@ -8,37 +8,11 @@ Set-PSDebug -Strict
 
 # Load config file
 $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
-$Env:LocalBoxTestsDir = "$Env:LocalBoxDir\Tests"
 
 Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 
-#####################################################################
-# Setup Azure CLI and Azure PowerShell
-#####################################################################
-
-# Login to Azure CLI with service principal provided by user
-Write-Header "Az CLI Login"
-az login --identity --tenant $Env:tenantId
-
 # Login to Azure PowerShell
 Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
-
-#####################################################################
-# Register Azure providers
-#####################################################################
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-az provider register --namespace Microsoft.OperationsManagement --wait
-az provider register --namespace Microsoft.AzureStackHCI --wait
-az provider register --namespace Microsoft.ResourceConnector --wait
-az provider register --namespace Microsoft.Compute --wait
 
 #####################################################################
 # Add RBAC permissions
@@ -71,6 +45,10 @@ $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
 $Shortcut.TargetPath = $LogsPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
+
+# Creating Hyper-V Manager desktop shortcut
+Write-Host 'Creating Hyper-V Shortcut'
+Copy-Item -Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk' -Destination 'C:\Users\All Users\Desktop' -Force
 
 #############################################################
 # Configure Windows Terminal as the default terminal application

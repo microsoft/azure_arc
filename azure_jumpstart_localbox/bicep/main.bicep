@@ -28,7 +28,7 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Location to deploy resources')
+@description('Location to deploy resources (except Azure Local cluster resource)')
 param location string = resourceGroup().location
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
@@ -50,6 +50,9 @@ param vmAutologon bool = true
 ])
 param vmSize string = 'Standard_E32s_v6'
 
+@description('Option to enable spot pricing for the LocalBox Client VM')
+param enableAzureSpotPricing bool = false
+
 @description('Setting this parameter to `true` will add the `CostControl` and `SecurityControl` tags to the provisioned resources. These tags are applicable to ONLY Microsoft-internal Azure lab tenants and designed for managing automated governance processes related to cost optimization and security controls')
 param governResourceTags bool = true
 
@@ -58,6 +61,19 @@ param governResourceTags bool = true
 param tags object = {
   Project: 'jumpstart_LocalBox'
 }
+
+@description('Region to register Azure Local instance in. This is the region where the Azure Local instance resources will be created. The region must be one of the supported Azure Local regions.')
+@allowed([
+  'australiaeast'
+  'southcentralus'
+  'eastus'
+  'westeurope'
+  'southeastasia'
+  'canadacentral'
+  'japaneast'
+  'centralindia'
+])
+param azureLocalInstanceLocation string = 'australiaeast'
 
 // if governResourceTags is true, add the following tags
 var resourceTags = governResourceTags ? union(tags, {
@@ -89,7 +105,7 @@ module networkDeployment 'network/network.bicep' = {
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
-    location: location
+    location: azureLocalInstanceLocation
     resourceTags: resourceTags
   }
 }
@@ -114,6 +130,8 @@ module hostDeployment 'host/host.bicep' = {
     autoUpgradeClusterResource: autoUpgradeClusterResource
     vmAutologon: vmAutologon
     resourceTags: resourceTags
+    enableAzureSpotPricing: enableAzureSpotPricing
+    azureLocalInstanceLocation: azureLocalInstanceLocation
   }
 }
 

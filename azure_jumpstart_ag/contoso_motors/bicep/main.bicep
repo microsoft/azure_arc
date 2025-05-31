@@ -96,6 +96,10 @@ param vmAutologon bool = true
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_motors'
 
+@description('The InfluxDB admin password')
+@secure()
+param influxDBPassword string = windowsAdminPassword
+
 @description('The sku name of the K3s cluster worker nodes.')
 @allowed([
   'Standard_D8s_v5'
@@ -107,8 +111,16 @@ param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 
 // param deployGPUNodes bool = false
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/refs/heads/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
+
+var customerUsageAttributionDeploymentName = '2d49dcea-99e4-4bf1-8540-2ead108c4ddf'
+
+module customerUsageAttribution 'mgmt/customerUsageAttribution.bicep' = {
+  name: 'pid-${customerUsageAttributionDeploymentName}'
+  params: {
+  }
+}
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -149,7 +161,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
     scenario: scenario
-    influxDBPassword: windowsAdminPassword    
+    influxDBPassword: windowsAdminPassword
   }
 }
 
