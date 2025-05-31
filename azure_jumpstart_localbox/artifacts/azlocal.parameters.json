@@ -84,7 +84,7 @@
             "value": true
         },
         "wdacEnforced": {
-            "value": true
+            "value": false
         },
         "streamingDataClient": {
             "value": true
