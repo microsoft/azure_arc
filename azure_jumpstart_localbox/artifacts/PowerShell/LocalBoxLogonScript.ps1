@@ -46,6 +46,10 @@ $Shortcut.TargetPath = $LogsPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
+# Creating Hyper-V Manager desktop shortcut
+Write-Host 'Creating Hyper-V Shortcut'
+Copy-Item -Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk' -Destination 'C:\Users\All Users\Desktop' -Force
+
 #############################################################
 # Configure Windows Terminal as the default terminal application
 #############################################################
