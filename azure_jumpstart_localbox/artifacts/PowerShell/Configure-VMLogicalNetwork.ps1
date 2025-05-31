@@ -17,7 +17,7 @@ az extension add --name stack-hci-vm
 $subId = $env:subscriptionId
 $rg = $env:resourceGroup
 $location = $env:azureLocation
-$switchName = '"ConvergedSwitch(compute_management_storage)"'
+$switchName = '"ConvergedSwitch(compute_management)"'
 $lnetName = "localbox-vm-lnet-vlan200"
 $addressPrefixes = $LocalBoxConfig.vmIpPrefix
 $gateway = $LocalBoxConfig.vmGateway
