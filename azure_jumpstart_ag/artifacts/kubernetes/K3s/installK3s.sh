@@ -44,7 +44,7 @@ exec >installK3s-${vmName}.log
 exec 2>&1
 
 # Set k3 deployment variables
-export K3S_VERSION="1.29.6+k3s2" # Do not change!
+export K3S_VERSION="1.33.0+k3s1"
 
 chmod +x vars.sh
 . ./vars.sh
