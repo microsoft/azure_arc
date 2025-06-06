@@ -44,7 +44,7 @@ exec >installK3s-${vmName}.log
 exec 2>&1
 
 # Set k3 deployment variables
-export K3S_VERSION="1.29.6+k3s2" # Do not change!
+export K3S_VERSION="1.33.0+k3s1"
 
 chmod +x vars.sh
 . ./vars.sh
@@ -121,6 +121,19 @@ sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
 check_dpkg_lock
+
+# Set prereqs for ACSA and  AIO
+
+echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+echo fs.file-max=100000 | sudo tee -a /etc/sysctl.conf
+
+
+echo 512 | sudo tee /proc/sys/vm/nr_hugepages
+echo "vm.nr_hugepages=512" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+sudo apt install linux-modules-extra-`uname -r`  -y
 
 if [[ "$k3sControlPlane" == "true" ]]; then
 
