@@ -199,24 +199,6 @@ if ($autoShutdownEnabled -eq "true") {
 
 }
 
-# Installing DHCP service
-Write-Output "Installing DHCP service"
-
-try {
-            Install-WindowsFeature -Name "DHCP" -IncludeManagementTools -ErrorAction Stop
-
-    }
-catch {
-        Write-Error "$(Get-Date -Format 'u') - ERROR installing feature: $($_.Exception.Message)"
-        Exit 1
-    }
-
-#Installing AD DS roles
-if ($flavor -eq "DataOps") {
-    Install-WindowsFeature -Name RSAT-AD-PowerShell
-    Install-WindowsFeature -Name RSAT-DNS-Server
-}
-
 # Installing tools
 
 Write-Header "Installing PowerShell 7"

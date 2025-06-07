@@ -89,4 +89,18 @@ properties:
         IPAddress: '10.10.1.1/24'
         AddressFamily: IPv4
         KeepExistingAddress: false
+    - resource: PSDesiredStateConfiguration/WindowsFeature
+      id: RSAT-AD-PowerShell
+      directives:
+        description: Install AD Management tools
+      settings:
+        name: RSAT-AD-PowerShell
+        source: winget
+    - resource: PSDesiredStateConfiguration/WindowsFeature
+      id: RSAT-DNS-Server
+      directives:
+        description: Install DNS Server Management tools
+      settings:
+        name: RSAT-DNS-Server
+        source: winget
   configurationVersion: 0.2.0
