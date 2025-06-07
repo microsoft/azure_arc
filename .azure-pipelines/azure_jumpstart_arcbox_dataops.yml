@@ -203,17 +203,45 @@ stages:
     RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
   jobs:
   - deployment:
-    displayName: "Get approval"
-    environment: 'arcbox_teardown_approval'
+    displayName: "Trigger teardown approval"
   - job: Delete
     steps:
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       inputs:
         azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
         Inline: |
-          $rgName = "$(RGname)"
-          Write-Host "Deleting resource group $rgName"
-          Remove-AzResourceGroup -Name $rgName -Force
+            $rgName = "$(ResourceGroupNamePrefix)"
+            Write-Host "Deleting resource group $rgName"
+            $projectName = "Azure Arc Jumpstart"
+            $pipelineId = 68   # The ID of the pipeline
+            $organization = "AzureArcJumpstart"
+            $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
+
+            Install-PSResource -Name VSTeam -TrustRepository
+
+            Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
+
+            Get-VSTeamProject
+
+            $body = @{
+                resources = @{
+                    repositories = @{
+                        self = @{
+                            refName = "refs/heads/arcbox_pipeline"
+                        }
+                    }
+                }
+                templateParameters = @{
+                    ResourceGroupName = $rgName
+                }
+            }
+
+            $jsonBody = $body | ConvertTo-Json -Depth 100
+
+            Invoke-VSTeamRequest -Url "https://dev.azure.com/$organization/$projectName/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1" -Method POST -Body $jsonBody -ContentType "application/json"

@@ -189,7 +189,7 @@ stages:
             $rgName = "$(ResourceGroupNamePrefix)"
             Write-Host "Deleting resource group $rgName"
             $projectName = "Azure Arc Jumpstart"
-            $pipelineId = 64   # The ID of the pipeline
+            $pipelineId = 69   # The ID of the pipeline
             $organization = "AzureArcJumpstart"
             $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
 
