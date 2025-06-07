@@ -20,6 +20,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Check that the resource group exists"
+    environment: 'localbox_deploy'
   - job: GetRg
     steps:
     - task: AzurePowerShell@5
