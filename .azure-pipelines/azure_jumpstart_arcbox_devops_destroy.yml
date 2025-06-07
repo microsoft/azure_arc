@@ -20,7 +20,9 @@ stages:
   jobs:
   - deployment:
     displayName: "Check that the resource group exists"
-    environment: 'arcbox_deploy'
+    #environment: 'arcbox_deploy'
+    pool:
+      vmImage: 'ubuntu-latest'
   - job: GetRg
     steps:
     - task: AzurePowerShell@5
@@ -45,6 +47,8 @@ stages:
   - deployment:
     displayName: "Get approval"
     environment: 'arcbox_devops_teardown_approval'
+    pool:
+      vmImage: 'ubuntu-latest'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
