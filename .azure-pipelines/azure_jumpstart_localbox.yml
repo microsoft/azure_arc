@@ -175,7 +175,31 @@ stages:
           } else {
               Write-Host "✅ All Pester tests passed." -ForegroundColor Green
           }
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          $rgName = "$(RGname)"
+          Write-Host "Deleting resource group $rgName"
+          Remove-AzResourceGroup -Name $rgName -Force
 
+- stage: destroy
+  displayName: 'LocalBox_teardown'
+  dependsOn: LocalBox_deployment
+  condition: failed('LocalBox_deployment')
+  variables:
+    RGname: $[ stageDependencies.LocalBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
+  jobs:
+  - deployment:
+    displayName: "Trigger teardown approval"
+    environment: 'localbox_deploy'
+    pool:
+      vmImage: 'ubuntu-latest'
+  - job: Delete
+    steps:
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'
       env:

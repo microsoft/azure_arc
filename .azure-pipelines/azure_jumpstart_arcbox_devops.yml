@@ -200,6 +200,9 @@ stages:
   jobs:
   - deployment:
     displayName: "Trigger teardown approval"
+    environment: 'arcbox_deploy'
+    pool:
+      vmImage: 'ubuntu-latest'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
