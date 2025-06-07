@@ -43,7 +43,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Get approval"
-    environment: 'localbox_teardown_approval'
+    environment: 'arcbox_itpro_teardown_approval'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
