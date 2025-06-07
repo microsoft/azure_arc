@@ -215,7 +215,7 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
         Inline: |
-            $rgName = "$(ResourceGroupNamePrefix)"
+            $rgName = "$(RGname)"
             Write-Host "Deleting resource group $rgName"
             $projectName = "Azure Arc Jumpstart"
             $pipelineId = 67   # The ID of the pipeline
