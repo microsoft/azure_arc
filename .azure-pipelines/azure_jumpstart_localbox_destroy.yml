@@ -20,7 +20,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Check that the resource group exists"
-    #environment: 'localbox_deploy'
+    environment: 'localbox_deploy'
     pool:
       vmImage: 'ubuntu-latest'
   - job: GetRg
