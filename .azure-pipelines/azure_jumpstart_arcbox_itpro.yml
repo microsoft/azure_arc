@@ -199,6 +199,7 @@ stages:
   jobs:
   - deployment:
     displayName: "Trigger teardown approval"
+    environment: 'arcbox_deploy'
   - job: Delete
     steps:
     - task: AzurePowerShell@5
