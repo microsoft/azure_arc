@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - arcbox_pipeline
+      - main
   paths:
     include:
       - azure_jumpstart_arcbox/*
@@ -11,7 +11,7 @@ schedules:
   displayName: Daily 18:00 UTC
   branches:
     include:
-      - arcbox_pipeline
+      - main
   always: true
 
 parameters:
@@ -34,7 +34,7 @@ parameters:
 - name: githubBranch
   displayName: 'githubBranch'
   type: string
-  default: 'arcbox_pipeline'
+  default: 'main'
 - name: flavor
   displayName: 'flavor'
   type: string
@@ -231,7 +231,7 @@ stages:
                 resources = @{
                     repositories = @{
                         self = @{
-                            refName = "refs/heads/arcbox_pipeline"
+                            refName = "refs/heads/main"
                         }
                     }
                 }
