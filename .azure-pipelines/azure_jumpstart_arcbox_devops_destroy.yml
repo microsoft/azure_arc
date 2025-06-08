@@ -1,0 +1,63 @@
+trigger: none
+
+parameters:
+- name: ResourceGroupName
+  displayName: 'Resource Group Name'
+  type: string
+  default: 'arcbox-devops-tests'
+- name: AzureSubscription
+  displayName: 'Azure Subscription'
+  type: string
+  default: 'jumpstart-ext-sub-ado-pipeline-tests-identity'
+
+variables:
+- name: RGname
+  value: ${{parameters.ResourceGroupName}}
+
+stages:
+- stage: check
+  displayName: 'check'
+  jobs:
+  - deployment:
+    displayName: "Check that the resource group exists"
+    environment: 'arcbox_deploy'
+    pool:
+      vmImage: 'ubuntu-latest'
+  - job: GetRg
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Get resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Getting resource group $(RGname)"
+          $rg = Get-AzResourceGroup -Name $(RGname) -ErrorAction SilentlyContinue
+          if ($null -eq $rg) {
+            throw "Resource group $(RGname) does not exist."
+            Write-Host "##vso[task.setvariable variable=RGExists;isOutput=true]false"
+          } else {
+            Write-Host "Resource group $(RGname) exists - wait for approval to delete it."
+            Write-Host "##vso[task.setvariable variable=RGExists;isOutput=true]true"
+          }
+- stage: destroy
+  displayName: 'teardown'
+  jobs:
+  - deployment:
+    displayName: "Get approval"
+    environment: 'arcbox_devops_teardown_approval'
+    pool:
+      vmImage: 'ubuntu-latest'
+  - job: Delete
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Deleting resource group $(RGname)"
+          Remove-AzResourceGroup -Name $(RGname) -Force
+          Write-Host "Resource group $(RGname) deleted."
