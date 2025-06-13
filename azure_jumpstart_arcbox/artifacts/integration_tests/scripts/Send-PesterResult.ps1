@@ -25,8 +25,6 @@ switch ($env:flavor) {
     }
 }
 
-Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
-
 $null = Connect-AzAccount -Identity -Scope Process
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
@@ -40,18 +38,36 @@ $vm = Get-AzResource -ResourceId $vmResourceId
 # Get the identity objectId
 $vm.Identity.PrincipalId
 
-if (Get-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
+Write-Output "Adding Storage Blob Data Contributor role assignment to Managed Identity $($vm.Identity.PrincipalId)) for allowing upload of Pester test results to Azure Storage"
 
-    Write-Output "Role assignment already exists"
+$maxRetries = 5
+$retryDelay = 30
+$attempt = 0
+$roleAssigned = $false
 
-} else {
+while (-not $roleAssigned -and $attempt -lt $maxRetries) {
+    try {
+        $attempt++
 
-    Write-Output "Role assignment does not yet exist"
-    $null = New-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
-
-    Write-Output "Wait for eventual consistency after RBAC assignment"
-    Start-Sleep 120
-
+        if (Get-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id -ErrorAction Stop) {
+            Write-Output "Role assignment already exists"
+            $roleAssigned = $true
+        } else {
+            Write-Output "Role assignment does not yet exist"
+            $null = New-AzRoleAssignment -ObjectId $vm.Identity.PrincipalId -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id -ErrorAction Stop
+            Write-Output "Wait for eventual consistency after RBAC assignment"
+            Start-Sleep 120
+            $roleAssigned = $true
+        }
+    } catch {
+        Write-Warning "Attempt $attempt : Failed to assign role. Error: $_. Exception.Message"
+        if ($attempt -lt $maxRetries) {
+            Write-Output "Retrying in $retryDelay seconds..."
+            Start-Sleep -Seconds $retryDelay
+        } else {
+            throw "Failed to assign Storage Blob Data Contributor role after $maxRetries attempts."
+        }
+    }
 }
 
 Write-Output "Waiting for deployment end in $logFilePath"
@@ -77,11 +93,11 @@ do {
     Start-Sleep -Seconds 60
 } while ((Get-Date) -lt $endTime)
 
-
 $ctx = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -UseConnectedAccount
 
 New-AzStorageContainer -Name testresults -Context $ctx -Permission Off
 
+Start-Sleep -Seconds 60
 
 Write-Output "Running Pester tests"
 
