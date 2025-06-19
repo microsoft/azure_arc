@@ -99,6 +99,7 @@ var primarySubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      defaultOutboundAccess: false
     }
   }
 ]
@@ -123,6 +124,7 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      defaultOutboundAccess: false
     }
   }
   {
@@ -134,11 +136,12 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      defaultOutboundAccess: false
     }
   }
 ]
 
-resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
+resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: virtualNetworkName
   location: location
   dependsOn: [
@@ -157,7 +160,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   }
 }
 
-resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = if (flavor == 'DataOps') {
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (flavor == 'DataOps') {
   name: drVirtualNetworkName
   location: location
   dependsOn: [
@@ -180,13 +183,14 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = if (f
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
+          defaultOutboundAccess: false
         }
       }
     ]
   }
 }
 
-resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = if (flavor == 'DataOps') {
+resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-07-01' = if (flavor == 'DataOps') {
   parent: arcVirtualNetwork
   name: 'peering-to-DR-vnet'
   dependsOn: [
@@ -203,7 +207,7 @@ resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetwork
   }
 }
 
-resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = if (flavor == 'DataOps') {
+resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-07-01' = if (flavor == 'DataOps') {
   parent: drVirtualNetwork
   name: 'peering-to-primary-vnet'
   dependsOn: [
