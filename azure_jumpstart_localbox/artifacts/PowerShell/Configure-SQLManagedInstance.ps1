@@ -62,11 +62,8 @@ if (-not (Test-Path -Path $cliDirPath)) {
 }
 
 Write-Header "Az CLI Login"
-az login --identity
+az login --use-device-code
 az account set -s $env:subscriptionId
-
-# Login to Azure PowerShell with service principal provided by user
-Connect-AzAccount -Identity
 
 # Before create SQL MI, make sure k8s has 3 nodes with right size Standard_D8s_v3
 # Check the current node count in the AKS node pool
@@ -197,7 +194,11 @@ try {
   $existingCustomLocation = az customlocation list --resource-group $Env:resourceGroup --query "[?name=='$aksCustomLocation']" -o tsv
   if (-not $existingCustomLocation) {
     Write-Host "The custom location '$aksCustomLocation' does not exist. Creating it now..."
-    az customlocation create --name $aksCustomLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --location australiaeast--only-show-errors
+
+    # Get Azure Local Cluster location
+    $localClusterLocation = az resource show --resource-group $Env:resourceGroup --name $LocalBoxConfig.ClusterName --resource-type "microsoft.azurestackhci/clusters" --query location -o tsv
+
+    az customlocation create --name $aksCustomLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --location $localClusterLocation --only-show-errors
   } else {
     Write-Host "The custom location '$aksCustomLocation' already exists. Skipping creation."
   }
@@ -440,8 +441,8 @@ $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_username',$Env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_password',$Env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_username',$AZDATA_USERNAME | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_password',$AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
 # Unzip SqlQueryStress
