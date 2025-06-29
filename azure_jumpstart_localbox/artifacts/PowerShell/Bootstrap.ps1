@@ -120,6 +120,13 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($LocalBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$LocalBoxPath\WinGet.ps1"
 
+# Arc SQL MI Files
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile "$LocalBoxPath\sqlmi.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "$LocalBoxPath\sqlmi.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "$LocalBoxPath\dataController.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "$LocalBoxPath\dataController.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-SQLManagedInstance.ps1") -OutFile "$LocalBoxPath\Configure-SQLManagedInstance.ps1"
+
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
 (Get-Content -Path $LocalBoxPath\LocalBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $LocalBoxPath\LocalBox-Config.psd1
