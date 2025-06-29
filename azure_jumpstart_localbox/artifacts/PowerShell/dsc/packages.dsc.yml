@@ -58,4 +58,18 @@ properties:
       settings:
         id: Microsoft.Sysinternals.BGInfo
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: SQLServerManagementStudio
+      directives:
+        description: Install Microsoft SQL Server Management Studio
+      settings:
+        id: Microsoft.SQLServerManagementStudio
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.AzureDataStudio
+      directives:
+        description: Install Microsoft Azure Data Studio
+      settings:
+        id: Microsoft.AzureDataStudio
+        source: winget    
   configurationVersion: 0.2.0
