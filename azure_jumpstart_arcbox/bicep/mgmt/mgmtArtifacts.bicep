@@ -103,24 +103,26 @@ var primarySubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: deployBastion ? {
-            id: natGateway.id
-          } : null
+      natGateway: {
+        id: natGateway.id
+      }
       defaultOutboundAccess: false
     }
   }
 ]
-var bastionSubnet = bastionSku != 'Developer' ? [
-  {
-    name: 'AzureBastionSubnet'
-    properties: {
-      addressPrefix: bastionSubnetIpPrefix
-      networkSecurityGroup: {
-        id: bastionNetworkSecurityGroup.id
+var bastionSubnet = bastionSku != 'Developer'
+  ? [
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: bastionSubnetIpPrefix
+          networkSecurityGroup: {
+            id: bastionNetworkSecurityGroup.id
+          }
+        }
       }
-    }
-  }
-] : []
+    ]
+  : []
 var dataOpsSubnets = [
   {
     name: aksSubnetName
@@ -131,9 +133,9 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: deployBastion ? {
-            id: natGateway.id
-          } : null
+      natGateway: {
+        id: natGateway.id
+      }
       defaultOutboundAccess: false
     }
   }
@@ -146,9 +148,11 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: deployBastion ? {
+      natGateway: deployBastion
+        ? {
             id: natGateway.id
-          } : null
+          }
+        : null
       defaultOutboundAccess: false
     }
   }
@@ -169,7 +173,15 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
     dhcpOptions: {
       dnsServers: dnsServers
     }
-    subnets: (deployBastion == false && flavor != 'DataOps') ? primarySubnet : (deployBastion == false && flavor == 'DataOps') ? union(primarySubnet,dataOpsSubnets) : (deployBastion == true && flavor != 'DataOps') ? union(primarySubnet,bastionSubnet) : (deployBastion == true && flavor == 'DataOps') ? union(primarySubnet,bastionSubnet,dataOpsSubnets) : primarySubnet
+    subnets: (deployBastion == false && flavor != 'DataOps')
+      ? primarySubnet
+      : (deployBastion == false && flavor == 'DataOps')
+          ? union(primarySubnet, dataOpsSubnets)
+          : (deployBastion == true && flavor != 'DataOps')
+              ? union(primarySubnet, bastionSubnet)
+              : (deployBastion == true && flavor == 'DataOps')
+                  ? union(primarySubnet, bastionSubnet, dataOpsSubnets)
+                  : primarySubnet
   }
 }
 
@@ -196,9 +208,11 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
-          natGateway: deployBastion ? {
-            id: natGateway.id
-          } : null
+          natGateway: deployBastion
+            ? {
+                id: natGateway.id
+              }
+            : null
           defaultOutboundAccess: false
         }
       }
@@ -206,7 +220,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
   }
 }
 
-resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion == true) {
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   name: '${natGatewayName}-PIP'
   location: location
   properties: {
@@ -219,7 +233,7 @@ resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = i
   }
 }
 
-resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion == true) {
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = {
   name: natGatewayName
   location: location
   sku: {
@@ -513,7 +527,6 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
   }
 }
 
-
 resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: workspaceName
   location: location
@@ -565,22 +578,26 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2024-05-01' = if (deployBas
     name: bastionSku
   }
   properties: {
-    virtualNetwork: bastionSku == 'Developer' ? {
-      id: arcVirtualNetwork.id
-    } : null
-    ipConfigurations: bastionSku != 'Developer' ? [
-      {
-        name: 'IpConf'
-        properties: {
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
-          subnet: {
-            id: bastionSubnetRef
-          }
+    virtualNetwork: bastionSku == 'Developer'
+      ? {
+          id: arcVirtualNetwork.id
         }
-      }
-    ] : null
+      : null
+    ipConfigurations: bastionSku != 'Developer'
+      ? [
+          {
+            name: 'IpConf'
+            properties: {
+              publicIPAddress: {
+                id: publicIpAddress.id
+              }
+              subnet: {
+                id: bastionSubnetRef
+              }
+            }
+          }
+        ]
+      : null
   }
 }
 
