@@ -47,7 +47,7 @@ switch ($env:flavor) {
     'ITPro' { 
                 winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity 
                 # install Power BI (does not support winget congigure) on ITPro flavor
-                winget install --id=Microsoft.PowerBI --silent --accept-package-agreements --accept-source-agreements
+                # winget install --id=Microsoft.PowerBI --silent --accept-package-agreements --accept-source-agreements
             }
 }
 
