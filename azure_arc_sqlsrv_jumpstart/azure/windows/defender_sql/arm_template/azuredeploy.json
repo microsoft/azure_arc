@@ -76,13 +76,6 @@
         "description": "User's github account where they have forked https://github.com/microsoft/jumpstart-apps"
       },
       "defaultValue": "microsoft"
-    },
-    "natGatewayName": {
-      "type": "string",
-      "defaultValue": "JS-natGateway",
-      "metadata": {
-        "description": "Name of the NAT Gateway"
-      }
     }
   },
   "variables": {
@@ -95,7 +88,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
+      "dependsOn": ["mgmtArtifactsAndPolicyDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -152,9 +145,6 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
-          },
-          "natGatewayName": {
-            "value": "[parameters('natGatewayName')]"
           }
         }
       }
