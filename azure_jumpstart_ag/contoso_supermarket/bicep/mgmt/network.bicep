@@ -36,7 +36,6 @@ var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
-
 var bastionSubnet = [
   {
     name: 'AzureBastionSubnet'
@@ -58,9 +57,9 @@ var cloudAKSDevSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
-      natGateway: deployBastion ? {
-            id: natGateway.id
-          } : null
+      natGateway: {
+        id: natGateway.id
+      }
       defaultOutboundAccess: false
     }
   }
@@ -76,9 +75,11 @@ var cloudAKSInnerLoopSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
-      natGateway: deployBastion ? {
+      natGateway: deployBastion
+        ? {
             id: natGateway.id
-          } : null
+          }
+        : null
       defaultOutboundAccess: false
     }
   }
@@ -94,11 +95,13 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false)
+      ? union(cloudAKSDevSubnet, cloudAKSInnerLoopSubnet)
+      : union(cloudAKSDevSubnet, cloudAKSInnerLoopSubnet, bastionSubnet)
   }
 }
 
-resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion == true) {
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   name: '${natGatewayName}-PIP'
   location: location
   properties: {
@@ -111,7 +114,7 @@ resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = i
   }
 }
 
-resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion == true) {
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = {
   name: natGatewayName
   location: location
   sku: {
