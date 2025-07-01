@@ -16,6 +16,9 @@ param drVirtualNetworkName string = '${namingPrefix}-DR-VNet'
 @description('Name of the DR subnet in the DR virtual network')
 param drSubnetName string = '${namingPrefix}-DR-Subnet'
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = '${namingPrefix}-NatGateway'
+
 @description('Name for your log analytics workspace')
 param workspaceName string
 
@@ -89,6 +92,7 @@ var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = '${namingPrefix}-Bastion'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
+
 var primarySubnet = [
   {
     name: subnetName
@@ -99,6 +103,9 @@ var primarySubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
       defaultOutboundAccess: false
     }
   }
@@ -124,6 +131,9 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
       defaultOutboundAccess: false
     }
   }
@@ -136,6 +146,9 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
+      natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
       defaultOutboundAccess: false
     }
   }
@@ -183,10 +196,42 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
+          natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
           defaultOutboundAccess: false
         }
       }
     ]
+  }
+}
+
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion == true) {
+  name: '${natGatewayName}-PIP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion == true) {
+  name: natGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIpAddresses: [
+      {
+        id: natGatewayPublicIp.id
+      }
+    ]
+    idleTimeoutInMinutes: 4
   }
 }
 
