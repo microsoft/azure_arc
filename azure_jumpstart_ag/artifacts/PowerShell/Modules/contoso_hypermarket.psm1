@@ -119,10 +119,7 @@ function Set-K3sClusters {
             kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
             Start-Sleep -Seconds 30
 
-            # Write-Host "Creating longhorn storage on K3scluster"
-            # kubectl apply -f "$($Agconfig.AgDirectories.AgToolsDir)\longhorn.yaml"
-            # Start-Sleep -Seconds 30
-            # Write-Host "`n"
+      
         }
     }
 }
