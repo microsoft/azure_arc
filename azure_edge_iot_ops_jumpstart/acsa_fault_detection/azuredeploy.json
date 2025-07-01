@@ -75,15 +75,15 @@
             }
         },
         "storageAccountName": {
-        "type": "string",
-        "metadata": {
-            "description": "The name of the Azure Storage account"
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Azure Storage account"
             }
         },
         "storageContainer": {
-        "type": "string",
-        "metadata": {
-            "description": "The name of the Azure Storage container within the specified account"
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Azure Storage container within the specified account"
             }
         },
         "password": {
@@ -123,6 +123,13 @@
             "defaultValue": "ACSA-Demo-VNET",
             "metadata": {
                 "description": "Name of the VNET"
+            }
+        },
+        "natGatewayName": {
+            "type": "string",
+            "defaultValue": "ACSA-natGateway",
+            "metadata": {
+                "description": "Name of the NAT Gateway"
             }
         },
         "subnetName": {
@@ -226,7 +233,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2022-07-01",
+            "apiVersion": "2024-05-01",
             "name": "[variables('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -241,7 +248,9 @@
                         "properties": {
                             "addressPrefix": "[variables('subnetAddressPrefix')]",
                             "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "natGateway": "[if(parameters('deployBastion'), createObject('id', resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))), null())]",
+                            "defaultOutboundAccess": false
                         }
                     },
                     {
@@ -251,7 +260,46 @@
                         }
                     }
                 ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))]"
+            ]
+        },
+        {
+            "condition": "[equals(parameters('deployBastion'), true())]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2024-07-01",
+            "name": "[format('{0}-PIP', parameters('natGatewayName'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4",
+                "idleTimeoutInMinutes": 4
+            },
+            "sku": {
+                "name": "Standard"
             }
+        },
+        {
+            "condition": "[equals(parameters('deployBastion'), true())]",
+            "type": "Microsoft.Network/natGateways",
+            "apiVersion": "2024-07-01",
+            "name": "[parameters('natGatewayName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIpAddresses": [
+                    {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-PIP', parameters('natGatewayName')))]"
+                    }
+                ],
+                "idleTimeoutInMinutes": 4
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-PIP', parameters('natGatewayName')))]"
+            ]
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
@@ -331,10 +379,10 @@
                 "typeHandlerVersion": "1.10",
                 "autoUpgradeMinorVersion": true,
                 "protectedSettings": {
-                   "fileUris": [
-                       "[uri(variables('templateBaseUrl'), concat('artifacts/Bootstrap.ps1'))]"
-                   ],
-                   "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -windowsNode ', parameters('windowsNode'), ' -templateBaseUrl ', variables('templateBaseUrl'), ' -storageAccountName ', parameters('storageAccountName'), ' -storageContainer ', parameters('storageContainer'))]"
+                    "fileUris": [
+                        "[uri(variables('templateBaseUrl'), concat('artifacts/Bootstrap.ps1'))]"
+                    ],
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -windowsNode ', parameters('windowsNode'), ' -templateBaseUrl ', variables('templateBaseUrl'), ' -storageAccountName ', parameters('storageAccountName'), ' -storageContainer ', parameters('storageContainer'))]"
                 }
             }
         },
