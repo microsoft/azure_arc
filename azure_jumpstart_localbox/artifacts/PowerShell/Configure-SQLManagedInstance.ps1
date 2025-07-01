@@ -351,6 +351,7 @@ if ($existingSqlInstance.Count -eq 0) {
 }
 
 # Creating SQLMI Endpoints file 
+$mgmtVMIP = $LocalBoxConfig.MgmtHostConfig.IP.Substring(0, $LocalBoxConfig.MgmtHostConfig.IP.IndexOf('/'))
 $sqlmiEndpoints = "$Env:LocalBoxDir\SQLMIEndpoints.txt"
 if (-not (Test-Path -Path $sqlmiEndpoints)) {
   New-Item -Path "$Env:LocalBoxDir\" -Name "SQLMIEndpoints.txt" -ItemType "file"
@@ -360,8 +361,7 @@ if (-not (Test-Path -Path $sqlmiEndpoints)) {
   $primaryEndpoint = kubectl get sqlmanagedinstances $sqlInstanceName -n arc -o=jsonpath='{.status.endpoints.primary}'
   $primaryEndpointIp = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(','))
   $primaryEndpointPort = $primaryEndpoint.Substring($primaryEndpoint.IndexOf(',') + 1)
-  $mgmtVMIP = $LocalBoxConfig.MgmtHostConfig.IP.Substring(0, $LocalBoxConfig.MgmtHostConfig.IP.IndexOf('/'))
-  
+    
   $primaryEndpoint = $mgmtVMIP + ",11433" | Add-Content $sqlmiEndpoints
   Add-Content $sqlmiEndpoints ""
 
@@ -424,7 +424,7 @@ Write-Host "Get primary replica pod from the Availability group to restore datab
 $primaryPodName =  kubectl get sqlmanagedinstances $sqlInstanceName -n arc -o=jsonpath='{.status.highAvailability.replicas[?(@.role=="PRIMARY")].replicaName}'
 
 Write-Host "Downloading AdventureWorks database for MS SQL... (2/3)"
-kubectl exec $primaryPodName-1 -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+kubectl exec $primaryPodName -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
 
 Write-Host "Restoring AdventureWorks database for MS SQL. (3/3)"
 kubectl exec $primaryPodName -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2019' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2019_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
@@ -434,36 +434,62 @@ Write-Host "AdventureWorks database restored successfully on SQL Managed Instanc
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "$Env:ArcBoxDir\settingsTemplate.json"
 
-# Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
+$primaryEndpoint = $mgmtVMIP + ",11433"
+$settingsContent = @"
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+        {
+            "options": {
+                "connectionName": "ArcSQLMI",
+                "server": "$primaryEndpoint",
+                "database": "",
+                "authenticationType": "SqlLogin",
+                "user": "$AZDATA_USERNAME",
+                "password": "$AZDATA_PASSWORD",
+                "applicationName": "azdata",
+                "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+                "databaseDisplayName": ""
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "ac333479-a04b-436b-88ab-3b314a201295"
+        }
+    ],
+    "window.zoomLevel": 2
+}
+"@
 
-# Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_username',$AZDATA_USERNAME | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_password',$AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
+$adsConfigFile = "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Set-Content -Path $adsConfigFile -Value $settingsContent -Force
 
-# Unzip SqlQueryStress
-Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.7.166/SqlQueryStress.exe" -OutFile $Env:LocalBoxDir\SqlQueryStress.exe
-Expand-Archive -Path $Env:LocalBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
-
-# Create SQLQueryStress desktop shortcut
-Write-Host "`n"
-Write-Host "Creating SQLQueryStress Desktop shortcut"
-Write-Host "`n"
-$TargetFile = "$Env:LocalBoxDir\SqlQueryStress\SqlQueryStress.exe"
-$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
+# Create Azure Data Studio desktop shortcut
+Write-Host "Creating Azure Data Studio Desktop Shortcut"
+$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Azure Data Studio\azuredatastudio.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft Azure Data Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# Create VSCode desktop shortcut
-Write-Host "Creating VSCode Desktop Shortcut"
-$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Azure Data Studio\azuredatastudio.exe"
-$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft Azure Data Studio.lnk"
+# Unzip SqlQueryStress
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.7.166/SqlQueryStress.exe" -OutFile $Env:LocalBoxDir\SqlQueryStress.exe
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "$Env:LocalBoxDir\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
