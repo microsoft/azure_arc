@@ -208,11 +208,9 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
-          natGateway: deployBastion
-            ? {
-                id: natGateway.id
-              }
-            : null
+          natGateway: {
+            id: natGateway.id
+          }
           defaultOutboundAccess: false
         }
       }
