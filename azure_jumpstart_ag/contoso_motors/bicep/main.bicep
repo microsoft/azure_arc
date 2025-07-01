@@ -229,7 +229,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   dependsOn: [
     ubuntuRancherK3sNodesDeployment
     ubuntuRancherK3sDataSvcNodesDeployment
-  ]  
+  ]
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
