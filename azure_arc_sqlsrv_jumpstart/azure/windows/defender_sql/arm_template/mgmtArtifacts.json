@@ -49,6 +49,13 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
+    },
+    "natGatewayName": {
+      "type": "string",
+      "defaultValue": "JS-natGateway",
+      "metadata": {
+        "description": "Name of the NAT Gateway"
+      }
     }
   },
   "variables": {
@@ -73,50 +80,54 @@
     "bastionName": "JS-Bastion",
     "bastionSubnetIpPrefix": "172.16.3.64/26",
     "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
-    "subnetsWithBastion" : [
+    "subnetsWithBastion": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
-          },
-          {
-            "name": "AzureBastionSubnet",
-            "properties": {
-              "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-              "networkSecurityGroup" : {
-                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
+        }
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      }
     ],
-    "subnetsWithoutBastion" : [
+    "subnetsWithoutBastion": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
-          }
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          },
+          "natGateway": "[if(parameters('deployBastion'), createObject('id', resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))), null())]",
+          "defaultOutboundAccess": false
+
+        }
+      }
     ]
   },
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2023-04-01",
+      "apiVersion": "2024-05-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+        "[resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -126,6 +137,42 @@
         },
         "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
       }
+    },
+    {
+      "condition": "[equals(parameters('deployBastion'), true())]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2024-07-01",
+      "name": "[format('{0}-PIP', parameters('natGatewayName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "idleTimeoutInMinutes": 4
+      },
+      "sku": {
+        "name": "Standard"
+      }
+    },
+    {
+      "condition": "[equals(parameters('deployBastion'), true())]",
+      "type": "Microsoft.Network/natGateways",
+      "apiVersion": "2024-07-01",
+      "name": "[parameters('natGatewayName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIpAddresses": [
+          {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-PIP', parameters('natGatewayName')))]"
+          }
+        ],
+        "idleTimeoutInMinutes": 4
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-PIP', parameters('natGatewayName')))]"
+      ]
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -253,7 +300,7 @@
               "destinationAddressPrefix": "Internet",
               "destinationPortRanges": [ "80", "443" ]
             }
-          }          
+          }
         ]
       }
     },
