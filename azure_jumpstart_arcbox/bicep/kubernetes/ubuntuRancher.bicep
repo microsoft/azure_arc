@@ -64,7 +64,7 @@ resource publicIpAddresses 'Microsoft.Network/publicIPAddresses@2024-05-01' = [f
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
 }]
 
