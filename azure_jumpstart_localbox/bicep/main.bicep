@@ -43,6 +43,9 @@ param autoUpgradeClusterResource bool = false
 @description('Enable automatic logon into LocalBox Virtual Machine')
 param vmAutologon bool = true
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway'
+
 @description('The size of the Virtual Machine')
 @allowed([
   'Standard_E32s_v5'
@@ -99,6 +102,7 @@ module networkDeployment 'network/network.bicep' = {
     deployBastion: deployBastion
     location: location
     resourceTags: resourceTags
+    natGatewayName: natGatewayName
   }
 }
 
