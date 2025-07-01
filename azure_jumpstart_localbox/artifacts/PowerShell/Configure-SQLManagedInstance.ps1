@@ -422,6 +422,14 @@ if (-not (Test-Path -Path $sqlmiEndpoints)) {
 # Downloading demo database and restoring onto SQL MI
 Write-Host "Get primary replica pod from the Availability group to restore database for MS SQL. (1/3)"
 $primaryPodName =  kubectl get sqlmanagedinstances $sqlInstanceName -n arc -o=jsonpath='{.status.highAvailability.replicas[?(@.role=="PRIMARY")].replicaName}'
+Write-Host "Primary replica pod in the Availability group is: $primaryPodName"
+if (-not $primaryPodName) {
+    Write-Error "Failed to retrieve primary replica pod name. Please check the SQL Managed Instance status."
+    Exit 1
+}
+
+# Wait for the primary pod to be ready to import database
+Start-Sleep -Seconds 30
 
 Write-Host "Downloading AdventureWorks database for MS SQL... (2/3)"
 kubectl exec $primaryPodName -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
