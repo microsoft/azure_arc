@@ -44,7 +44,7 @@ param autoUpgradeClusterResource bool = false
 param vmAutologon bool = true
 
 @description('Name of the NAT Gateway')
-param natGatewayName string = 'Ag-NatGateway'
+param natGatewayName string = 'LocalBox-NatGateway'
 
 @description('The size of the Virtual Machine')
 @allowed([
