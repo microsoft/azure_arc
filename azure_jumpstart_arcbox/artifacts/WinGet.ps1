@@ -44,11 +44,7 @@ winget configure --file C:\ArcBox\DSC\common.dsc.yml --accept-configuration-agre
 switch ($env:flavor) {
     'DevOps' { winget configure --file C:\ArcBox\DSC\devops.dsc.yml --accept-configuration-agreements --disable-interactivity }
     'DataOps' { winget configure --file C:\ArcBox\DSC\dataops.dsc.yml --accept-configuration-agreements --disable-interactivity }
-    'ITPro' { 
-                winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity 
-                # install Power BI (does not support winget congigure) on ITPro flavor
-                # winget install --id=Microsoft.PowerBI --silent --accept-package-agreements --accept-source-agreements
-            }
+    'ITPro' { winget configure --file C:\ArcBox\DSC\itpro.dsc.yml --accept-configuration-agreements --disable-interactivity }
 }
 
 # Start remaining logon scripts
