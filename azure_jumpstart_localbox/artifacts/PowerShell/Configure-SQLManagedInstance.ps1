@@ -359,6 +359,8 @@ if (-not (Test-Path -Path $sqlmiEndpoints)) {
   # Retrieving SQL MI connection endpoints
   Add-Content $sqlmiEndpoints "Primary SQL Managed Instance external endpoint:"
   $primaryEndpoint = kubectl get sqlmanagedinstances $sqlInstanceName -n arc -o=jsonpath='{.status.endpoints.primary}'
+  Write-Host "Primary endpoint: $primaryEndpoint"
+
   $primaryEndpointIp = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(','))
   $primaryEndpointPort = $primaryEndpoint.Substring($primaryEndpoint.IndexOf(',') + 1)
     
@@ -384,18 +386,21 @@ if (-not (Test-Path -Path $sqlmiEndpoints)) {
   # Get secondary endpoint details
   Add-Content $sqlmiEndpoints "Secondary SQL Managed Instance external endpoint:"
   $secondaryEndpoint = kubectl get sqlmanagedinstances $sqlInstanceName -n arc -o=jsonpath='{.status.endpoints.secondary}'
+  Write-Host "Secondary endpoint: $secondaryEndpoint"
 
   $secondaryEndpointIp = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(','))
   $secondaryEndpointPort = $secondaryEndpoint.Substring($secondaryEndpoint.IndexOf(',') + 1)
 
   $secondaryEndpoint = $mgmtVMIP + ",11533" | Add-Content $sqlmiEndpoints
 
-
+  Write-Host "Configuring port forwarding for SQL MI endpoints."
   Invoke-Command -ComputerName $mgmtVMIP -ScriptBlock {
     param($secondaryEndpointIp, $secondaryEndpointPort, $mgmtVMIP)
     netsh interface portproxy add v4tov4 listenaddress=$mgmtVMIP listenport=11533 connectaddress=$secondaryEndpointIp connectport=$secondaryEndpointPort
     netsh advfirewall firewall add rule name="Allow Port 11533 Inbound" dir=in action=allow protocol=TCP localport=11533
   } -ArgumentList $primaryEndpointIp, $primaryEndpointPort, $mgmtVMIP -Credential $winCreds
+
+  Write-Host "Port forwarding completed."
 
   # Retrieving SQL MI connection username and password
   Add-Content $sqlmiEndpoints ""
@@ -405,17 +410,18 @@ if (-not (Test-Path -Path $sqlmiEndpoints)) {
   Add-Content $sqlmiEndpoints ""
   Add-Content $sqlmiEndpoints "SQL Managed Instance password:"
   $AZDATA_PASSWORD | Add-Content $sqlmiEndpoints
-
-  Write-Host "`n"
-  Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
-  Write-Host "`n"
-  $TargetFile = $sqlmiEndpoints
-  $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SQLMI Endpoints.lnk"
-  $WScriptShell = New-Object -ComObject WScript.Shell
-  $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-  $Shortcut.TargetPath = $TargetFile
-  $Shortcut.Save()
 }
+
+Write-Host "`n"
+Write-Host "Creating SQLMI Endpoints Desktop shortcut"
+Write-Host "`n"
+$TargetFile = $sqlmiEndpoints
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SQLMI Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+Write-Host "Created SQLMI Endpoints Desktop shortcut."
 
 # Downloading demo database and restoring onto SQL MI
 # Connect to SQL Managed Instance and execute a query using sqlcmd
@@ -488,6 +494,7 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
+Write-Host "Created Azure Data Studio Desktop Shortcut"
 
 # Unzip SqlQueryStress
 Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/0.9.7.166/SqlQueryStress.exe" -OutFile $Env:LocalBoxDir\SqlQueryStress.exe
@@ -502,6 +509,7 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
+Write-Host "Created SQLQueryStress Desktop shortcut"
 
 # Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
 Write-Host "`n"
@@ -513,6 +521,7 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
+Write-Host "Created Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
 
 Write-Host "`n"
 Stop-Transcript
