@@ -4,6 +4,7 @@ BeforeDiscovery {
 
 }
 
+if ("True" -eq $env:autoDeployClusterResource) {
 Describe "LocalBox resource group" {
     BeforeAll {
         $ResourceGroupName = $env:resourceGroup
@@ -11,4 +12,14 @@ Describe "LocalBox resource group" {
     It "should have 25 resources or more" {
         (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 25
     }
+}
+} else {
+Describe "LocalBox resource group" {
+    BeforeAll {
+        $ResourceGroupName = $env:resourceGroup
+    }
+    It "should have 18 resources or more" {
+        (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 18
+    }
+}
 }
