@@ -83,6 +83,9 @@ param rdpPort string = '3389'
 @description('Enable automatic logon into Virtual Machine')
 param vmAutologon bool = true
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway-${namingGuid}'
+
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_supermarket'
 
@@ -112,6 +115,7 @@ module networkDeployment 'mgmt/network.bicep' = {
     subnetNameCloudAksInnerLoop: subnetNameCloudAksInnerLoop
     deployBastion: deployBastion
     location: location
+    natGatewayName: natGatewayName
   }
 }
 

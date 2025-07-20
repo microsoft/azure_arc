@@ -79,6 +79,9 @@ param resourceTags object = {
   Solution: 'jumpstart_arcbox_${toLower(flavor)}'
 }
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = '${namingPrefix}-NatGateway'
+
 @maxLength(7)
 @description('The naming prefix for the nested virtual machines and all Azure resources deployed. The maximum length for the naming prefix is 7 characters,example: `ArcBox-Win2k19`')
 param namingPrefix string = 'ArcBox'
@@ -240,6 +243,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     namingPrefix: namingPrefix
     windowsAdminPassword: windowsAdminPassword
     registryPassword: registryPassword
+    natGatewayName: natGatewayName
   }
 }
 

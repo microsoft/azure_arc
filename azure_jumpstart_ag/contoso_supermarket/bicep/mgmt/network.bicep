@@ -15,6 +15,9 @@ param resourceTags object = {
   Project: 'Jumpstart_Agora'
 }
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway'
+
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
@@ -32,7 +35,6 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
-
 
 var bastionSubnet = [
   {
@@ -55,6 +57,10 @@ var cloudAKSDevSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
+      natGateway: {
+        id: natGateway.id
+      }
+      defaultOutboundAccess: false
     }
   }
 ]
@@ -69,11 +75,17 @@ var cloudAKSInnerLoopSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
+      natGateway: deployBastion
+        ? {
+            id: natGateway.id
+          }
+        : null
+      defaultOutboundAccess: false
     }
   }
 ]
 
-resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
+resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: virtualNetworkNameCloud
   location: location
   tags: resourceTags
@@ -83,7 +95,38 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false)
+      ? union(cloudAKSDevSubnet, cloudAKSInnerLoopSubnet)
+      : union(cloudAKSDevSubnet, cloudAKSInnerLoopSubnet, bastionSubnet)
+  }
+}
+
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${natGatewayName}-PIP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = {
+  name: natGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIpAddresses: [
+      {
+        id: natGatewayPublicIp.id
+      }
+    ]
+    idleTimeoutInMinutes: 4
   }
 }
 

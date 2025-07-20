@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'LocalBox-NatGateway'
+
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'LocalBox-NSG'
 
@@ -26,7 +29,7 @@ var bastionName = 'LocalBox-Bastion'
 var bastionSubnetIpPrefix = '172.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
-resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -45,6 +48,10 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
+          natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
+          defaultOutboundAccess: false
         }
       }
       {
@@ -66,11 +73,44 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
+          natGateway: deployBastion ? {
+            id: natGateway.id
+          } : null
+          defaultOutboundAccess: false
         }
       }
     ]
   }
  tags: resourceTags
+}
+
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion == true) {
+  name: '${natGatewayName}-PIP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion == true) {
+  name: natGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIpAddresses: [
+      {
+        id: natGatewayPublicIp.id
+      }
+    ]
+    idleTimeoutInMinutes: 4
+  }
 }
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {

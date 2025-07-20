@@ -74,7 +74,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-05-01' = if (
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
     tier: 'Regional'
   }
 }

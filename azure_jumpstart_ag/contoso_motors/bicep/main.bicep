@@ -100,6 +100,9 @@ param scenario string = 'contoso_motors'
 @secure()
 param influxDBPassword string = windowsAdminPassword
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway-${namingGuid}'
+
 @description('The sku name of the K3s cluster worker nodes.')
 @allowed([
   'Standard_D8s_v5'
@@ -135,9 +138,10 @@ module networkDeployment 'mgmt/network.bicep' = {
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
     subnetNameCloudK3s: subnetNameCloudK3s
-    subnetNameCloud: subnetNameCloud    
+    subnetNameCloud: subnetNameCloud
     deployBastion: deployBastion
     location: location
+    natGatewayName: natGatewayName
   }
 }
 
@@ -225,7 +229,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   dependsOn: [
     ubuntuRancherK3sNodesDeployment
     ubuntuRancherK3sDataSvcNodesDeployment
-  ]  
+  ]
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
