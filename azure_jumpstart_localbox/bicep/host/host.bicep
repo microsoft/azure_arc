@@ -323,4 +323,4 @@ resource deployerRoleAssignment_StorageAccountContributor 'Microsoft.Authorizati
 }
 
 output adminUsername string = windowsAdminUsername
-output publicIP string = deployBastion == false ? concat(publicIpAddress.properties.ipAddress) : ''
+output publicIP string = deployBastion == false ? publicIpAddress!.properties.ipAddress : ''
