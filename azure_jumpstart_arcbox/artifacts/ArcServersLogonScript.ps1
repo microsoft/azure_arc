@@ -701,6 +701,10 @@ if ($Env:flavor -ne 'DevOps') {
     }
 }
 
+# Triggering Azure Policy compliance scan
+Write-Header 'Triggering Azure Policy compliance scan'
+Start-AzPolicyComplianceScan -ResourceGroupName $resourceGroup -AsJob
+
 #Changing to Jumpstart ArcBox wallpaper
 Write-Header 'Changing wallpaper'
 
