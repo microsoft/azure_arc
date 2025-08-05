@@ -103,9 +103,9 @@ var primarySubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: {
+      natGateway: (deployBastion || flavor != 'ITPro') ? {
         id: natGateway.id
-      }
+      } : null
       defaultOutboundAccess: false
     }
   }
@@ -133,9 +133,9 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: {
+      natGateway: (deployBastion || flavor != 'ITPro') ? {
         id: natGateway.id
-      }
+      } : null
       defaultOutboundAccess: false
     }
   }
@@ -148,7 +148,7 @@ var dataOpsSubnets = [
       networkSecurityGroup: {
         id: networkSecurityGroup.id
       }
-      natGateway: deployBastion
+      natGateway: (deployBastion || flavor != 'ITPro')
         ? {
             id: natGateway.id
           }
@@ -208,9 +208,9 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
-          natGateway: {
+          natGateway: (deployBastion || flavor != 'ITPro') ? {
             id: natGateway.id
-          }
+          } : null
           defaultOutboundAccess: false
         }
       }
@@ -218,7 +218,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
   }
 }
 
-resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion || flavor != 'ITPro') {
   name: '${natGatewayName}-PIP'
   location: location
   properties: {
@@ -231,7 +231,7 @@ resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   }
 }
 
-resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = {
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion || flavor != 'ITPro') {
   name: natGatewayName
   location: location
   sku: {
