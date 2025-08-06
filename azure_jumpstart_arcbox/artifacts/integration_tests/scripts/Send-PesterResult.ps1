@@ -27,10 +27,12 @@ switch ($env:flavor) {
 
 $null = Connect-AzAccount -Identity -Scope Process
 
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
+$MetaData = (Invoke-RestMethod -Headers @{Metadata="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance?api-version=2021-02-01").compute
 
-# Get the VM's resource ID
-$vmResourceId = (Invoke-RestMethod -Headers @{Metadata="true"} -Method GET -Uri "http://169.254.169.254/metadata/instance?api-version=2021-02-01").compute.resourceId
+$vmResourceId = $MetaData.resourceId
+$resourceGroup = $MetaData.resourceGroupName
+
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $resourceGroup
 
 # Get the VM resource
 $vm = Get-AzResource -ResourceId $vmResourceId
