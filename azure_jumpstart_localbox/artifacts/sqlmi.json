@@ -1,0 +1,195 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "resourceGroup": {
+      "type": "string"
+    },
+    "dataControllerId": {
+      "type": "string"
+    },
+    "customLocation": {
+      "type": "string"
+    },
+    "subscriptionId": {
+      "type": "string"
+    },
+    "sqlInstanceName": {
+      "type": "string",
+      "defaultValue": "localbox-aks-sql"
+    },
+    "admin": {
+      "type": "string"
+    },
+    "password": {
+      "type": "securestring"
+    },
+    "namespace": {
+      "type": "string",
+      "defaultValue": "arc"
+    },
+    "serviceType": {
+      "type": "string"
+    },
+    "readableSecondaries": {
+      "type": "string"
+    },
+    "vCoresRequest": {
+      "type": "string"
+    },
+    "memoryRequest": {
+      "type": "string"
+    },
+    "vCoresLimit": {
+      "type": "string"
+    },
+    "memoryLimit": {
+      "type": "string"
+    },
+    "dataStorageSize": {
+      "type": "string",
+      "defaultValue": "5"
+    },
+    "dataStorageClassName": {
+      "type": "string"
+    },
+    "logsStorageSize": {
+      "type": "string",
+      "defaultValue": "5"
+    },
+    "logsStorageClassName": {
+      "type": "string"
+    },
+    "dataLogsStorageSize": {
+      "type": "string",
+      "defaultValue": "5"
+    },
+    "dataLogsStorageClassName": {
+      "type": "string"
+    },
+    "replicas": {
+      "type": "int"
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {
+        "Solution": "jumpstart_hcibox"
+      }
+    },
+    "apiVersion": {
+      "type": "string"
+    },
+    "pricingTier": {
+      "type": "string"
+    },
+    "licenseType": {
+      "type": "string"
+    },
+    "port": {
+      "type": "int"
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.AzureArcData/sqlManagedInstances",
+      "apiVersion": "[parameters('apiVersion')]",
+      "name": "[parameters('sqlInstanceName')]",
+      "location": "[parameters('location')]",
+      "extendedLocation": {
+        "type": "CustomLocation",
+        "name": "[parameters('customLocation')]"
+      },
+      "tags": "[parameters('resourceTags')]",
+      "sku": {
+        "name": "vCore",
+        "tier": "[parameters('pricingTier')]"
+      },
+      "properties": {
+        "admin": "[parameters('admin')]",
+        "basicLoginInformation": {
+          "username": "[parameters('admin')]",
+          "password": "[parameters('password')]"
+        },
+        "licenseType": "[parameters('licenseType')]",
+        "k8sRaw": {
+          "spec": {
+            "dev": true,
+            "services": {
+              "primary": {
+                "type": "[parameters('serviceType')]",
+                "port": "[parameters('port')]"
+              },
+              "readableSecondaries": {
+                "type": "[parameters('readableSecondaries')]",
+                "port": "[parameters('port')]"
+              }
+            },
+            "replicas": "[parameters('replicas')]",
+            "scheduling": {
+              "default": {
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('vCoresRequest')]",
+                    "memory": "[parameters('memoryRequest')]"
+                  },
+                  "limits": {
+                    "cpu": "[parameters('vCoresLimit')]",
+                    "memory": "[parameters('memoryLimit')]"
+                  }
+                }
+              }
+            },
+            "storage": {
+              "data": {
+                "volumes": [
+                  {
+                    "className": "[parameters('dataStorageClassName')]",
+                    "size": "[parameters('dataStorageSize')]"
+                  }
+                ]
+              },
+              "logs": {
+                "volumes": [
+                  {
+                    "className": "[parameters('logsStorageClassName')]",
+                    "size": "[parameters('logsStorageSize')]"
+                  }
+                ]
+              },
+              "datalogs": {
+                "volumes": [
+                  {
+                    "className": "[parameters('dataLogsStorageClassName')]",
+                    "size": "[parameters('dataLogsStorageSize')]"
+                  }
+                ]
+              }
+            },
+            "settings": {
+              "azure": {
+                "location": "[parameters('location')]",
+                "resourceGroup": "[parameters('resourceGroup')]",
+                "subscription": "[parameters('subscriptionId')]"
+              }
+            }
+          },
+          "metadata": {
+            "namespace": "[parameters('namespace')]"
+          },
+          "status": {}
+        },
+        "dataControllerId": "[parameters('dataControllerId')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
