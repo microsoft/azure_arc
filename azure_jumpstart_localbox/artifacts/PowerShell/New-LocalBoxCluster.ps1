@@ -29,7 +29,7 @@ $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
 azcopy cp 'https://azlocalvhds.blob.core.windows.net/images/AzLocal2508.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp 'hhttps://azlocalvhds.blob.core.windows.net/images/AzLocal2508.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://azlocalvhds.blob.core.windows.net/images/AzLocal2508.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
 $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
 $hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256"
