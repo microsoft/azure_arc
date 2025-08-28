@@ -19,6 +19,9 @@ param drSubnetName string = '${namingPrefix}-DR-Subnet'
 @description('Name of the NAT Gateway')
 param natGatewayName string = '${namingPrefix}-NatGateway'
 
+@description('Name of the DR network NAT Gateway')
+param drNatGatewayName string = '${namingPrefix}-DR-NatGateway'
+
 @description('Name for your log analytics workspace')
 param workspaceName string
 
@@ -209,7 +212,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = if (f
             id: networkSecurityGroup.id
           }
           natGateway: (deployBastion || flavor != 'ITPro') ? {
-            id: natGateway.id
+            id: natGatewayDR.id
           } : null
           defaultOutboundAccess: false
         }
@@ -231,6 +234,19 @@ resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = i
   }
 }
 
+resource natGatewayDRPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = if (deployBastion || flavor == 'DataOps') {
+  name: '${natGatewayName}-DR-PIP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
 resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion || flavor != 'ITPro') {
   name: natGatewayName
   location: location
@@ -241,6 +257,22 @@ resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = if (deployBasti
     publicIpAddresses: [
       {
         id: natGatewayPublicIp.id
+      }
+    ]
+    idleTimeoutInMinutes: 4
+  }
+}
+
+resource natGatewayDR 'Microsoft.Network/natGateways@2024-07-01' = if (deployBastion || flavor == 'DataOps') {
+  name: drNatGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIpAddresses: [
+      {
+        id: natGatewayDRPublicIp.id
       }
     ]
     idleTimeoutInMinutes: 4
