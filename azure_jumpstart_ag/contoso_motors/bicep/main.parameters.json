@@ -3,28 +3,28 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "spnClientId": {
-      "value": ""
+      "value": "b3716cb8-569b-4258-84c6-a2e2f8763adc"
     },
     "spnClientSecret": {
-      "value": ""
+      "value": "cI18Q~QS4vs6E2ITty-Nd1-t19QqMFLmsAiuicfd"
     },
     "spnTenantId": {
-      "value": ""
+      "value": "7f920d24-35f9-458e-ba26-cbad612fffff"
     },
     "spnObjectId": {
-      "value": ""
+      "value": "cabbd2ad-3d78-4282-8ce4-23a5831db6b7"
     },
     "windowsAdminUsername": {
-      "value": ""
+      "value": "arcdemo"
     },
     "windowsAdminPassword": {
-      "value": ""
+      "value": "Terminology0402"
     },
     "deployBastion": {
-      "value": false
+      "value": True
     },
     "customLocationRPOID": {
-      "value": ""
+      "value": "605082e9-98dc-4796-8bb9-446d623fd9c1"
     }
   }
 }
