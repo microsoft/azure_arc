@@ -4175,6 +4175,8 @@ spec:
                     type: string
                   serviceCertificateSecret:
                     type: string
+                  fsGroupChangePolicy:
+                    type: string
                   activeDirectory:
                     type: object
                     properties:
