@@ -145,6 +145,7 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2024
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_secondary
       dnsServiceIP: dnsServiceIP_secondary
+      outboundType: 'userAssignedNATGateway'
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
