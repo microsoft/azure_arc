@@ -67,7 +67,7 @@ param kubernetesVersion string = '1.32'
 var serviceCidr_staging = '10.21.64.0/19'
 var dnsServiceIP_staging = '10.21.64.10'
 
-resource aksStaging 'Microsoft.ContainerService/managedClusters@2025-02-01' = {
+resource aksStaging 'Microsoft.ContainerService/managedClusters@2025-05-02-preview' = {
   location: location
   name: aksStagingClusterName
   tags: resourceTags
@@ -106,6 +106,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2025-02-01' = {
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_staging
       dnsServiceIP: dnsServiceIP_staging
+      outboundType: 'userAssignedNATGateway'
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername

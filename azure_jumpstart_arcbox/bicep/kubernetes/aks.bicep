@@ -58,7 +58,7 @@ var aksSubnetName = '${namingPrefix}-AKS-Subnet'
 var drVirtualNetworkName = '${namingPrefix}-DR-VNet'
 var drSubnetName = '${namingPrefix}-DR-Subnet'
 
-resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2024-09-02-preview' = {
+resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2025-05-02-preview' = {
   location: location
   name: aksClusterName
   identity: {
@@ -92,6 +92,7 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_primary
       dnsServiceIP: dnsServiceIP_primary
+      outboundType: 'userAssignedNATGateway'
     }
     autoUpgradeProfile: {
       nodeOSUpgradeChannel: 'NodeImage'
@@ -144,6 +145,7 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2024
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_secondary
       dnsServiceIP: dnsServiceIP_secondary
+      outboundType: 'userAssignedNATGateway'
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
