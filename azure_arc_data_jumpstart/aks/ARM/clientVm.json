@@ -268,7 +268,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
+        "name": "[if(not(parameters('deployBastion')),'Standard','Standard')]",
         "tier": "Regional"
       }
     },
