@@ -93,6 +93,9 @@ param azureOpenAIModel object = {
     apiVersion: '2024-08-01-preview'
 }
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway-${namingGuid}'
+
 // @description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
 // param deployGPUNodes bool = false
 
@@ -131,6 +134,7 @@ module networkDeployment 'mgmt/network.bicep' = {
     subnetNameCloud: subnetNameCloud
     deployBastion: deployBastion
     location: location
+    natGatewayName: natGatewayName
   }
 }
 

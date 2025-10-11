@@ -14,7 +14,9 @@ param resourceTags object = {
 
 param azureUpdateManagerArcPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46'
 param azureUpdateManagerAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/59efceea-0c96-497e-a4a1-4eb2290dac15'
-param sshPostureControlAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/a8f3e6a6-dcd2-434c-b0f7-6f309ce913b4'
+param sshPostureControlLinuxAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/a8f3e6a6-dcd2-434c-b0f7-6f309ce913b4'
+param sshPostureControlWindowsAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/fe4e11ff-f561-4d4a-877c-256cc0b6470e'
+param azureMachineConfigurationPrerequisitePolicyId string = '/providers/Microsoft.Authorization/policySetDefinitions/12794019-7a00-42cf-95c2-882eed337cc8'
 
 param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
@@ -66,7 +68,7 @@ resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[0].roleDefinition[0])
-    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0]!.identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
@@ -75,7 +77,7 @@ resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   name: guid( policies[0].name, policies[0].roleDefinition[1],resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[0].roleDefinition[1])
-    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0]!.identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
@@ -84,7 +86,7 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[0].roleDefinition[2])
-    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0]!.identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
@@ -93,7 +95,7 @@ resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@202
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[1].roleDefinition)
-    principalId: contains(policies[1].flavors, flavor)?policies_name[1].identity.principalId:guid('policies_name_id${0}')
+    principalId: contains(policies[1].flavors, flavor)?policies_name[1]!.identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
@@ -203,18 +205,57 @@ resource updateManagerAzurePolicyLinux  'Microsoft.Authorization/policyAssignmen
   }
 }
 
-resource sshPostureControlAudit  'Microsoft.Authorization/policyAssignments@2025-01-01' = {
-  name: '(ArcBox) Enable SSH Posture Control audit'
+resource sshPostureControlLinuxAudit  'Microsoft.Authorization/policyAssignments@2025-01-01' = {
+  name: '(ArcBox) Enable SSH Posture Control audit for Linux'
   location: azureLocation
   scope: resourceGroup()
   properties:{
-    displayName: '(ArcBox) Enable SSH Posture Control audit'
-    description: 'Enable SSH Posture Control in audit mode'
-    policyDefinitionId: sshPostureControlAzurePolicyId
+    displayName: '(ArcBox) Enable SSH Posture Control audit for Linux (powered by OSConfig)'
+    description: 'Enable SSH Posture Control for Linux in audit mode'
+    policyDefinitionId: sshPostureControlLinuxAzurePolicyId
     parameters: {
       IncludeArcMachines: {
         value: 'true'
       }
     }
+  }
+}
+
+resource sshPostureControlWindowsAudit  'Microsoft.Authorization/policyAssignments@2025-01-01' = {
+  name: '(ArcBox) Enable SSH Posture Control audit for Windows'
+  location: azureLocation
+  scope: resourceGroup()
+  properties:{
+    displayName: '(ArcBox) Enable SSH Posture Control audit for Windows (powered by OSConfig)'
+    description: 'Enable SSH Posture Control for Windows in audit mode'
+    policyDefinitionId: sshPostureControlWindowsAzurePolicyId
+    parameters: {
+      IncludeArcMachines: {
+        value: 'true'
+      }
+    }
+  }
+}
+
+resource azureMachineConfigurationPrerequisitePolicy  'Microsoft.Authorization/policyAssignments@2025-01-01' = {
+  name: '(ArcBox) Deploy prerequisites to enable Machine Configuration'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Deploy prerequisites to enable Guest Configuration policies on virtual machines'
+    description: 'This initiative adds a system-assigned managed identity and deploys the platform-appropriate Guest Configuration extension to virtual machines that are eligible to be monitored by Guest Configuration policies.'
+    policyDefinitionId: azureMachineConfigurationPrerequisitePolicyId
+  }
+}
+
+resource azureMachineConfigurationPrerequisitePolicy_role 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('azureMachineConfigurationPrerequisitePolicy', 'Contributor', resourceGroup().id)
+  properties: {
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
+    principalId: azureMachineConfigurationPrerequisitePolicy.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }

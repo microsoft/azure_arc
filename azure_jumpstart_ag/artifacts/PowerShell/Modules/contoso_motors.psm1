@@ -89,7 +89,7 @@ function Merge-K3sConfigFilesContosoMotors{
 
 }
 
-function Set-K3sClusters {
+function Set-K3sClustersContosoMotors {
     Write-Host "Configuring kube-vip on K3s clusters"
     az login --identity
     az account set -s $subscriptionId
@@ -98,7 +98,7 @@ function Set-K3sClusters {
             $clusterName = $cluster.Value.FriendlyName.ToLower()
             $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
             kubectx $clusterName
-            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
+            $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -o tsv)
             Write-Host "Assigning kube-vip-role on k3s cluster"
             $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
             kubectl apply -f $kubeVipRbac
@@ -110,28 +110,35 @@ function Set-K3sClusters {
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
             kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-            # Initialize serviceIpRange as empty
-            $serviceIpRange = @()
+            # Initialize kubeVipPrivateIP as null
+            $kubeVipPrivateIP = $null
 
-            # Loop until serviceIpRange is not empty
-            while ($serviceIpRange.Count -eq 0) {
-                $serviceIpRange = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv)
-                if ($serviceIpRange.Count -eq 0) {
-                    Write-Host "serviceIpRange is empty, retrying..."
+            # Wait for kube-vip to assign a private IP address
+            while ($kubeVipPrivateIP -eq $null) {
+                Write-Host "Waiting for kube-vip to assign a private IP address from $vmName-NIC"
+                $kubeVipPrivateIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -o tsv)
+                # debug
+                Write-Host "kubeVipPrivateIP: $kubeVipPrivateIP"
+                if ($kubeVipPrivateIP -eq $null) {
+                    Write-Host "kubeVipPrivateIP is null; retrying..."
                     Start-Sleep -Seconds 5
                 }
             }
-
-            $sortedIps = $serviceIpRange | Sort-Object { [System.Version]$_ }
-            $lowestServiceIp = $sortedIps[0]
-            $highestServiceIp = $sortedIps[-1]
-
-            kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
-            Start-Sleep -Seconds 30
-
-            # Write-Host "Creating longhorn storage on K3scluster"
-            # kubectl apply -f "$($Agconfig.AgDirectories.AgToolsDir)\longhorn.yaml"
-            # Start-Sleep -Seconds 30
+            
+            # Check if the ConfigMap exists and has the cidr-global property
+            # we have to ensure that the kubevip configmap is created with the cidr-global property
+            $configMap = kubectl get configmap kubevip -n kube-system -o json | ConvertFrom-Json
+            if ($configMap -and $configMap.data -and $configMap.data.'cidr-global') {
+                Write-Host "ConfigMap 'kubevip' already exists and has 'cidr-global' property."
+            } else {
+                if ($configMap) {
+                    Write-Host "ConfigMap 'kubevip' exists but does not have 'cidr-global' property. Deleting and re-creating it."
+                    kubectl delete configmap kubevip -n kube-system
+                } else {
+                    Write-Host "ConfigMap 'kubevip' does not exist. Creating it."
+                }
+                kubectl create configmap -n kube-system kubevip --from-literal cidr-global=$kubeVipPrivateIP/32
+            }
         }
     }
 }
@@ -438,4 +445,154 @@ function Deploy-MotorsBookmarks {
     $quickAccess = new-object -com shell.application
     $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
     $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+}
+
+function Deploy-AIO-M3ContosoMotors {
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the Arc-enabled clusters" -ForegroundColor Gray
+    Write-Host "`n"
+
+
+    $kvIndex = 0
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for AIO secrets management" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityKvName = "aio-${clusterName}-${namingGuid}-kv-identity"
+        $userAssignedMIKvResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityKvName -o tsv --query id)
+
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityCloudName = "aio-${clusterName}-${namingGuid}-cloud-identity"
+        $userAssignedMICloudResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityCloudName -o tsv --query id)
+
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+        $retryCount = 0
+        $maxRetries = 5
+        $aioStatus = "notDeployed"
+
+        # Enable custom locations on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az connectedk8s enable-features --name $arcClusterName `
+            --resource-group $resourceGroup `
+            --features cluster-connect custom-locations `
+            --custom-locations-oid $customLocationRPOID `
+            --only-show-errors
+
+        # Create the Schema registry for the cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating the schema registry on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $schemaName = "${clusterName}-$($Env:namingGuid)-schema"
+        $schemaId = $(az iot ops schema registry create --name $schemaName `
+                --resource-group $Env:resourceGroup `
+                --registry-namespace "$clusterName-$($Env:namingGuid)-namespace" `
+                --sa-resource-id $(az storage account show --name $Env:aioStorageAccountName --resource-group $Env:resourceGroup -o tsv --query id) `
+                --query id -o tsv)
+
+        Write-Host "[$(Get-Date -Format t)] INFO: The aio storage account name is: $aioStorageAccountName" -ForegroundColor DarkGray
+        Write-Host "[$(Get-Date -Format t)] INFO: the schemaId is '$schemaId'" -ForegroundColor DarkGray
+
+        $customLocationName = $arcClusterName.toLower() + "-cl"
+
+        # Initialize the Azure IoT Operations instance on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Initialize the Azure IoT Operations instance on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        do {
+            az iot ops init --cluster $arcClusterName.toLower() `
+                --resource-group $resourceGroup `
+                --subscription $subscriptionId `
+                --only-show-errors
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops init --cluster $arcClusterName.toLower() `
+                    --resource-group $Env:resourceGroup `
+                    --subscription $Env:subscriptionId `
+                    --only-show-errors
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+        $retryCount = 0
+        $maxRetries = 5
+        # Create the Azure IoT Operations instance on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Create the Azure IoT Operations instance on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        do {
+            az iot ops create --name $arcClusterName.toLower() `
+                --cluster $arcClusterName.toLower() `
+                --resource-group $Env:resourceGroup `
+                --subscription $Env:subscriptionId `
+                --custom-location $customLocationName `
+                --sr-resource-id $schemaId `
+                --enable-rsync true `
+                --add-insecure-listener true `
+                --only-show-errors
+
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops create --name $arcClusterName.toLower() `
+                    --cluster $arcClusterName.toLower() `
+                    --resource-group $resourceGroup `
+                    --subscription $subscriptionId `
+                    --custom-location $customLocationName `
+                    --sr-resource-id $schemaId `
+                    --enable-rsync true `
+                    --add-insecure-listener true `
+                    --only-show-errors
+
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+        # Configure the Azure IoT Operations instance for secret synchronization
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
+        Write-Host "`n"
+
+        # Enable OIDC issuer and workload identity on the Arc-enabled cluster
+        az connectedk8s update -n $arcClusterName `
+            --resource-group $resourceGroup `
+            --enable-oidc-issuer `
+            --enable-workload-identity
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Assigning the user-assigned managed identity to the Azure IoT Operations instance" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az iot ops identity assign --name $arcClusterName.toLower() `
+            --resource-group $resourceGroup `
+            --mi-user-assigned $userAssignedMIKvResourceId
+
+        Start-Sleep -Seconds 60
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
+        Write-Host "`n"
+
+        az iot ops secretsync enable --instance $arcClusterName.toLower() `
+            --kv-resource-id $keyVaultId `
+            --resource-group $resourceGroup `
+            --mi-user-assigned $userAssignedMICloudResourceId `
+            --only-show-errors
+
+        $kvIndex++
+
+
+
+    }
 }

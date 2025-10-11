@@ -199,16 +199,6 @@ if ($autoShutdownEnabled -eq "true") {
 
 }
 
-# Installing DHCP service
-Write-Output "Installing DHCP service"
-Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
-
-#Installing AD DS roles
-if ($flavor -eq "DataOps") {
-    Install-WindowsFeature -Name RSAT-AD-PowerShell
-    Install-WindowsFeature -Name RSAT-DNS-Server
-}
-
 # Installing tools
 
 Write-Header "Installing PowerShell 7"

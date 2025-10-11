@@ -51,7 +51,7 @@ var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var k3sControlPlane = 'true' // deploy single-node k3s control plane
 var diskSize = 512
-var numberOfIPAddresses =  15 // The number of IP addresses to create
+var numberOfIPAddresses =  1 // The number of IP addresses to create
 
 // Create multiple public IP addresses
 resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
@@ -63,7 +63,7 @@ resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [f
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
 }]
 
@@ -173,9 +173,9 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} ${scenario} ${influxDBPassword}'
+      commandToExecute: 'bash installK3s-motors.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name} ${scenario} ${influxDBPassword} ${templateBaseUrl}'
       fileUris: [
-        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
+        '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s-motors.sh'
       ]
     }
   }

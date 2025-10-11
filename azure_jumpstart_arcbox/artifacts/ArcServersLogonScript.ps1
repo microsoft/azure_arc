@@ -554,6 +554,7 @@ if ($Env:flavor -ne 'DevOps') {
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value 'StrictHostKeyChecking=accept-new'
 
+        Get-VM *Ubuntu*  | Wait-VM -For Heartbeat
         Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
         if ($namingPrefix -ne 'ArcBox') {
@@ -699,6 +700,10 @@ if ($Env:flavor -ne 'DevOps') {
         Unregister-ScheduledTask -TaskName 'ArcServersLogonScript' -Confirm:$false
     }
 }
+
+# Triggering Azure Policy compliance scan
+Write-Header 'Triggering Azure Policy compliance scan'
+Start-AzPolicyComplianceScan -ResourceGroupName $resourceGroup -AsJob
 
 #Changing to Jumpstart ArcBox wallpaper
 Write-Header 'Changing wallpaper'

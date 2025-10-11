@@ -24,6 +24,9 @@ param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
 @description('Name of the Bastion Network Security Group')
 param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
 
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway'
+
 var addressPrefixCloud = '10.16.0.0/16'
 var subnetAddressPrefixK3s = '10.16.80.0/21'
 var subnetAddressPrefixCloud = '10.16.64.0/21'
@@ -58,6 +61,10 @@ var cloudK3sSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
+      natGateway: {
+        id: natGateway.id
+      }
+      defaultOutboundAccess: false
     }
   }
 ]
@@ -72,11 +79,17 @@ var cloudSubnet = [
       networkSecurityGroup: {
         id: networkSecurityGroupCloud.id
       }
+      natGateway: deployBastion
+        ? {
+            id: natGateway.id
+          }
+        : null
+      defaultOutboundAccess: false
     }
   }
 ]
 
-resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
+resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: virtualNetworkNameCloud
   location: location
   tags: resourceTags
@@ -103,6 +116,35 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2023-02-01' = if (
   }
   sku: {
     name: 'Standard'
+  }
+}
+
+resource natGatewayPublicIp 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${natGatewayName}-PIP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource natGateway 'Microsoft.Network/natGateways@2024-07-01' = {
+  name: natGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIpAddresses: [
+      {
+        id: natGatewayPublicIp.id
+      }
+    ]
+    idleTimeoutInMinutes: 4
   }
 }
 
@@ -385,39 +427,42 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
   }
 }
 
-resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for (site, i) in sites: {
-  name: 'Ag-LB-Public-IP-${site}'
-  location: location
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    publicIPAddressVersion: 'IPv4'
-    idleTimeoutInMinutes: 4
+resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [
+  for (site, i) in sites: {
+    name: 'Ag-LB-Public-IP-${site}'
+    location: location
+    properties: {
+      publicIPAllocationMethod: 'Static'
+      publicIPAddressVersion: 'IPv4'
+      idleTimeoutInMinutes: 4
+    }
+    sku: {
+      name: 'Standard'
+    }
   }
-  sku: {
-    name: 'Standard'
-  }
-}]
+]
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (site, i) in sites: {
-  name: 'Ag-LoadBalancer-${site}'
-  location: location
-  sku: {
-    name: 'Standard'
-  }
-  properties: {
-    frontendIPConfigurations: [
-      {
-        name: 'Ag-LB-Frontend-${site}'
-        properties: {
-          publicIPAddress: {
-            id: loadBalancerPip[i].id
+resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = [
+  for (site, i) in sites: {
+    name: 'Ag-LoadBalancer-${site}'
+    location: location
+    sku: {
+      name: 'Standard'
+    }
+    properties: {
+      frontendIPConfigurations: [
+        {
+          name: 'Ag-LB-Frontend-${site}'
+          properties: {
+            publicIPAddress: {
+              id: loadBalancerPip[i].id
+            }
           }
         }
-      }
-    ]
+      ]
+    }
   }
-}]
-
+]
 
 output vnetId string = cloudVirtualNetwork.id
 output k3sSubnetId string = cloudVirtualNetwork.properties.subnets[0].id

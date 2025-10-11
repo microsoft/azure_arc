@@ -1,0 +1,245 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - azure_jumpstart_arcbox/*
+
+schedules:
+- cron: "00 18 * * *"
+  displayName: Daily 18:00 UTC
+  branches:
+    include:
+      - main
+  always: true
+
+parameters:
+- name: ResourceGroupNamePrefix
+  displayName: 'Resource Group Name prefix'
+  type: string
+  default: 'arcbox-itpro-tests'
+- name: Location
+  displayName: 'Location'
+  type: string
+  default: 'northeurope'
+- name: AzureSubscription
+  displayName: 'Azure Subscription'
+  type: string
+  default: 'jumpstart-ext-sub-ado-pipeline-tests-identity'
+- name: githubAccount
+  displayName: 'githubAccount'
+  type: string
+  default: 'microsoft'
+- name: githubBranch
+  displayName: 'githubBranch'
+  type: string
+  default: 'main'
+- name: flavor
+  displayName: 'flavor'
+  type: string
+  default: 'ITPro'
+
+variables:
+#- group: 'integration-tests'
+- name: ResourceGroupNamePrefix
+  value: ${{parameters.ResourceGroupNamePrefix}}
+- name: githubAccount
+  value: ${{parameters.githubAccount}}
+- name: githubBranch
+  value: ${{parameters.githubBranch}}
+- name: flavor
+  value: ${{parameters.flavor}}
+- name: Location
+  value: ${{parameters.Location}}
+
+stages:
+- stage: 'ArcBox_deployment'
+  jobs:
+  - job: Deploy
+    timeoutInMinutes: 235 # 5 minutes before the ACA self-hosted runner in order for the runner to gracefully shutdown
+    pool:
+      #name: 'localbox-pool'
+      vmImage: 'ubuntu-latest'
+    continueOnError: 'false'
+    steps:
+
+    - task: AzurePowerShell@5
+      name: DeployRG
+      displayName: 'Deploy resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          $dateSuffix = (Get-Date -Format "yyyy-MM-dd-HH-mm")
+          $RGname = "$(ResourceGroupNamePrefix)-$dateSuffix"
+
+          # Output for downstream tasks (job output)
+          Write-Host "##vso[task.setvariable variable=RGname;isOutput=true]$RGname"
+
+          # Output for global scope (pipeline-wide)
+          Write-Host "##vso[task.setvariable variable=RGname]$RGname"
+
+          New-AzResourceGroup -Name $RGname -Location "$(Location)" -Force
+          Write-Host "Resource group $RGname created."
+
+    - task: AzurePowerShell@5
+      displayName: 'Deploy Bicep template'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Deploying to $(RGname)"
+          $githubAccount = "$(githubAccount)"
+          $githubBranch = "$(githubBranch)"
+          $flavor = "$(flavor)"
+          if ($githubAccount -ne "microsoft") {
+            Write-Host "Checking out $githubAccount/$githubBranch"
+            git remote add upstream https://github.com/$($githubAccount)/azure_arc.git
+            git fetch upstream
+            git checkout -b $githubBranch upstream/$githubBranch
+          }
+          New-AzResourceGroupDeployment -Name ArcBox `
+          -ResourceGroupName $(RGname) `
+          -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
+          -TemplateParameterObject @{ `
+              windowsAdminUsername = "arcdemo" ; `
+              flavor = $flavor ; `
+              deployBastion = $false ; `
+              githubAccount = $githubAccount ; `
+              githubBranch = $githubBranch ; `
+              vmAutologon = $true ; `
+              autoShutdownEnabled = $false ; `
+              rdpPort = "3389" `
+          }
+
+    # Need to run this script multiple times to avoid Azure PowerShell authentication cache issues when run for more than 60 minutes
+    - task: AzurePowerShell@5
+      displayName: 'Upload Pester test-results from ArcBox VM'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: FilePath
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
+        ScriptArguments: -ResourceGroupName $(RGname) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
+
+    - task: AzurePowerShell@5
+      displayName: 'Download Pester test-results from storage account to pipeline agent'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: FilePath
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
+        ScriptArguments: -ResourceGroupName $(RGname)
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFormat: NUnit
+        testResultsFiles: '$(System.DefaultWorkingDirectory)/testresults/*.xml'
+
+    - task: AzurePowerShell@5
+      displayName: 'Check for failed tests'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          $resultsPath = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY 'testresults'
+          Write-Host "Looking in: $resultsPath"
+
+          $xmlFiles = Get-ChildItem -Path $resultsPath -Filter *.xml -Recurse
+          if ($xmlFiles.Count -eq 0) {
+              throw "❌ No test result XML files found in $resultsPath"
+          }
+
+          $failedTestsFound = $false
+
+          foreach ($file in $xmlFiles) {
+              Write-Host "Found test file: $($file.FullName)"
+              [xml]$xml = Get-Content -Path $file.FullName
+
+              $failedTests = $xml.SelectNodes('//test-case[@result="Failure" or @result="Failed"]')
+
+              if ($failedTests.Count -gt 0) {
+                  Write-Host "`n❌ FAILED TESTS in file: $($file.Name)" -ForegroundColor Red
+                  foreach ($test in $failedTests) {
+                      Write-Host " - $($test.name): $($test.description)" -ForegroundColor Red
+                  }
+                  $failedTestsFound = $true
+              }
+          }
+
+          if ($failedTestsFound) {
+              throw "❌ One or more Pester tests failed."
+          } else {
+              Write-Host "✅ All Pester tests passed." -ForegroundColor Green
+          }
+
+
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+            $rgName = "$(RGname)"
+            Write-Host "Deleting resource group $rgName"
+            Remove-AzResourceGroup -Name $rgName -Force
+
+- stage: destroy
+  displayName: 'ArcBox_teardown'
+  dependsOn: ArcBox_deployment
+  condition: failed('ArcBox_deployment')
+  variables:
+    RGname: $[ stageDependencies.ArcBox_deployment.Deploy.outputs['DeployRG.RGname'] ]
+  jobs:
+  - deployment:
+    displayName: "Trigger teardown approval"
+    environment: 'arcbox_deploy'
+    pool:
+      vmImage: 'ubuntu-latest'
+  - job: Delete
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      inputs:
+        azureSubscription: ${{parameters.AzureSubscription}}
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+        Inline: |
+            $rgName = "$(RGname)"
+            Write-Host "Deleting resource group $rgName"
+            $projectName = "Azure Arc Jumpstart"
+            $pipelineId = 66   # The ID of the pipeline
+            $organization = "AzureArcJumpstart"
+            $DevOpsPersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
+
+            Install-PSResource -Name VSTeam -TrustRepository
+
+            Set-VSTeamAccount -Account $organization -PersonalAccessToken $DevOpsPersonalAccessToken
+
+            Get-VSTeamProject
+
+            $body = @{
+                resources = @{
+                    repositories = @{
+                        self = @{
+                            refName = "refs/heads/main"
+                        }
+                    }
+                }
+                templateParameters = @{
+                    ResourceGroupName = $rgName
+                }
+            }
+
+            $jsonBody = $body | ConvertTo-Json -Depth 100
+
+            Invoke-VSTeamRequest -Url "https://dev.azure.com/$organization/$projectName/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1" -Method POST -Body $jsonBody -ContentType "application/json"

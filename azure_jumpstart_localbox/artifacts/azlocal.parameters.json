@@ -1,0 +1,227 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deploymentMode": {
+            "value": "Validate"
+        },
+        "keyVaultName": {
+            "value": "keyVaultName-staging"
+        },
+        "softDeleteRetentionDays": {
+            "value": 30
+        },
+        "diagnosticStorageAccountName": {
+            "value": "diagnosticStorageAccountName-staging"
+        },
+        "logsRetentionInDays": {
+            "value": 30
+        },
+        "storageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "clusterName": {
+            "value": "clusterName-staging"
+        },
+        "location": {
+            "value": "location-staging"
+        },
+        "tenantId": {
+            "value": "tenantId-staging"
+        },
+        "witnessType": {
+            "value": "Cloud"
+        },
+        "clusterWitnessStorageAccountName": {
+            "value": "ClusterWitnessStorageAccountName-staging"
+        },
+        "localAdminUserName": {
+            "value": "localAdminUserName-staging"
+        },
+        "localAdminPassword": {
+            "value": "localAdminPassword-staging"
+        },
+        "AzureStackLCMAdminUsername": {
+            "value": "AzureStackLCMAdminUserName-staging"
+        },
+        "AzureStackLCMAdminPasssword": {
+            "value": "AzureStackLCMAdminAdminPassword-staging"
+        },
+        "hciResourceProviderObjectID": {
+            "value": "hciResourceProviderObjectID-staging"
+        },
+        "arcNodeResourceIds": {
+            "value": arcNodeResourceIds-staging
+        },
+        "domainFqdn": {
+            "value": "domainFqdn-staging"
+        },
+        "namingPrefix": {
+            "value": "namingPrefix-staging"
+        },
+        "adouPath": {
+            "value": "adouPath-staging"
+        },
+        "securityLevel": {
+            "value": "Recommended"
+        },
+        "driftControlEnforced": {
+            "value": true
+        },
+        "credentialGuardEnforced": {
+            "value": true
+        },
+        "smbSigningEnforced": {
+            "value": true
+        },
+        "smbClusterEncryption": {
+            "value": false
+        },
+        "bitlockerBootVolume": {
+            "value": true
+        },
+        "bitlockerDataVolumes": {
+            "value": true
+        },
+        "wdacEnforced": {
+            "value": false
+        },
+        "streamingDataClient": {
+            "value": true
+        },
+        "euLocation": {
+            "value": false
+        },
+        "episodicDataUpload": {
+            "value": true
+        },
+        "configurationMode": {
+            "value": "Express"
+        },
+        "subnetMask": {
+            "value": "subnetMask-staging"
+        },
+        "defaultGateway": {
+            "value": "defaultGateway-staging"
+        },
+        "startingIPAddress": {
+            "value": "startingIp-staging"
+        },
+        "endingIPAddress": {
+            "value": "endingIp-staging"
+        },
+        "dnsServers": {
+            "value": dnsServers-staging
+        },
+        "useDhcp": {
+            "value": false
+        },
+        "physicalNodesSettings": {
+            "value": physicalNodesSettings-staging
+        },
+        "networkingType": {
+            "value": "switchlessMultiServerDeployment"
+        },
+        "networkingPattern": {
+            "value": "convergedManagementCompute"
+        },
+        "intentList": {
+            "value": [
+                {
+                    "name": "Compute_Management",
+                    "trafficType": [
+                      "Management",
+                      "Compute"
+                    ],
+                    "adapter": [
+                         "FABRIC"
+                    ],
+                    "overrideVirtualSwitchConfiguration": false,
+                    "virtualSwitchConfigurationOverrides": {
+                        "enableIov": "",
+                        "loadBalancingAlgorithm": ""
+                    },
+                    "overrideQosPolicy": true,
+                    "qosPolicyOverrides": {
+                        "priorityValue8021Action_Cluster": "7",
+                        "priorityValue8021Action_SMB": "3",
+                        "bandwidthPercentage_SMB": "50"
+                    },
+                    "overrideAdapterProperty": false,
+                    "adapterPropertyOverrides": {
+                        "jumboPacket": "9014",
+                        "networkDirect": "Enabled",
+                        "networkDirectTechnology": "RoCEv2"
+                    }
+                },
+                {
+                  "name": "Storage",
+                  "trafficType": ["Storage"],
+                  "adapter": ["StorageA", "StorageB"],
+                  "overrideVirtualSwitchConfiguration": false,
+                  "virtualSwitchConfigurationOverrides": {
+                    "enableIov": "",
+                    "loadBalancingAlgorithm": ""
+                  },
+                  "overrideQosPolicy": true,
+                  "qosPolicyOverrides": {
+                    "priorityValue8021Action_Cluster": "7",
+                    "priorityValue8021Action_SMB": "3",
+                    "bandwidthPercentage_SMB": "50"
+                  },
+                  "overrideAdapterProperty": false,
+                  "adapterPropertyOverrides": {
+                    "jumboPacket": "9014",
+                    "networkDirect": "Enabled",
+                    "networkDirectTechnology": "RoCEv2"
+                  }
+                }
+            ]
+        },
+        "storageNetworkList": {
+            "value": [
+                {
+                    "name": "StorageA",
+                    "networkAdapterName": "StorageA",
+                    "vlanId": "storageNicAVLAN-staging"
+                },
+                {
+                    "name": "StorageB",
+                    "networkAdapterName": "StorageB",
+                    "vlanId": "storageNicBVLAN-staging"
+                }
+            ]
+        },
+        "storageConnectivitySwitchless": {
+            "value": false
+        },
+        "enableStorageAutoIp": {
+            "value": true
+        },
+        "customLocation": {
+            "value": "customLocation-staging"
+        },
+        "sbeVersion":{
+            "value": ""
+          },
+          "sbeFamily":{
+            "value": ""
+          },
+          "sbePublisher":{
+            "value": ""
+          },
+          "sbeManifestSource":{
+            "value": ""
+          },
+          "sbeManifestCreationDate":{
+            "value": ""
+          },
+          "partnerProperties": {
+            "value":[
+            ]
+          },
+        "partnerCredentiallist": {
+            "value": []
+          }
+    }
+}

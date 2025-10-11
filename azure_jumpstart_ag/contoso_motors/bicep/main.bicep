@@ -96,6 +96,13 @@ param vmAutologon bool = true
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_motors'
 
+@description('The InfluxDB admin password')
+@secure()
+param influxDBPassword string = windowsAdminPassword
+
+@description('Name of the NAT Gateway')
+param natGatewayName string = 'Ag-NatGateway-${namingGuid}'
+
 @description('The sku name of the K3s cluster worker nodes.')
 @allowed([
   'Standard_D8s_v5'
@@ -105,10 +112,18 @@ param scenario string = 'contoso_motors'
 param k8sWorkerNodesSku string = 'Standard_D8s_v5'
 //param k8sWorkerNodesSku string = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
 
-param deployGPUNodes bool = false
+// param deployGPUNodes bool = false
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/refs/heads/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
+
+var customerUsageAttributionDeploymentName = '2d49dcea-99e4-4bf1-8540-2ead108c4ddf'
+
+module customerUsageAttribution 'mgmt/customerUsageAttribution.bicep' = {
+  name: 'pid-${customerUsageAttributionDeploymentName}'
+  params: {
+  }
+}
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -123,9 +138,10 @@ module networkDeployment 'mgmt/network.bicep' = {
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
     subnetNameCloudK3s: subnetNameCloudK3s
-    subnetNameCloud: subnetNameCloud    
+    subnetNameCloud: subnetNameCloud
     deployBastion: deployBastion
     location: location
+    natGatewayName: natGatewayName
   }
 }
 
@@ -149,6 +165,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
     scenario: scenario
+    influxDBPassword: windowsAdminPassword
   }
 }
 
@@ -165,6 +182,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
     scenario: scenario
+    influxDBPassword: windowsAdminPassword
   }
 }
 
@@ -211,7 +229,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   dependsOn: [
     ubuntuRancherK3sNodesDeployment
     ubuntuRancherK3sDataSvcNodesDeployment
-  ]  
+  ]
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword

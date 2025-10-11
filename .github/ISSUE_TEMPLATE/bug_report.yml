@@ -19,7 +19,7 @@ body:
       description: What Jumpstart solution you are running?
       options:
         - label: Jumpstart ArcBox
-        - label: Jumpstart HCIBox
+        - label: Jumpstart LocalBox
         - label: Jumpstart Agora
         - label: A specific Jumpstart scenario
         - label: Jumpstart Drops
