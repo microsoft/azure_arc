@@ -245,7 +245,7 @@
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
+        "name": "Standard"
       },
       "properties": {
         "publicIpAllocationMethod": "Static",

@@ -90,7 +90,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2023-02-01' = if (
     idleTimeoutInMinutes: 4
   }
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
 }
 
