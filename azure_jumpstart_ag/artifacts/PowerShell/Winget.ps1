@@ -9,7 +9,8 @@ $logFilePath = Join-Path -Path $AgLogsDir -ChildPath ('WinGet-provisioning-' + (
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
 # Install WinGet PowerShell modules
-Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+# Pinned to version 1.11.460 to avoid known issue: https://github.com/microsoft/winget-cli/issues/5826
+Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.11.460
 
 # Install WinGet CLI
 $null = Repair-WinGetPackageManager -AllUsers -Force -Latest
