@@ -15,8 +15,9 @@ Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptio
 Update-AzDeploymentProgressTag -ProgressString 'Installing WinGet packages...' -ResourceGroupName $env:resourceGroup -ComputerName $env:computername
 
 # Install WinGet PowerShell modules
-Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
-Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+# Pinned to version 1.11.460 to avoid known issue: https://github.com/microsoft/winget-cli/issues/5826
+Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.11.460
+Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.11.460
 
 # Install DSC resources required for ArcBox
 Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
