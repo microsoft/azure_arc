@@ -130,6 +130,10 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+
+# Pin due to incompatibility issues with version 5.3.2: https://github.com/microsoft/azure_arc/issues/3359
+Install-Module -Name Az.Accounts -RequiredVersion 5.3.1 -Force
+
 $modules = @("Az", "Az.ConnectedMachine", "Az.ConnectedKubernetes", "Az.CustomLocation", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
 
 foreach ($module in $modules) {
