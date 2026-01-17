@@ -132,7 +132,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
 
 # Install Az modules (excluding Az.Accounts which will be pinned separately)
-$modules = @("Az.ConnectedMachine", "Az.ConnectedKubernetes", "Az.CustomLocation", "Az.Resources", "Az.KeyVault", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
+$modules = @("Az.ConnectedMachine", "Az.ConnectedKubernetes", "Az.CustomLocation", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
 
 foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
@@ -142,13 +142,16 @@ foreach ($module in $modules) {
 # See: https://github.com/microsoft/azure_arc/issues/3359
 Install-PSResource -Name Az.Accounts -Version 5.3.1 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
 Install-PSResource -Name Az.KeyVault -Version 6.4.1 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
+Install-PSResource -Name Az.Compute -Version 11.1.0 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
+Install-PSResource -Name Az.Resources -Version 9.0.0 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
+Install-PSResource -Name Az.Storage -Version 9.4.0  -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
 
 # Import the module to ensure the correct version is loaded
 Import-Module Az.Accounts -RequiredVersion 5.3.1 -Force
 Import-Module Az.KeyVault -RequiredVersion 6.4.1 -Force
-
-# Add Key Vault Secrets
-Connect-AzAccount -Identity
+Import-Module Az.Compute -RequiredVersion 11.1.0 -Force
+Import-Module Az.Resources -RequiredVersion 9.0.0 -Force
+Import-Module Az.Storage -RequiredVersion 9.4.0 -Force
 
 $DeploymentProgressString = "Started bootstrap-script..."
 
