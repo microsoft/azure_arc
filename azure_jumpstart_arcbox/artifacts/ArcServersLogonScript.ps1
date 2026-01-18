@@ -51,6 +51,33 @@ $Shortcut.TargetPath = $LogsPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
+# Create desktop shortcut for Power BI Dashboard (ITPro flavor only)
+if ($Env:flavor -eq "ITPro") {
+
+    # Create Power Bi Report and Directory
+    if (-not (Test-Path $ArcBoxPBIDir)) {
+        New-Item -Path $ArcBoxPBIDir -ItemType Directory -Force
+        Write-Host "Created directory for Power BI Dashboard at $ArcBoxPBIDir"
+    } else {
+        Write-Host "Power BI Dashboard directory already exists at $ArcBoxPBIDir"
+    }
+
+    #Download Power BI dashboard from drops
+    Invoke-WebRequest ("https://github.com/Azure/arc_jumpstart_drops/raw/refs/heads/main/ui_dashboard_workbook/arc_pbi_dashboard/arc_insights_dashboard_jumpstart.pbit") -OutFile $ArcBoxPBIDir\ArcBoxDashboard.pbit
+
+    #Create shortcute for Power BI Dashboard
+    $PBIDashboardPath = "$ArcBoxPBIDir\ArcBoxDashboard.pbit"
+    if (Test-Path $PBIDashboardPath) {
+        $PBIShortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\ArcBox Power BI Dashboard.lnk")
+        $PBIShortcut.TargetPath = $PBIDashboardPath
+        $PBIShortcut.WindowStyle = 1
+        $PBIShortcut.Save()
+        Write-Host "Created desktop shortcut for Power BI Dashboard"
+    } else {
+        Write-Host "Power BI Dashboard file not found at $PBIDashboardPath"
+    }
+}
+
 # Configure Windows Terminal as the default terminal application
 $registryPath = 'HKCU:\Console\%%Startup'
 
