@@ -131,7 +131,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
 
-# Pin Az.Accounts and Az.KeyVault after other modules to avoid version conflicts
+# Pin Az-modules after other modules to avoid version conflicts
 # See: https://github.com/microsoft/azure_arc/issues/3359
 Install-PSResource -Name Az.Accounts -Version 5.3.1 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
 Install-PSResource -Name Az.KeyVault -Version 6.4.1 -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Reinstall
