@@ -147,6 +147,8 @@ Import-Module Az.Resources -RequiredVersion 9.0.0 -Force
 
 $DeploymentProgressString = "Started bootstrap-script..."
 
+Connect-AzAccount -Identity
+
 $tags = Get-AzResourceGroup -Name $resourceGroup | Select-Object -ExpandProperty Tags
 
 if ($null -ne $tags) {
