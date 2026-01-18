@@ -205,7 +205,7 @@ if ($autoShutdownEnabled -eq "true") {
 
 }
 
-# Installing tools
+# Installing tools and module
 
 Write-Header "Installing PowerShell 7"
 
