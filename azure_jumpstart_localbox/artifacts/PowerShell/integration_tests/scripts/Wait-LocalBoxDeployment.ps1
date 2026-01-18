@@ -19,7 +19,7 @@ if ($existingJob) {
     Set-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName LocalBox-Client -RunCommandName RetrievePesterResults -Location $Location -SourceScriptUri "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/azure_jumpstart_localbox/artifacts/PowerShell/integration_tests/scripts/Send-PesterResult.ps1" -AsyncExecution
 }
 
-$timeoutMinutes = 360 # 6 hours timeout
+$timeoutMinutes = 480 # 8 hours timeout
 $elapsedMinutes = 0
 
 do {
