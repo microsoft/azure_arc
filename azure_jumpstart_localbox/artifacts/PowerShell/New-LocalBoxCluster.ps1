@@ -191,6 +191,9 @@ Set-AzLocalDeployPrereqs -LocalBoxConfig $LocalBoxConfig -localCred $localCred -
 
 Write-Host "[Build cluster - Step 10/11] Validate cluster deployment..." -ForegroundColor Green
 
+# Wait before starting validation to allow Connected Machines to register device information
+Start-Sleep -Seconds 600
+
 if ("True" -eq $env:autoDeployClusterResource) {
 
 Update-AzDeploymentProgressTag -ProgressString 'Validating Azure Local cluster deployment' -ResourceGroupName $env:resourceGroup -ComputerName $env:computername
