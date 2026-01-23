@@ -28,8 +28,11 @@ Write-Host "[Build cluster - Step 1/11] Downloading LocalBox VHDs" -ForegroundCo
 $Env:AZCOPY_BUFFER_GB = 4
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2509.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
-azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2509.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2509.vhdx' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+#azcopy cp 'https://jumpstartprodsg.blob.core.windows.net/jslocal/localbox/prod/AzLocal2509.sha256' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
+
+azcopy cp 'https://azlocalvhdx657231709.blob.core.windows.net/vhdx/AzLocal2601.vhdx?sv=2025-07-05&spr=https&st=2026-01-23T19%3A43%3A28Z&se=2026-01-30T19%3A43%3A00Z&sr=b&sp=r&sig=dPfHZBYmS7wbp7bmsjO718QYcpXz0jHcCxWyLHKkaOg%3D' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp 'https://azlocalvhdx657231709.blob.core.windows.net/vhdx/AzLocal2601.sha256?sv=2025-07-05&spr=https&st=2026-01-23T19%3A42%3A44Z&se=2026-01-30T19%3A42%3A00Z&sr=b&sp=r&sig=2b99h9fpZYYXSeOnB%2FAJGQ2G3tHvFTyfHAa5VXj%2Bhtk%3D' "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256" --recursive=true --check-length=false --log-level=ERROR
 
 $checksum = Get-FileHash -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.vhdx"
 $hash = Get-Content -Path "$($LocalBoxConfig.Paths.VHDDir)\AzL-node.sha256"
