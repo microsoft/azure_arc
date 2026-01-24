@@ -14,7 +14,7 @@ function Wait-AzDeployment {
         [Parameter(Mandatory = $true)]
         [string]$ClusterName,
 
-        [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
+        [int]$TimeoutMinutes = 480  # Default timeout of 8 hours
     )
 
     $startTime = Get-Date
@@ -163,7 +163,7 @@ Write-Header 'Adding deployment test results to wallpaper using BGInfo'
 Set-Content "$Env:windir\TEMP\localbox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\localbox-tests-failed.txt" $tests_failed
 
-bginfo.exe $Env:LocalBoxTestsDir\localbox-bginfo.bgi /timer:0 /NOLICPROMPT
+bginfo64.exe $Env:LocalBoxTestsDir\localbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 # Setup scheduled task for running tests on each logon
 $TaskName = 'Pester tests'
