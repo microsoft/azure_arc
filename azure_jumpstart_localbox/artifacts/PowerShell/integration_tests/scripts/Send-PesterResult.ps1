@@ -130,7 +130,7 @@ function Wait-AzDeployment {
         [Parameter(Mandatory = $true)]
         [string]$ClusterName,
 
-        [int]$TimeoutMinutes = 240  # Default timeout of 4 hours
+        [int]$TimeoutMinutes = 480  # Default timeout of 8 hours
     )
 
     $startTime = Get-Date
@@ -143,14 +143,24 @@ function Wait-AzDeployment {
         Write-Host "Waiting for deployment '$DeploymentName' in resource group '$ResourceGroupName' to complete..."
 
         while ($true) {
-            $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName
+            try {
+                $deployment = Get-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName -ErrorAction Stop
+            } catch {
+                Write-Host "Deployment '$DeploymentName' not found yet. Checking again in 1 minute..."
+                if ((Get-Date) -gt $endTime) {
+                    Write-Host 'Timeout reached. Deployment was never created.'
+                    return 'Timeout'
+                }
+                Start-Sleep -Seconds 60
+                continue
+            }
 
             if ($deployment.ProvisioningState -ne 'InProgress') {
                 Write-Host "Deployment completed with state: $($deployment.ProvisioningState)"
                 return $deployment.ProvisioningState
             }
 
-            if (Get-Date -gt $endTime) {
+            if ((Get-Date) -gt $endTime) {
                 Write-Host 'Timeout reached. Deployment still in progress.'
                 return 'Timeout'
             }
@@ -207,10 +217,14 @@ function Wait-AzLocalClusterConnectivity {
 if ('True' -eq $env:autoDeployClusterResource) {
 
     # Wait for the deployment to complete
-    Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName localcluster-deploy -ClusterName $LocalBoxConfig.ClusterName
+    $deploymentState = Wait-AzDeployment -ResourceGroupName $env:resourceGroup -DeploymentName localcluster-deploy -ClusterName $LocalBoxConfig.ClusterName
+    Write-Host "Deployment wait completed with result: $deploymentState"
 
     # Wait for the cluster to be connected
-    Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName -TimeoutMinutes 180
+    $connected = Wait-AzLocalClusterConnectivity -ResourceGroupName $env:resourceGroup -ClusterName $LocalBoxConfig.ClusterName -TimeoutMinutes 480
+    if (-not $connected) {
+        Write-Warning "Cluster '$($LocalBoxConfig.ClusterName)' did not reach 'Connected' status within the timeout period. Connectivity tests are expected to fail."
+    }
 
 }
 
