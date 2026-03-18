@@ -1,9 +1,9 @@
 using './main.bicep'
 
-param tenantId = '<your tenant id>'
-param spnProviderId = '<your Microsoft.AzureStackHCI resource provider object id>'
-param windowsAdminUsername = 'arcdemo'
-param windowsAdminPassword = '<your password>'
+param tenantId = '<ede7f777-8472-4ae1-ab7a-3e85f44bfe06>'
+param spnProviderId = '<2c6ff338-dd0a-46a0-bd61-53655819369c>'
+param windowsAdminUsername = 'Abdelrahman'
+param windowsAdminPassword = '<Microsoft@244f>'
 param logAnalyticsWorkspaceName = 'LocalBox-Workspace'
 param natDNS = '8.8.8.8'
 param githubAccount = 'microsoft'
