@@ -37,43 +37,65 @@ foreach ($key in $keys) {
 
 #############################################################
 # Create desktop shortcut for Logs-folder
+# Wrapped in try-catch: fails gracefully when running as SYSTEM (no Desktop folder)
 #############################################################
 
-$WshShell = New-Object -comObject WScript.Shell
-$LogsPath = "C:\LocalBox\Logs"
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
-$Shortcut.TargetPath = $LogsPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+try {
+    $desktopPath = "$Env:USERPROFILE\Desktop"
+    if (-not (Test-Path $desktopPath)) {
+        New-Item -ItemType Directory -Path $desktopPath -Force | Out-Null
+    }
+    $WshShell = New-Object -comObject WScript.Shell
+    $LogsPath = "C:\LocalBox\Logs"
+    $Shortcut = $WshShell.CreateShortcut("$desktopPath\Logs.lnk")
+    $Shortcut.TargetPath = $LogsPath
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
+} catch {
+    Write-Host "WARN: Could not create Logs shortcut (non-interactive session): $($_.Exception.Message)"
+}
 
 # Creating Hyper-V Manager desktop shortcut
-Write-Host 'Creating Hyper-V Shortcut'
-Copy-Item -Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk' -Destination 'C:\Users\All Users\Desktop' -Force
+try {
+    Write-Host 'Creating Hyper-V Shortcut'
+    Copy-Item -Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk' -Destination 'C:\Users\All Users\Desktop' -Force
+} catch {
+    Write-Host "WARN: Could not create Hyper-V shortcut: $($_.Exception.Message)"
+}
 
 #############################################################
 # Configure Windows Terminal as the default terminal application
 #############################################################
 
-$registryPath = "HKCU:\Console\%%Startup"
+try {
+    $registryPath = "HKCU:\Console\%%Startup"
 
-if (Test-Path $registryPath) {
-    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
-} else {
-    New-Item -Path $registryPath -Force | Out-Null
-    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+    if (Test-Path $registryPath) {
+        Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+        Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+    } else {
+        New-Item -Path $registryPath -Force | Out-Null
+        Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+        Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+    }
+} catch {
+    Write-Host "WARN: Could not configure Windows Terminal defaults: $($_.Exception.Message)"
 }
 
 #############################################################
 # Install VSCode extensions
+# Skipped when running as SYSTEM (code.exe not in PATH)
 #############################################################
 
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($LocalBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-foreach ($extension in $LocalBoxConfig.VSCodeExtensions) {
-    $WarningPreference = "SilentlyContinue"
-    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($LocalBoxConfig.Paths.LogsDir + "\Tools.log")
-    $WarningPreference = "Continue"
+if (Get-Command code -ErrorAction SilentlyContinue) {
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($LocalBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+    foreach ($extension in $LocalBoxConfig.VSCodeExtensions) {
+        $WarningPreference = "SilentlyContinue"
+        code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($LocalBoxConfig.Paths.LogsDir + "\Tools.log")
+        $WarningPreference = "Continue"
+    }
+} else {
+    Write-Host "[$(Get-Date -Format t)] WARN: VSCode not found in PATH, skipping extension install (headless mode)"
 }
 
 #####################################################################
