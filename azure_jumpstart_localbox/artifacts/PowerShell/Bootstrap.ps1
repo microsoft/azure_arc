@@ -236,8 +236,9 @@ Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $ad
 
 # Creating scheduled task for LocalBoxLogonScript.ps1
 Write-Host "Creating scheduled task for LocalBoxLogonScript.ps1"
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $LocalBoxPath\LocalBoxLogonScript.ps1
-Register-ScheduledTask -TaskName "LocalBoxLogonScript"  -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "LocalBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disable Edge 'First Run' Setup
 Write-Host "Configuring Microsoft Edge."
