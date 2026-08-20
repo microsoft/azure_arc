@@ -147,10 +147,10 @@
                         "priorityValue8021Action_SMB": "3",
                         "bandwidthPercentage_SMB": "50"
                     },
-                    "overrideAdapterProperty": false,
+                    "overrideAdapterProperty": true,
                     "adapterPropertyOverrides": {
                         "jumboPacket": "9014",
-                        "networkDirect": "Enabled",
+                        "networkDirect": "Disabled",
                         "networkDirectTechnology": "RoCEv2"
                     }
                 },
@@ -169,10 +169,10 @@
                     "priorityValue8021Action_SMB": "3",
                     "bandwidthPercentage_SMB": "50"
                   },
-                  "overrideAdapterProperty": false,
+                                    "overrideAdapterProperty": true,
                   "adapterPropertyOverrides": {
                     "jumboPacket": "9014",
-                    "networkDirect": "Enabled",
+                                        "networkDirect": "Disabled",
                     "networkDirectTechnology": "RoCEv2"
                   }
                 }
