@@ -6,6 +6,14 @@ trigger:
     include:
       - azure_jumpstart_localbox/*
 
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - azure_jumpstart_localbox/*
+
 schedules:
 - cron: "00 15 * * 1,4"
   displayName: Mondays and Thursdays at 15:00 UTC
