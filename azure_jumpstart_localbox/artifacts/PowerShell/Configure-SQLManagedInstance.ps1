@@ -62,6 +62,7 @@ if (-not (Test-Path -Path $cliDirPath)) {
 }
 
 Write-Header "Az CLI Login"
+az cloud set --name $Env:azureEnvironment
 az login --use-device-code
 az account set -s $env:subscriptionId
 

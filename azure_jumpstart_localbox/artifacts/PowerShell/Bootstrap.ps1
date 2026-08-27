@@ -2,6 +2,7 @@ param (
   [string]$adminUsername,
   [string]$adminPassword,
   [string]$spnProviderId,
+  [string]$azureEnvironment,
   [string]$tenantId,
   [string]$subscriptionId,
   [string]$resourceGroup,
@@ -24,6 +25,7 @@ Write-Output "Input parameters:"
 $PSBoundParameters
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureEnvironment', $azureEnvironment, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnProviderId', $spnProviderId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
@@ -153,7 +155,7 @@ Import-Module Az.Accounts -RequiredVersion 5.3.1 -Force
 Import-Module Az.KeyVault -RequiredVersion 6.4.1 -Force
 Import-Module Az.Resources -RequiredVersion 9.0.0 -Force
 
-Connect-AzAccount -Identity
+Connect-AzAccount -Identity -Environment $azureEnvironment
 
 $DeploymentProgressString = "Started bootstrap-script..."
 

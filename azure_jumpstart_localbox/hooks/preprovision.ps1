@@ -13,7 +13,7 @@ if (-not (Get-Command -Name Get-AzContext)) {
 # If not signed in, run the Connect-AzAccount cmdlet
 if (-not (Get-AzContext)) {
     Write-Host "Logging in to Azure with subscription id $env:AZURE_SUBSCRIPTION_ID"
-    If (-not (Connect-AzAccount -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop)){
+    If (-not (Connect-AzAccount -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -Environment $Env:azureEnvironment -ErrorAction Stop)){
         Throw "Unable to login to Azure. Please check your credentials and try again."
     }
 }
@@ -26,6 +26,7 @@ $azCliTenantId = (az account show --query "tenantId" -o tsv) 2>&1
 if ($azCliTenantId -ne $tenantId) {
     Write-Host "Azure CLI is not authenticated to the same tenant as Azure PowerShell - performing login..."
 
+    az cloud set --name $Env:azureEnvironment
     az login --tenant $tenantId
 
 }
