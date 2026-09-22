@@ -40,4 +40,11 @@ properties:
         IPAddress: '10.10.1.1/24'
         AddressFamily: IPv4
         KeepExistingAddress: false
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: powerbi
+      directives:
+        description: Install Microsoft PowerBI
+      settings:
+        id: Microsoft.PowerBI
+        source: winget
   configurationVersion: 0.2.0
