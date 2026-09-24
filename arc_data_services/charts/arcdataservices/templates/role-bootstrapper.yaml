@@ -80,6 +80,7 @@ rules:
   - postgresqls
   verbs:
   - create
+  - delete
   - patch
   - update
 - apiGroups:
