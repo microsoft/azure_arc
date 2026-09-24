@@ -66,10 +66,10 @@ properties:
         id: Microsoft.SQLServerManagementStudio
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: Microsoft.AzureDataStudio
+      id: Microsoft.Azure.DataStudio
       directives:
         description: Install Microsoft Azure Data Studio
       settings:
-        id: Microsoft.AzureDataStudio
+        id: Microsoft.Azure.DataStudio
         source: winget    
   configurationVersion: 0.2.0
