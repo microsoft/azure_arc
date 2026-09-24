@@ -10,7 +10,7 @@ $logFilePath = Join-Path -Path $Env:LocalBoxLogsDir -ChildPath ('WinGet-provisio
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
 # Login to Azure PowerShell
-Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
+Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId -Environment $Env:azureEnvironment
 
 Update-AzDeploymentProgressTag -ProgressString 'Installing WinGet packages...' -ResourceGroupName $env:resourceGroup -ComputerName $env:computername
 

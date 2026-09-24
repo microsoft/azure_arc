@@ -5,6 +5,8 @@ param vmName string = 'LocalBox-Client'
 @allowed([
   'Standard_E32s_v5'
   'Standard_E32s_v6'
+  'Standard_E32as_v5'
+  'Standard_E32as_v6'
 ])
 param vmSize string = 'Standard_E32s_v5'
 
@@ -33,6 +35,7 @@ param location string = resourceGroup().location
   'canadacentral'
   'japaneast'
   'centralindia'
+  'usgovvirginia'
 ])
 param azureLocalInstanceLocation string = 'australiaeast'
 
@@ -40,6 +43,9 @@ param azureLocalInstanceLocation string = 'australiaeast'
 param subnetId string
 
 param resourceTags object
+
+@description('Azure environment for your service principal')
+param azureEnvironment string
 
 @description('Tenant id of the service principal')
 param tenantId string
@@ -284,7 +290,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${azureLocalInstanceLocation} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSArc ${deployAKSArc} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -azureEnvironment ${azureEnvironment} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${azureLocalInstanceLocation} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSArc ${deployAKSArc} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource} -vmAutologon ${vmAutologon}'
     }
   }
 }

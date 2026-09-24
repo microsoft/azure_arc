@@ -12,7 +12,7 @@ $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\LocalBoxLogonScript.log"
 
 # Login to Azure PowerShell
-Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
+Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId -Environment $Env:azureEnvironment
 
 #####################################################################
 # Add RBAC permissions

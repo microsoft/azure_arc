@@ -11,6 +11,7 @@ $Env:LocalBoxDir = "C:\LocalBox"
 $LocalBoxConfig = Import-PowerShellDataFile -Path $Env:LocalBoxConfigFile
 Start-Transcript -Path "$($LocalBoxConfig.Paths.LogsDir)\Configure-VMLogicalNetwork.log"
 
+az cloud set --name $Env:azureEnvironment
 az login --identity
 az config set extension.use_dynamic_install=yes_without_prompt | Out-Null
 az extension add --name customlocation

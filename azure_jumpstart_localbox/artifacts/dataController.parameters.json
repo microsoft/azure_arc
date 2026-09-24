@@ -30,7 +30,7 @@
         "value": "tenantId-stage"
       },
       "spnAuthority": {
-        "value": "https://login.microsoftonline.com"
+        "value": "https://login.microsoftonline.us" 
       },
       "logAnalyticsWorkspaceId": {
         "value": "logAnalyticsWorkspaceId-stage"
