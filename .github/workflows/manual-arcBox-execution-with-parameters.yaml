@@ -50,7 +50,7 @@ jobs:
       ExcludeRules: SC2148,SC2116,SC2044,SC2129
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
         with:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Bash Script
@@ -59,7 +59,7 @@ jobs:
           ./tests/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
         continue-on-error: true
       - name: Upload Bash Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: bash-lint-result.txt
           path: bash-lint-result.txt
@@ -70,7 +70,7 @@ jobs:
       ExcludeRules: "PSAvoidUsingInvokeExpression,PSAvoidTrailingWhitespace"
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
         with:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Power Shell
@@ -80,7 +80,7 @@ jobs:
           Stop-Transcript
         continue-on-error: true
       - name: Upload PowerShell Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: ps-lint-result.txt
           path: ps-lint-result.txt
@@ -91,7 +91,7 @@ jobs:
       ExcludeRules: "Secure-String-Parameters-Cannot-Have-Default,CommandToExecute-Must-Use-ProtectedSettings-For-Secrets,URIs-Should-Be-Properly-Constructed,Template-Should-Not-Contain-Blanks,Location-Should-Not-Be-Hardcoded"
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
         with:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Compile bicep
@@ -104,7 +104,7 @@ jobs:
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: bicep-lint-results.txt
           path: bicep-lint-results.txt
@@ -116,7 +116,7 @@ jobs:
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: arm-lint-results.txt
           path: arm-lint-results.txt
@@ -128,7 +128,7 @@ jobs:
       ChecovExcludeRules: CKV2_AZURE_10
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
         with:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Install tfsec and checkov
@@ -142,12 +142,12 @@ jobs:
           checkov  --directory . --skip-check "$ChecovExcludeRules" | tee terraform-lint-checov-results.txt
         continue-on-error: true
       - name: Upload Terraform tfsec Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: terraform-lint-tfsec-results.txt
           path: ./azure_jumpstart_arcbox/terraform/terraform-lint-tfsec-results.txt
       - name: Upload Terraform Checov Lint Results File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: terraform-lint-checov-results.txt
           path: ./azure_jumpstart_arcbox/terraform/terraform-lint-checov-results.txt
@@ -195,27 +195,27 @@ jobs:
           sudo apt-get -y install putty-tools
           sudo apt-get -y install sshpass
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@ed3a0531877aca392eb870f440d9ae7aba83a6bd # v1.4.0
         if: github.event.inputs.mechanism == 'Terraform'
         with:
           terraform_version: 1.0.11
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
         with:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Azure Login
-        uses: Azure/login@v1.4.3
+        uses: Azure/login@1f63701bf3e6892515f1b7ce2d2bf1708b46beaf # v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy ArcBox - Arm
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         if: github.event.inputs.mechanism == 'ARM'
         with:
           inlineScript: |
             az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
             az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/ARM/azuredeploy.json" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
       - name: Deploy ArcBox - Bicep
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         if: github.event.inputs.mechanism == 'Bicep'
         with:
           inlineScript: |
@@ -234,20 +234,20 @@ jobs:
                  "${{ github.event.inputs.githubBranch }}" "${{ github.event.inputs.deployBastion }}" \
                  "${{secrets.SPN_SUBSCRIPTION_ID}}"
       - name: Add NSG Rule to open our SSH Port (2204) and Run Command requires connectivity to Azure public IP addresses
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         with:
           inlineScript: |
             az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowOpenSsh' --source-port-ranges  '*' --source-address-prefixes '*' --priority 1100 --destination-address-prefixes  '*' --destination-port-ranges '2204' --direction Inbound --access Allow --protocol Tcp --description "Allow Open SSH"
             az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowAzureCloud' --source-port-ranges  '*' --source-address-prefixes 'AzureCloud' --priority 1200 --destination-address-prefixes  '*' --destination-port-ranges '*' --direction Inbound --access Allow --protocol '*' --description "Allow allow azure ips"
             az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowAzureCloudOutBound' --source-port-ranges  '*' --source-address-prefixes '*' --priority 1300 --destination-address-prefixes  'AzureCloud' --destination-port-ranges '*' --direction Outbound --access Allow --protocol '*' --description "Allow allow azure ips outbound"
       - name: Count Resources pre vm Script execution
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         with:
           inlineScript: |
             chmod +x ./tests/CountResources.sh
             ./tests/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} initialResourceAmount ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         if: ${{ github.event.inputs.deployBastion == 'true' }}
         with:
           inlineScript: |
@@ -287,49 +287,49 @@ jobs:
           ./tests/DownloadLogs.sh ${{ github.event.inputs.windowsAdminUsername }} ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Upload LogsBundle.zip File
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: LogsBundle.zip
           path: LogsBundle.zip
       - name: Upload Bootstrap.log File
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: Bootstrap.log
           path: Bootstrap.log
       - name: Upload ArcServersLogonScript.log File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'ITPro') &&  (success() || failure())
         with:
           name: ArcServersLogonScript.log
           path: ArcServersLogonScript.log
       - name: Upload DataServicesLogonScript.log File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         if: github.event.inputs.flavor == 'Full' &&  (success() || failure())
         with:
           name: DataServicesLogonScript.log
           path: DataServicesLogonScript.log
       - name: Upload DevOpsLogonScript.log File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         if: (github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: DevOpsLogonScript.log
           path: DevOpsLogonScript.log
       - name: Upload installCAPI.log File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: installCAPI.log
           path: installCAPI.log
       - name: Upload installCAPI.log File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: installK3s.log
           path: installK3s.log
       - name: Upload MonitorWorkbookLogonScript.log File
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: MonitorWorkbookLogonScript.log
           path: MonitorWorkbookLogonScript.log
@@ -338,13 +338,13 @@ jobs:
           chmod +x ./tests/FileValidations.sh
           ./tests/FileValidations.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Final Deploy Validation
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         with:
           inlineScript: |
             chmod +x ./tests/FinalValidation.sh
             ./tests/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Delete Resources
-        uses: Azure/cli@v1.0.6
+        uses: Azure/cli@7378ce2ca3c38b4b063feb7a4cbe384fef978055 # v1.0.6
         with:
           inlineScript: |
             az group delete -n ${{ github.event.inputs.resourceGroupName }} -y
