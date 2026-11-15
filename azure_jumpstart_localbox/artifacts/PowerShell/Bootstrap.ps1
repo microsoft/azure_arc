@@ -174,9 +174,8 @@ $null = Set-AzResourceGroup -ResourceGroupName $resourceGroup -Tag $tags
 Write-Host "Installing PowerShell 7..."
 
 $ProgressPreference = 'SilentlyContinue'
-$url = "https://github.com/PowerShell/PowerShell/releases/latest"
-$latestVersion = (Invoke-WebRequest -UseBasicParsing -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
-$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/$latestVersion/PowerShell-$($latestVersion.Substring(1,5))-win-x64.msi"
+# Pin to 7.6 LTS because PowerShell 7.7 and later do not provide MSI installers.
+$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.6.10/PowerShell-7.6.10-win-x64.msi"
 Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -OutFile .\PowerShell7.msi
 Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1'
 Remove-Item .\PowerShell7.msi
