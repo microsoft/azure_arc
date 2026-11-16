@@ -540,6 +540,7 @@ if ($Env:flavor -ne 'DevOps') {
         }
 
         # Getting the Ubuntu nested VM IP address
+        Get-VM *Ubuntu* | Wait-VM -For IPAddress
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
         $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
 
